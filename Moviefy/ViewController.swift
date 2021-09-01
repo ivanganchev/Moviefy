@@ -10,26 +10,26 @@ import Foundation
 
 class ViewController: UIViewController {
     var moviesCollectionView: UICollectionView?
-    var moviesColelctionViewHelper: MoviesCollectionViewHelper?
+    var moviesTableViewDataSource: MoviesTableViewDataSource?
     var movies: Array<Movie> = []
+    var moviesTableView: UITableView?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        let layout = UICollectionViewFlowLayout()
-        layout.scrollDirection = .horizontal
-        self.moviesCollectionView = UICollectionView(frame: CGRect(x: 0, y: 0, width: 500, height: 500), collectionViewLayout: layout)
-        self.view.addSubview(self.moviesCollectionView!)
-        self.moviesColelctionViewHelper = MoviesCollectionViewHelper()
-        self.moviesCollectionView?.dataSource = self.moviesColelctionViewHelper
-        self.moviesCollectionView?.register(MoviesCollectionViewCell.self, forCellWithReuseIdentifier: MoviesCollectionViewCell.identifier)
+        self.moviesTableView = UITableView(frame: CGRect(x: 0, y: 0, width: 400, height: 800))
+        self.moviesTableViewDataSource = MoviesTableViewDataSource()
+        self.moviesTableView?.dataSource = self.moviesTableViewDataSource
+        self.moviesTableView?.register(MoviesTableViewCell.self, forCellReuseIdentifier: MoviesTableViewCell.identifier)
+        self.view.addSubview(self.moviesTableView!)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        self.moviesColelctionViewHelper?.fetchMovies()
-        DispatchQueue.main.async {
-            self.moviesCollectionView?.reloadData()
-        }
+        self.moviesTableViewDataSource?.fetchMovies(completion: {
+            DispatchQueue.main.async {
+                self.moviesTableView?.reloadData()
+            }
+        })
     }
 }
 

@@ -26,17 +26,18 @@ class MoviesService {
         }.resume()
     }
     
-    func fetchMoviesByCategory(page: String, completion: @escaping (MoviesResponse?, Error?)->()) {
-        var url = URLComponents(string: Secrets.defaultLink + Secrets.topRatedMoviesEndPoint)!
+    func fetchMoviesByCategory(page: String, completion: @escaping (Result<MoviesResponse, Error>)->()) {
+        var url = URLComponents(string: EndPoint.defaultLink + EndPoint.topRatedMoviesEndPoint)!
         provideService(url: &url, params: ["page": page, "language": "en-US"], completion: {(data, response, error) in
             guard let data = data else {
                 return
             }
             do {
                 let obj:MoviesResponse = try JSONDecoder().decode(MoviesResponse.self, from: data)
-                completion(obj, nil)
+                completion(.success(obj))
                 
             } catch let err {
+                completion(.failure(err))
                 print(err)
             }
         })

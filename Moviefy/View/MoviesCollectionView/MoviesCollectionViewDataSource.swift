@@ -8,31 +8,29 @@
 import Foundation
 import UIKit
 
-class MoviesCollectionViewHelper: NSObject, UICollectionViewDataSource {
+class MoviesCollectionViewDataSource: NSObject, UICollectionViewDataSource {
     
     var movies:Array<Movie> = []
     
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return self.movies.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MoviesCollectionViewCell.identifier, for: indexPath) as! MoviesCollectionViewCell
-        cell.backgroundColor = .yellow
+        cell.movie = movies[indexPath.row]
+        cell.backgroundColor = .green
         
         return cell
     }
-}
-
-//Mark: Data fetching
-
-extension MoviesCollectionViewHelper {
-    func fetchMovies() {
-        MoviesService().fetchMoviesByCategory(page: "1", completion: {response, err  in
-            self.movies = (response?.movies)!   
-        })
-        
+    
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return 1
     }
 }
+
+
+
+
 
 
