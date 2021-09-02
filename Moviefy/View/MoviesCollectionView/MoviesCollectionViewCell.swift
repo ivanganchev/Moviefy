@@ -10,16 +10,16 @@ import UIKit
 class MoviesCollectionViewCell: UICollectionViewCell {
     static let identifier = "MoviesCollectionViewCell"
     
-    var movie: Movie? {
+    var data: Data? {
         didSet {
-            myTextLabel.text = movie?.title
+            DispatchQueue.main.async {
+                self.myImageView.image = UIImage(data: self.data!)
+            }
         }
     }
     
     private let myImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(systemName: "house")
-        imageView.tintColor = .red
         return imageView
     }()
     
@@ -30,8 +30,8 @@ class MoviesCollectionViewCell: UICollectionViewCell {
     }()
     
     override init(frame: CGRect) {
-        super.init(frame: frame)	
-        contentView.addSubview(myTextLabel)
+        super.init(frame: frame)
+        contentView.addSubview(myImageView)
     }
     
     required init?(coder: NSCoder) {
@@ -39,7 +39,6 @@ class MoviesCollectionViewCell: UICollectionViewCell {
     }
     
     override func layoutSubviews() {
-        self.myTextLabel.frame = CGRect(x: 0, y: 0, width: 100, height: 200)
-        self.myTextLabel.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
+        myImageView.frame = CGRect(x: 0, y: 0, width: 140, height: 200)
     }
 }

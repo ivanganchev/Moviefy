@@ -22,7 +22,7 @@ class MoviesTableViewDataSource: NSObject, UITableViewDataSource {
 //Mark: Data fetching
 
 extension MoviesTableViewDataSource {
-    func fetchMovies(completion: @escaping () ->()) {
+    func fetchMovies(completion: @escaping () -> ()) {
         MoviesService().fetchMoviesByCategory(page: "1", completion: { result in
             switch result {
             case .success(let moviesResponse):

@@ -20,13 +20,13 @@ class MoviesService {
         var request = URLRequest(url:url)
         request.httpMethod = "GET"
         request.setValue(authHeader, forHTTPHeaderField: "Authorization")
-        URLSession.shared.dataTask(with: request) {(data, response, error) in
+        self.session.dataTask(with: request) {(data, response, error) in
             print(response!)
             completion(data, response, error)
         }.resume()
     }
     
-    func fetchMoviesByCategory(page: String, completion: @escaping (Result<MoviesResponse, Error>)->()) {
+    func fetchMoviesByCategory(page: String, completion: @escaping (Result<MoviesResponse, Error>) -> ()) {
         var url = URLComponents(string: EndPoint.defaultLink + EndPoint.topRatedMoviesEndPoint)!
         provideService(url: &url, params: ["page": page, "language": "en-US"], completion: {(data, response, error) in
             guard let data = data else {
@@ -41,6 +41,20 @@ class MoviesService {
                 print(err)
             }
         })
+    }
+    
+    func fetchMovieImage(imageUrl: String, completion: @escaping(Data?) -> ()) {
+        let urlComponents = URLComponents(string: EndPoint.imageLink + imageUrl)
+        guard let url = urlComponents?.url else {
+            return
+        }
+        
+        self.session.dataTask(with: url) {data, response, error in
+            guard let data = data else {
+                return
+            }
+            completion(data)
+        }.resume()
     }
 }
 
