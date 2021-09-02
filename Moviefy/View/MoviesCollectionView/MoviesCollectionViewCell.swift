@@ -25,16 +25,21 @@ class MoviesCollectionViewCell: UICollectionViewCell {
     
     private let myTextLabel: UILabel = {
         let myText = UILabel()
-        myText.tintColor = .white
+        myText.tintColor = .black
         return myText
     }()
     
     override init(frame: CGRect) {
-        super.init(frame: frame)
+        super.init(frame: frame)	
         contentView.addSubview(myTextLabel)
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func layoutSubviews() {
+        self.myTextLabel.frame = CGRect(x: 0, y: 0, width: 100, height: 200)
+        self.myTextLabel.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
     }
 }

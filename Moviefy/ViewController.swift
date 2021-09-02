@@ -11,14 +11,19 @@ import Foundation
 class ViewController: UIViewController {
     var moviesCollectionView: UICollectionView?
     var moviesTableViewDataSource: MoviesTableViewDataSource?
+    var moviesTableViewDelegate: MoviesTableViewDelegate?
     var movies: Array<Movie> = []
     var moviesTableView: UITableView?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         self.moviesTableView = UITableView(frame: CGRect(x: 0, y: 0, width: 400, height: 800))
+        self.moviesTableView?.separatorStyle = .none
+        self.moviesTableView?.translatesAutoresizingMaskIntoConstraints = false
         self.moviesTableViewDataSource = MoviesTableViewDataSource()
+        self.moviesTableViewDelegate = MoviesTableViewDelegate()
         self.moviesTableView?.dataSource = self.moviesTableViewDataSource
+        self.moviesTableView?.delegate = self.moviesTableViewDelegate
         self.moviesTableView?.register(MoviesTableViewCell.self, forCellReuseIdentifier: MoviesTableViewCell.identifier)
         self.view.addSubview(self.moviesTableView!)
     }

@@ -15,6 +15,8 @@ class MoviesTableViewDataSource: NSObject, UITableViewDataSource {
         cell.movies = self.movies
         return cell
     }
+    
+    
 }
 
 //Mark: Data fetching
