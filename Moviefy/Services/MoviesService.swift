@@ -21,13 +21,12 @@ class MoviesService {
         request.httpMethod = "GET"
         request.setValue(authHeader, forHTTPHeaderField: "Authorization")
         self.session.dataTask(with: request) {(data, response, error) in
-            print(response!)
             completion(data, response, error)
         }.resume()
     }
     
-    func fetchMoviesByCategory(page: String, completion: @escaping (Result<MoviesResponse, Error>) -> ()) {
-        var url = URLComponents(string: EndPoint.defaultLink + EndPoint.topRatedMoviesEndPoint)!
+    func fetchMoviesByCategory(movieCategoryPath: String, page: String, completion: @escaping (Result<MoviesResponse, Error>) -> ()) {
+        var url = URLComponents(string: EndPoint.defaultLink + movieCategoryPath)!
         provideService(url: &url, params: ["page": page, "language": "en-US"], completion: {(data, response, error) in
             guard let data = data else {
                 return

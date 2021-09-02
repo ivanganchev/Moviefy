@@ -4,7 +4,9 @@ import Foundation
 import UIKit
 
 class MoviesTableViewDataSource: NSObject, UITableViewDataSource {
-    var movies: Array<Movie> = []
+    var movies: [Movie] = []
+    var moviesSections: [String] = ["Top Rated", "Popular", "Upcoming", "Now Playing"]
+    var movieCategoryCases: [MovieCategoryEndPoint] = MovieCategoryEndPoint.allCases
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 1
@@ -12,26 +14,13 @@ class MoviesTableViewDataSource: NSObject, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: MoviesTableViewCell.identifier, for: indexPath) as! MoviesTableViewCell
-        cell.movies = self.movies
+        
+        cell.movieCategoryPath = movieCategoryCases[indexPath.section].rawValue
         return cell
     }
-    
-    
-}
 
-//Mark: Data fetching
-
-extension MoviesTableViewDataSource {
-    func fetchMovies(completion: @escaping () -> ()) {
-        MoviesService().fetchMoviesByCategory(page: "1", completion: { result in
-            switch result {
-            case .success(let moviesResponse):
-                self.movies = moviesResponse.movies!
-                completion()
-            case .failure(let err):
-                print(err)
-            }
-        })
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return self.moviesSections.count
     }
 }
 

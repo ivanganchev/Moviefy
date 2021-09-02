@@ -14,10 +14,13 @@ class MoviesTableViewCell : UITableViewCell {
     var moviesCollectionViewDataSource: MoviesCollectionViewDataSource?
     var moviesCollectionView: UICollectionView?
     
-    var movies: [Movie] = [] {
+    var movieCategoryPath: String = "" {
         didSet {
-            self.moviesCollectionViewDataSource?.movies = movies
-            self.moviesCollectionView?.reloadData()
+            self.moviesCollectionViewDataSource?.fetchMovies(movieCategoryPath: movieCategoryPath, completion: {
+                DispatchQueue.main.async {
+                    self.moviesCollectionView?.reloadData()
+                }
+            })
         }
     }
     
@@ -33,13 +36,11 @@ class MoviesTableViewCell : UITableViewCell {
         self.moviesCollectionView!.dataSource = self.moviesCollectionViewDataSource
         self.moviesCollectionView!.register(MoviesCollectionViewCell.self, forCellWithReuseIdentifier: MoviesCollectionViewCell.identifier)
         contentView.addSubview(moviesCollectionView!)
+        
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func layoutSubviews() {
-        
-    }
 }

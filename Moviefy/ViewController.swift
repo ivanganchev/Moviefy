@@ -17,7 +17,7 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.moviesTableView = UITableView(frame: CGRect(x: 0, y: 0, width: 400, height: 800))
+        self.moviesTableView = UITableView(frame: CGRect(x: 0, y: 0, width: 400, height: 800), style: .grouped)
         self.moviesTableView?.separatorStyle = .none
         self.moviesTableView?.translatesAutoresizingMaskIntoConstraints = false
         self.moviesTableViewDataSource = MoviesTableViewDataSource()
@@ -26,27 +26,8 @@ class ViewController: UIViewController {
         self.moviesTableView?.delegate = self.moviesTableViewDelegate
         self.moviesTableView?.register(MoviesTableViewCell.self, forCellReuseIdentifier: MoviesTableViewCell.identifier)
         self.view.addSubview(self.moviesTableView!)
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        self.moviesTableViewDataSource?.fetchMovies(completion: {
-            DispatchQueue.main.async {
-                self.moviesTableView?.reloadData()
-            }
-        })
+        self.moviesTableView?.reloadData()
     }
 }
 
-//MARK: Server side
-    
-extension ViewController {
-}
-
-//MARK: UI Update
-
-extension ViewController {
-    func updateCollectionView() {
-    }
-}
 
