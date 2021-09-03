@@ -17,6 +17,7 @@ class MoviesCollectionViewDataSource: NSObject, UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MoviesCollectionViewCell.identifier, for: indexPath) as! MoviesCollectionViewCell
         MoviesService().fetchMovieImage(imageUrl: self.movies[indexPath.row].posterPath!, completion: {data in
             cell.data = data

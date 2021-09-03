@@ -23,12 +23,6 @@ class MoviesCollectionViewCell: UICollectionViewCell {
         return imageView
     }()
     
-    private let myTextLabel: UILabel = {
-        let myText = UILabel()
-        myText.tintColor = .black
-        return myText
-    }()
-    
     override init(frame: CGRect) {
         super.init(frame: frame)
         contentView.addSubview(myImageView)

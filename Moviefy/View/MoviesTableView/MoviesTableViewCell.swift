@@ -29,14 +29,13 @@ class MoviesTableViewCell : UITableViewCell {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
         layout.itemSize = CGSize(width: 140, height: 200)
-        self.moviesCollectionView = UICollectionView(frame: CGRect(x: 10, y: 0, width: 390, height: 200), collectionViewLayout: layout)
-        self.moviesCollectionView?.backgroundColor = .clear
+        self.moviesCollectionView = UICollectionView(frame: CGRect(x: 10, y: 0, width: UIScreen.main.bounds.width, height: 220), collectionViewLayout: layout)
+        self.moviesCollectionView?.backgroundColor = .white
         self.moviesCollectionView?.showsHorizontalScrollIndicator = false
         self.moviesCollectionViewDataSource = MoviesCollectionViewDataSource()
         self.moviesCollectionView!.dataSource = self.moviesCollectionViewDataSource
         self.moviesCollectionView!.register(MoviesCollectionViewCell.self, forCellWithReuseIdentifier: MoviesCollectionViewCell.identifier)
         contentView.addSubview(moviesCollectionView!)
-        
     }
     
     required init?(coder: NSCoder) {

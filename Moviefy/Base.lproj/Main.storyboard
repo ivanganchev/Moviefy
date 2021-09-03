@@ -11,6 +11,7 @@
         <!--View Controller-->
         <scene sceneID="IHO-5z-qHV">
             <objects>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="6Yh-65-wcu" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
                 <viewController id="x2n-vj-kwW" customClass="ViewController" customModule="Moviefy" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="f4D-eF-71a">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
@@ -19,7 +20,6 @@
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
                 </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="6Yh-65-wcu" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="87" y="73"/>
         </scene>
