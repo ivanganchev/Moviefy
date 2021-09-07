@@ -28,8 +28,8 @@ class MoviesTableViewCell : UITableViewCell {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
-        layout.itemSize = CGSize(width: 130, height: 200)
-        self.moviesCollectionView = UICollectionView(frame: CGRect(x: 10, y: 0, width: UIScreen.main.bounds.width, height: 220), collectionViewLayout: layout)
+        layout.itemSize = CGSize(width: UIScreen.main.bounds.width / 3, height: 200)
+        self.moviesCollectionView = UICollectionView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 220), collectionViewLayout: layout)
         self.moviesCollectionView?.backgroundColor = .white
         self.moviesCollectionView?.showsHorizontalScrollIndicator = false
         self.moviesCollectionViewDataSource = MoviesCollectionViewDataSource()

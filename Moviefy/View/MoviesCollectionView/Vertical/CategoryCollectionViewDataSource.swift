@@ -28,14 +28,14 @@ class CategoryCollectionViewDataSource: NSObject,  UICollectionViewDataSource {
 }
 
 extension CategoryCollectionViewDataSource {
-    func fetchMovies(completion: @escaping () -> ()) {
-        MoviesService().fetchMoviesByCategory(movieCategoryPath: self.movieCategoryPath!, page: "1", completion: { result in
+    func fetchMovies(page: Int, completion: @escaping (Result<[Movie], Error>) -> ()) {
+        MoviesService().fetchMoviesByCategory(movieCategoryPath: self.movieCategoryPath!, page: page, completion: { result in
             switch result {
             case .success(let moviesResponse):
-                self.movies = moviesResponse.movies!
-                completion()
+                self.movies.append(contentsOf: moviesResponse.movies!)
+                completion(.success(moviesResponse.movies!))
             case .failure(let err):
-                print(err)
+                completion(.failure(err))
             }
         })
     }

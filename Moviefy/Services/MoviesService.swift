@@ -11,10 +11,13 @@ class MoviesService {
     let session = URLSession.shared
     
     private func provideService(url:inout URLComponents, params: [String:String]?, completion: @escaping (Data?, URLResponse?, Error?) -> ()) {
-        let keys = params?.keys
-        keys?.forEach { k in
-            url.queryItems?.append(URLQueryItem(name: k, value: params?[k]))
-        }
+        let keys = [String] (params!.keys)
+//        keys?.forEach { k in
+//            url.queryItems?.append(URLQueryItem(name: k, value: params?[k]))
+//        }
+        
+        let queryItems = [URLQueryItem(name: keys[0], value: params![keys[0]]), URLQueryItem(name: keys[1], value: params![keys[1]])]
+        url.queryItems = queryItems
         guard let url = url.url else { return }
         let authHeader = "Bearer " + Secrets.apiKey
         var request = URLRequest(url:url)
@@ -25,9 +28,9 @@ class MoviesService {
         }.resume()
     }
     
-    func fetchMoviesByCategory(movieCategoryPath: String, page: String, completion: @escaping (Result<MoviesResponse, Error>) -> ()) {
+    func fetchMoviesByCategory(movieCategoryPath: String, page: Int, completion: @escaping (Result<MoviesResponse, Error>) -> ()) {
         var url = URLComponents(string: EndPoint.defaultLink + movieCategoryPath)!
-        provideService(url: &url, params: ["page": page, "language": "en-US"], completion: {(data, response, error) in
+        provideService(url: &url, params: ["page": String(page), "language": "en-US"], completion: {(data, response, error) in
             guard let data = data else {
                 return
             }

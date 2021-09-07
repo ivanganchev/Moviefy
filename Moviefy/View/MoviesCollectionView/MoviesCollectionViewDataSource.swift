@@ -33,7 +33,7 @@ class MoviesCollectionViewDataSource: NSObject, UICollectionViewDataSource {
 
 extension MoviesCollectionViewDataSource {
     func fetchMovies(movieCategoryPath: String, completion: @escaping () -> ()) {
-        MoviesService().fetchMoviesByCategory(movieCategoryPath: movieCategoryPath, page: "1", completion: { result in
+        MoviesService().fetchMoviesByCategory(movieCategoryPath: movieCategoryPath, page: 1, completion: { result in
             switch result {
             case .success(let moviesResponse):
                 self.movies = moviesResponse.movies!
