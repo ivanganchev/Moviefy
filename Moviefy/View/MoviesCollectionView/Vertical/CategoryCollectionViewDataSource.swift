@@ -18,14 +18,13 @@ class CategoryCollectionViewDataSource: NSObject,  UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MoviesCollectionViewCell.identifier, for: indexPath) as! MoviesCollectionViewCell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CategoryCollectionViewCell.identifier, for: indexPath) as! CategoryCollectionViewCell
         MoviesService().fetchMovieImage(imageUrl: (self.movies[indexPath.row].posterPath!), completion: {data in
             cell.data = data
         })
         
         return cell
     }
-    
 }
 
 extension CategoryCollectionViewDataSource {

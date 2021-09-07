@@ -40,7 +40,7 @@ class MoviesTableViewDelegate: NSObject, UITableViewDelegate {
         button.center.y = view.center.y
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(MoviesTableViewDelegate.headerButtonTapped), for: .touchUpInside)
-        self.path = movieCategoryCases[section]
+        button.tag = section
         
         view.addSubview(label)
         view.addSubview(button)
@@ -58,7 +58,7 @@ class MoviesTableViewDelegate: NSObject, UITableViewDelegate {
         return 30
     }
     
-    @objc func headerButtonTapped() {
-        delegate?.switchView(path: self.path!)
+    @objc func headerButtonTapped(sender:UIButton) {
+        delegate?.switchView(path: self.movieCategoryCases[sender.tag])
     }
 }

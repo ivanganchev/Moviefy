@@ -31,10 +31,14 @@ class ViewController: UIViewController, MoviesTableViewButtonTapDelegate {
         self.moviesTableViewDelegate?.delegate = self
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        self.navigationController?.navigationBar.isHidden = true
+    }
+    
     func switchView(path: MovieCategoryEndPoint) {
         let viewController = CategoryCollectionViewViewController()
         viewController.movieCategoryPath = path
-        self.present(viewController, animated: true, completion: nil)
+        self.navigationController?.pushViewController(viewController, animated: true)
     }
 }
 

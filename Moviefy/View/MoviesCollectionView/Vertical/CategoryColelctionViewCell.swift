@@ -1,14 +1,16 @@
 //
-//  MoviesCollectionViewCell.swift
+//  CategoryColelctionViewCell.swift
 //  Moviefy
 //
-//  Created by A-Team Intern on 29.08.21.
+//  Created by A-Team Intern on 7.09.21.
 //
+
+import Foundation
 
 import UIKit
 
-class MoviesCollectionViewCell: UICollectionViewCell {
-    static let identifier = "MoviesCollectionViewCell"
+class CategoryCollectionViewCell: UICollectionViewCell {
+    static let identifier = "CategoryCollectionViewCell"
     
     var data: Data? {
         didSet {
@@ -33,6 +35,6 @@ class MoviesCollectionViewCell: UICollectionViewCell {
     }
     
     override func layoutSubviews() {
-        myImageView.frame = CGRect(x: 0, y: 0, width: 130, height: 200)
+        self.myImageView.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width/3.0, height: UIScreen.main.bounds.height/4.0)
     }
 }
