@@ -4,7 +4,7 @@ import Foundation
 import UIKit
 
 class MoviesTableViewDataSource: NSObject, UITableViewDataSource {
-    var movies: [Movie] = []
+    var movies: [MovieResponse] = []
     var moviesSections: [String] = ["Top Rated", "Popular", "Upcoming", "Now Playing"]
     var movieCategoryCases: [MovieCategoryEndPoint] = MovieCategoryEndPoint.allCases
     

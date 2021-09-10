@@ -10,7 +10,7 @@ import UIKit
 
 class MoviesCollectionViewDataSource: NSObject, UICollectionViewDataSource {
     
-    var movies:Array<Movie> = []
+    var movies:Array<MovieResponse> = []
     
      func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return self.movies.count

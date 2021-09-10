@@ -28,14 +28,14 @@ class MoviesTableViewDelegate: NSObject, UITableViewDelegate {
         
         let label = UILabel(frame: .zero)
         label.text = self.moviesSections[section]
-        label.font = UIFont(name: "Helvetica-Bold", size: 24)
+        label.font = UIFont(name: "Helvetica-Bold", size: 26)
         label.textColor = .black
         label.center.y = view.center.y
         label.translatesAutoresizingMaskIntoConstraints = false
         
         let button = UIButton(frame: .zero)
         button.setTitle("See all", for: .normal)
-        button.titleLabel?.font = UIFont(name: "Helvetica-Light", size: 17)
+        button.titleLabel?.font = UIFont(name: "Helvetica-Light", size: 18)
         button.setTitleColor(.systemBlue, for: .normal)
         button.center.y = view.center.y
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -55,8 +55,12 @@ class MoviesTableViewDelegate: NSObject, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 30
+        return 45
     }
+    
+//    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+//        return CGFloat.leastNormalMagnitude
+//    }
     
     @objc func headerButtonTapped(sender:UIButton) {
         delegate?.switchView(path: self.movieCategoryCases[sender.tag])

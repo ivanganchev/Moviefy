@@ -12,22 +12,22 @@ import UIKit
 class CategoryCollectionViewCell: UICollectionViewCell {
     static let identifier = "CategoryCollectionViewCell"
     
-    var data: Data? {
+    var image: UIImage? {
         didSet {
             DispatchQueue.main.async {
-                self.myImageView.image = UIImage(data: self.data!)
+                self.imageView.image = self.image
             }
         }
     }
     
-    private let myImageView: UIImageView = {
+     let imageView: UIImageView = {
         let imageView = UIImageView()
         return imageView
     }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        contentView.addSubview(myImageView)
+        contentView.addSubview(imageView)
     }
     
     required init?(coder: NSCoder) {
@@ -35,6 +35,6 @@ class CategoryCollectionViewCell: UICollectionViewCell {
     }
     
     override func layoutSubviews() {
-        self.myImageView.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width/3.0, height: UIScreen.main.bounds.height/4.0)
+        self.imageView.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width / 3.0, height: UIScreen.main.bounds.height / 4.0)
     }
 }

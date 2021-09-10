@@ -17,7 +17,7 @@ class ViewController: UIViewController, MoviesTableViewButtonTapDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.navigationController?.navigationBar.isHidden = true
-        self.moviesTableView = UITableView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height), style: .grouped)
+        self.moviesTableView = UITableView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height), style: .grouped	)
         self.moviesTableView?.translatesAutoresizingMaskIntoConstraints = false
         self.moviesTableViewDataSource = MoviesTableViewDataSource()
         self.moviesTableViewDelegate = MoviesTableViewDelegate()
