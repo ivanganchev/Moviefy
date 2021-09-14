@@ -9,13 +9,10 @@ import Foundation
 
 class MoviesService {
     let session = URLSession.shared
+    let genres: GenresResponse? = nil
     
     private func provideService(url:inout URLComponents, params: [String:String]?, completion: @escaping (Data?, URLResponse?, Error?) -> ()) {
         let keys = [String] (params!.keys)
-//        keys?.forEach { k in
-//            url.queryItems?.append(URLQueryItem(name: k, value: params?[k]))
-//        }
-        
         let queryItems = [URLQueryItem(name: keys[0], value: params![keys[0]]), URLQueryItem(name: keys[1], value: params![keys[1]])]
         url.queryItems = queryItems
         guard let url = url.url else { return }
@@ -51,12 +48,31 @@ class MoviesService {
             return
         }
         
-        self.session.dataTask(with: url) {data, response, error in
+        self.session.dataTask(with: url) {(data, response, error) in
             guard let data = data else {
                 return
             }
             completion(data)
         }.resume()
+    }
+    
+    func fetchMoviesGenreList(completion: @escaping(Result<GenresResponse, Error>) -> ()){
+        let urlComponents = URLComponents(string: EndPoint.defaultLink + EndPoint.genresPath)
+        guard let url = urlComponents?.url else {
+            return
+        }
+        
+        self.session.dataTask(with: url) {(data, response, error) in
+            guard let data = data else {
+                return
+            }
+            do {
+                let obj:GenresResponse = try JSONDecoder().decode(GenresResponse.self, from: data)
+                completion(.success(obj))
+            } catch let err {
+                completion(.failure(err))
+            }
+        }
     }
 }
 

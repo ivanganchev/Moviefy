@@ -18,6 +18,8 @@
 		8E492C3826E7CB02002FAF8C /* MovieInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E492C3726E7CB02002FAF8C /* MovieInfoViewController.swift */; };
 		8E492C4026E9FFF8002FAF8C /* Movie.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E492C3F26E9FFF8002FAF8C /* Movie.swift */; };
 		8E492C4326EB406C002FAF8C /* TransitionAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E492C4226EB406C002FAF8C /* TransitionAnimator.swift */; };
+		8E492C4926EF40E0002FAF8C /* GenresResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E492C4826EF40E0002FAF8C /* GenresResponse.swift */; };
+		8E492C4C26EF414E002FAF8C /* Genre.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E492C4B26EF414E002FAF8C /* Genre.swift */; };
 		8E4A87D326D7A1D3001985FA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E4A87D226D7A1D3001985FA /* AppDelegate.swift */; };
 		8E4A87D526D7A1D3001985FA /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E4A87D426D7A1D3001985FA /* SceneDelegate.swift */; };
 		8E4A87D726D7A1D3001985FA /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E4A87D626D7A1D3001985FA /* ViewController.swift */; };
@@ -45,6 +47,8 @@
 		8E492C3726E7CB02002FAF8C /* MovieInfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieInfoViewController.swift; sourceTree = "<group>"; };
 		8E492C3F26E9FFF8002FAF8C /* Movie.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Movie.swift; sourceTree = "<group>"; };
 		8E492C4226EB406C002FAF8C /* TransitionAnimator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransitionAnimator.swift; sourceTree = "<group>"; };
+		8E492C4826EF40E0002FAF8C /* GenresResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenresResponse.swift; sourceTree = "<group>"; };
+		8E492C4B26EF414E002FAF8C /* Genre.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Genre.swift; sourceTree = "<group>"; };
 		8E4A87CF26D7A1D3001985FA /* Moviefy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Moviefy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8E4A87D226D7A1D3001985FA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		8E4A87D426D7A1D3001985FA /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -153,6 +157,8 @@
 				8E9F27D026D8C55A00E60D9F /* TokenResponse.swift */,
 				8E9F27E426D901A000E60D9F /* MoviesResponse.swift */,
 				8E492C3F26E9FFF8002FAF8C /* Movie.swift */,
+				8E492C4826EF40E0002FAF8C /* GenresResponse.swift */,
+				8E492C4B26EF414E002FAF8C /* Genre.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -265,12 +271,14 @@
 			files = (
 				8E492C2826E22FA7002FAF8C /* CategoryCollectionViewDataSource.swift in Sources */,
 				8E492C1426DF69E3002FAF8C /* EndPoint.swift in Sources */,
+				8E492C4C26EF414E002FAF8C /* Genre.swift in Sources */,
 				8E9F27EF26DB6E8100E60D9F /* MoviesCollectionViewCell.swift in Sources */,
 				8E4A87D726D7A1D3001985FA /* ViewController.swift in Sources */,
 				8E492C1E26E0C2DD002FAF8C /* MoviesTableViewDelegate.swift in Sources */,
 				8E9F27CA26D7D5C500E60D9F /* Secrets.swift in Sources */,
 				8E492C2B26E74097002FAF8C /* CategoryColelctionViewCell.swift in Sources */,
 				8E4A87D326D7A1D3001985FA /* AppDelegate.swift in Sources */,
+				8E492C4926EF40E0002FAF8C /* GenresResponse.swift in Sources */,
 				8E492C4326EB406C002FAF8C /* TransitionAnimator.swift in Sources */,
 				8E9F27E526D901A000E60D9F /* MoviesResponse.swift in Sources */,
 				8E9F27C426D7CE4C00E60D9F /* MovieResponse.swift in Sources */,
@@ -430,15 +438,17 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = GKHHS42JFG;
+				DEVELOPMENT_TEAM = 553GFM6GWL;
 				INFOPLIST_FILE = Moviefy/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = net.nemetschek.bg.Moviefy;
+				PRODUCT_BUNDLE_IDENTIFIER = net.Moviefy;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -449,15 +459,17 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = GKHHS42JFG;
+				DEVELOPMENT_TEAM = 553GFM6GWL;
 				INFOPLIST_FILE = Moviefy/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = net.nemetschek.bg.Moviefy;
+				PRODUCT_BUNDLE_IDENTIFIER = net.Moviefy;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
