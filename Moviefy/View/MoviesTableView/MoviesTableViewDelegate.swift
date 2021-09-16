@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 
 protocol MoviesTableViewButtonTapDelegate {
-    func switchView(path: MovieCategoryEndPoint)
+    func switchView(path: MovieCategoryEndPoint, categoryType: String)
 }
 
 class MoviesTableViewDelegate: NSObject, UITableViewDelegate {
@@ -63,6 +63,6 @@ class MoviesTableViewDelegate: NSObject, UITableViewDelegate {
 //    }
     
     @objc func headerButtonTapped(sender:UIButton) {
-        delegate?.switchView(path: self.movieCategoryCases[sender.tag])
+        delegate?.switchView(path: self.movieCategoryCases[sender.tag], categoryType: self.moviesSections[sender.tag])
     }
 }

@@ -38,34 +38,19 @@ class CategoryCollectionViewDataSource: NSObject,  UICollectionViewDataSource, U
         }
     }
     
+    func getMovieAtIndexPath(_ indexPath: IndexPath) -> Movie {
+        return self.movies[indexPath.row]
+    }
+    
+    func getLoadedImage() -> Movie?{
+        return self.movies.first(where: { movie in
+            movie.imageData != nil
+        })
+    }
+    
 }
 
 extension CategoryCollectionViewDataSource {
-//    func fetchMovies(page: Int, completion: @escaping () -> (), completion2: @escaping () -> ()) {
-//        MoviesService().fetchMoviesByCategory(movieCategoryPath: self.movieCategoryPath!, page: page, completion: { result in
-//            switch result {
-//            case .success(let moviesResponse):
-//                let movies = moviesResponse.movies?.map { (movieResponse) -> Movie in
-//                    return Movie(movieResponse: movieResponse)
-//                }
-//                self.movies.append(contentsOf: movies ?? [])
-//
-//                self.movies.forEach { (movie) in
-//                    guard let path = movie.movieResponse.posterPath else {
-//                        return
-//                    }
-//
-//                    MoviesService().fetchMovieImage(imageUrl: path, completion: {data in
-//                        movie.imageData = data
-//                        completion()
-//                    })
-//                }
-//                completion2()
-//            case .failure(let err):
-//                print(err)
-//            }
-//        })
-//    }
     
     func fetchMovies(page: Int, completion: @escaping () -> ()) {
             MoviesService().fetchMoviesByCategory(movieCategoryPath: self.movieCategoryPath!, page: page, completion: { result in
@@ -97,8 +82,14 @@ extension CategoryCollectionViewDataSource {
     }
     
     func loadImage(movie: Movie) {
-        MoviesService().fetchMovieImage(imageUrl: movie.movieResponse.posterPath!, completion: {data in
+        guard let posetPath = movie.movieResponse.posterPath else {
+            return
+        }
+    
+        MoviesService().fetchMovieImage(imageUrl: posetPath , completion: {data in
             movie.imageData = data
         })
     }
 }
+
+

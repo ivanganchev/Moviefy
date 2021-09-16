@@ -10,9 +10,10 @@ import UIKit
 class MovieInfoViewController: UIViewController {
 
     var movie: Movie?
-    var movieInfoScrollView: UIScrollView?
+    var genres: [String]?
+    var movieInfoScrollView: UIScrollView = UIScrollView()
     var movieTitle: UILabel?
-    var movieImage: UIImageView?
+    var movieImage: UIImageView = UIImageView()
     var shadowView: UIView?
     var closeButton: UIButton?
     var movieOverview: UILabel?
@@ -20,8 +21,7 @@ class MovieInfoViewController: UIViewController {
     var movieDateReleased: UILabel?
     var movieOverviewLabel: UILabel?
     var containerView: UIView = UIView()
-    var topPartView: UIView?
-//    var textSubPartView: UIView = UIView()
+    var topPartView: UIView = UIView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,18 +29,17 @@ class MovieInfoViewController: UIViewController {
         self.view.backgroundColor = .white
         
         self.movieInfoScrollView = UIScrollView()
-        self.movieInfoScrollView?.translatesAutoresizingMaskIntoConstraints = false
-        self.movieInfoScrollView?.contentInsetAdjustmentBehavior = .never
+        self.movieInfoScrollView.translatesAutoresizingMaskIntoConstraints = false
+        self.movieInfoScrollView.contentInsetAdjustmentBehavior = .never
         
         self.containerView.translatesAutoresizingMaskIntoConstraints = false
 
-//        self.textSubPartView.translatesAutoresizingMaskIntoConstraints = false
-
-        self.movieImage = UIImageView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 250))
-        self.movieImage?.image = UIImage(data: (self.movie?.imageData)!)
-        self.movieImage?.clipsToBounds = true
-        self.movieImage?.layer.cornerRadius = 20
-        self.movieImage?.layer.maskedCorners = [.layerMaxXMaxYCorner, .layerMinXMaxYCorner]
+        self.movieImage.image = UIImage(data: (self.movie?.imageData)!)
+        self.movieImage.contentMode = .scaleAspectFit
+        self.movieImage.clipsToBounds = true
+        self.movieImage.layer.cornerRadius = 20
+        self.movieImage.layer.maskedCorners = [.layerMaxXMaxYCorner, .layerMinXMaxYCorner]
+        self.movieImage.translatesAutoresizingMaskIntoConstraints = false
         
         self.shadowView = UIView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 100))
         let gradient = CAGradientLayer()
@@ -68,13 +67,16 @@ class MovieInfoViewController: UIViewController {
         self.closeButton?.widthAnchor.constraint(equalToConstant: 25).isActive = true
         self.closeButton?.heightAnchor.constraint(equalToConstant: 25).isActive = true
         
-        self.topPartView = UIView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 250))
-        self.topPartView?.addSubview(self.movieImage!)
-        self.topPartView?.addSubview(self.shadowView!)
-        self.movieImage?.centerXAnchor.constraint(equalTo: self.topPartView!.centerXAnchor).isActive = true
-        self.movieImage?.centerYAnchor.constraint(equalTo: self.topPartView!.centerYAnchor).isActive = true
-        self.shadowView?.leadingAnchor.constraint(equalTo: self.topPartView!.leadingAnchor).isActive = true
-        self.shadowView?.topAnchor.constraint(equalTo: self.topPartView!.topAnchor).isActive = true
+        self.topPartView = UIView()
+        self.topPartView.translatesAutoresizingMaskIntoConstraints = false
+        self.topPartView.addSubview(self.movieImage)
+        self.topPartView.addSubview(self.shadowView!)
+        self.movieImage.topAnchor.constraint(equalTo: self.topPartView.topAnchor).isActive = true
+        self.movieImage.leadingAnchor.constraint(equalTo: self.topPartView.leadingAnchor).isActive = true
+        self.movieImage.trailingAnchor.constraint(equalTo: self.topPartView.trailingAnchor).isActive = true
+        self.movieImage.heightAnchor.constraint(equalTo: self.movieImage.widthAnchor, multiplier: movieImage.image!.size.height / movieImage.image!.size.width, constant: 0).isActive = true
+        self.shadowView?.leadingAnchor.constraint(equalTo: self.topPartView.leadingAnchor).isActive = true
+        self.shadowView?.topAnchor.constraint(equalTo: self.topPartView.topAnchor).isActive = true
         
         self.movieTitle = UILabel()
         self.movieTitle?.numberOfLines = 0
@@ -89,7 +91,7 @@ class MovieInfoViewController: UIViewController {
         self.movieGenres?.translatesAutoresizingMaskIntoConstraints = false
         self.movieGenres?.tintColor = .lightGray
         self.movieGenres?.alpha = 0.7
-        self.movieGenres?.text = "Action, Drama, Horror"
+        self.setGenres()
         
         self.movieDateReleased = UILabel()
         self.movieDateReleased?.numberOfLines = 0
@@ -113,19 +115,20 @@ class MovieInfoViewController: UIViewController {
         self.movieOverview?.alpha = 0.9
         self.movieOverview?.text = self.movie?.movieResponse.overview
     
-        self.containerView.addSubview(self.topPartView!)
+        self.containerView.addSubview(self.topPartView)
         self.containerView.addSubview(self.movieTitle!)
         self.containerView.addSubview(self.movieGenres!)
         self.containerView.addSubview(self.movieDateReleased!)
         self.containerView.addSubview(self.movieOverviewLabel!)
         self.containerView.addSubview(self.movieOverview!)
         
-        self.topPartView?.topAnchor.constraint(equalTo: self.containerView.topAnchor).isActive = true
-        self.topPartView?.leadingAnchor.constraint(equalTo: self.containerView.leadingAnchor).isActive = true
-        self.topPartView?.widthAnchor.constraint(equalTo: self.containerView.widthAnchor).isActive = true
+        self.topPartView.topAnchor.constraint(equalTo: self.containerView.topAnchor).isActive = true
+        self.topPartView.leadingAnchor.constraint(equalTo: self.containerView.leadingAnchor).isActive = true
+        self.topPartView.widthAnchor.constraint(equalTo: self.containerView.widthAnchor).isActive = true
+        self.topPartView.heightAnchor.constraint(equalTo: self.movieImage.heightAnchor).isActive = true
         
         self.movieTitle?.leadingAnchor.constraint(equalTo: self.containerView.leadingAnchor, constant: 10).isActive = true
-        self.movieTitle?.topAnchor.constraint(equalTo: self.topPartView!.bottomAnchor, constant: 15).isActive = true
+        self.movieTitle?.topAnchor.constraint(equalTo: self.topPartView.bottomAnchor, constant: 15).isActive = true
         self.movieTitle?.trailingAnchor.constraint(equalTo: self.containerView.trailingAnchor, constant: -10).isActive = true
         
         self.movieGenres?.leadingAnchor.constraint(equalTo: self.containerView.leadingAnchor, constant: 10).isActive = true
@@ -145,25 +148,36 @@ class MovieInfoViewController: UIViewController {
         self.movieOverview?.bottomAnchor.constraint(equalTo: self.containerView.bottomAnchor, constant: -20).isActive = true
         self.movieOverview?.trailingAnchor.constraint(equalTo: self.containerView.trailingAnchor, constant: -10).isActive = true
         
-        self.movieInfoScrollView?.addSubview(self.containerView)
+        self.movieInfoScrollView.addSubview(self.containerView)
         
-        self.containerView.topAnchor.constraint(equalTo: self.movieInfoScrollView!.topAnchor).isActive = true
-        self.containerView.leadingAnchor.constraint(equalTo: self.movieInfoScrollView!.leadingAnchor).isActive = true
-        self.containerView.trailingAnchor.constraint(equalTo: self.movieInfoScrollView!.trailingAnchor).isActive = true
-        self.containerView.bottomAnchor.constraint(equalTo: self.movieInfoScrollView!.bottomAnchor).isActive = true
-        self.containerView.widthAnchor.constraint(equalTo: self.movieInfoScrollView!.widthAnchor).isActive = true
+        self.containerView.topAnchor.constraint(equalTo: self.movieInfoScrollView.topAnchor).isActive = true
+        self.containerView.leadingAnchor.constraint(equalTo: self.movieInfoScrollView.leadingAnchor).isActive = true
+        self.containerView.trailingAnchor.constraint(equalTo: self.movieInfoScrollView.trailingAnchor).isActive = true
+        self.containerView.bottomAnchor.constraint(equalTo: self.movieInfoScrollView.bottomAnchor).isActive = true
+        self.containerView.widthAnchor.constraint(equalTo: self.movieInfoScrollView.widthAnchor).isActive = true
 
-        self.view.addSubview(self.movieInfoScrollView!)
+        self.view.addSubview(self.movieInfoScrollView)
 
-        self.movieInfoScrollView?.topAnchor.constraint(equalTo: self.view.topAnchor).isActive = true
-        self.movieInfoScrollView?.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
-        self.movieInfoScrollView?.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
-        self.movieInfoScrollView?.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
-        self.movieInfoScrollView?.widthAnchor.constraint(equalTo: self.view.widthAnchor).isActive = true
+        self.movieInfoScrollView.topAnchor.constraint(equalTo: self.view.topAnchor).isActive = true
+        self.movieInfoScrollView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
+        self.movieInfoScrollView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
+        self.movieInfoScrollView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
+        self.movieInfoScrollView.widthAnchor.constraint(equalTo: self.view.widthAnchor).isActive = true
     }
     
     @objc func closeButtonTap() {
         self.dismiss(animated: true, completion: nil)
     }
     
+    private func setGenres() {
+        let genres = MoviesService.genres
+        
+        let arrayOfGenres: [String] = self.movie?.movieResponse.genreIds?.compactMap({ id in
+            return genres?[id]
+        }) ?? []
+        
+        let joined = arrayOfGenres.joined(separator: ", ")
+        
+        self.movieGenres?.text = joined
+    }
 }

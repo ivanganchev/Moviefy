@@ -8,11 +8,13 @@
 import Foundation
 import UIKit
 
-class CategoryCollectionViewViewController: UIViewController, UIViewControllerTransitioningDelegate {
+class CategoryCollectionViewViewController: UIViewController, UIViewControllerTransitioningDelegate, UISearchResultsUpdating {
    
     var categoryCollectionView: UICollectionView?
+    var categoryType: String?
     var categoryCollectionViewDataSource: CategoryCollectionViewDataSource?
     var movieCategoryPath: MovieCategoryEndPoint?
+    var searchController: UISearchController = UISearchController(searchResultsController: nil)
     var currentPage:Int = 1
     var isFetching = false
     
@@ -27,6 +29,16 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
     
     override func viewDidLoad() {
         self.navigationController?.navigationBar.isHidden = false
+        
+        self.searchController.searchResultsUpdater = self
+        self.navigationItem.searchController = self.searchController
+        self.navigationItem.hidesSearchBarWhenScrolling = false
+        let barTitle: UILabel = UILabel(frame: CGRect(x: 0, y: 0, width: 50, height: 40))
+        barTitle.font = UIFont(name: "Helvetica-Bold", size: 16)
+        barTitle.text = self.categoryType
+        
+        self.navigationItem.titleView = barTitle
+        
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         
@@ -65,8 +77,14 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
 extension CategoryCollectionViewViewController: UICollectionViewDelegateFlowLayout {
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let width = collectionView.bounds.width / self.itemsInRow - self.interItemSpacing - self.itemsInRow
-        let height = collectionView.bounds.height / self.itemsInColumn
+//        let movie = self.categoryCollectionViewDataSource?.getLoadedImage()
+        let width = (collectionView.bounds.width - self.interItemSpacing - self.interItemSpacing) / self.itemsInRow
+//        guard let imageData = movie?.imageData, let image: UIImage = UIImage(data: imageData) else {
+//            return CGSize(width: collectionView.bounds.width / itemsInRow - self.interItemSpacing, height: collectionView.bounds.height / itemsInColumn)
+//        }
+//        let height = width * (image.size.height / image.size.width)
+//        let height = collectionView.bounds.size.height / 4 * (collectionView.bounds.size.height / collectionView.bounds.size.width)
+        let height = width * (750 / 500)
         return CGSize(width: width, height: height)
     }
     
@@ -157,6 +175,10 @@ extension CategoryCollectionViewViewController: UICollectionViewDelegateFlowLayo
         movieInfoViewController.modalPresentationStyle = .fullScreen
         movieInfoViewController.transitioningDelegate = self
         present(movieInfoViewController, animated: true)
+    }
+    
+    func updateSearchResults(for searchController: UISearchController) {
+        
     }
 }
 

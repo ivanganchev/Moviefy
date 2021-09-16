@@ -17,7 +17,7 @@ class ViewController: UIViewController, MoviesTableViewButtonTapDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.navigationController?.navigationBar.isHidden = true
-        self.moviesTableView = UITableView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height), style: .grouped	)
+        self.moviesTableView = UITableView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height), style: .grouped)
         self.moviesTableView?.translatesAutoresizingMaskIntoConstraints = false
         self.moviesTableViewDataSource = MoviesTableViewDataSource()
         self.moviesTableViewDelegate = MoviesTableViewDelegate()
@@ -29,15 +29,17 @@ class ViewController: UIViewController, MoviesTableViewButtonTapDelegate {
         self.view.addSubview(self.moviesTableView!)
         self.moviesTableView?.reloadData()
         self.moviesTableViewDelegate?.delegate = self
+        MoviesService.loadMoviesGenreList()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         self.navigationController?.navigationBar.isHidden = true
     }
     
-    func switchView(path: MovieCategoryEndPoint) {
+    func switchView(path: MovieCategoryEndPoint, categoryType: String) {
         let viewController = CategoryCollectionViewViewController()
         viewController.movieCategoryPath = path
+        viewController.categoryType = categoryType
         self.navigationController?.pushViewController(viewController, animated: true)
     }
 }

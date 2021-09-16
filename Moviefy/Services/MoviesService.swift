@@ -9,25 +9,28 @@ import Foundation
 
 class MoviesService {
     let session = URLSession.shared
-    let genres: GenresResponse? = nil
+    static var genres: [Int:String]?
     
-    private func provideService(url:inout URLComponents, params: [String:String]?, completion: @escaping (Data?, URLResponse?, Error?) -> ()) {
-        let keys = [String] (params!.keys)
-        let queryItems = [URLQueryItem(name: keys[0], value: params![keys[0]]), URLQueryItem(name: keys[1], value: params![keys[1]])]
+    private static func provideService(url:inout URLComponents, params: [String:String]?, completion: @escaping (Data?, URLResponse?, Error?) -> ()) {
+        var queryItems: [URLQueryItem] = url.queryItems ?? []
+        params?.forEach({ (key: String, value: String) in
+            let queryItem = URLQueryItem(name: key, value: value)
+            queryItems.append(queryItem)
+        })
         url.queryItems = queryItems
         guard let url = url.url else { return }
         let authHeader = "Bearer " + Secrets.apiKey
         var request = URLRequest(url:url)
         request.httpMethod = "GET"
         request.setValue(authHeader, forHTTPHeaderField: "Authorization")
-        self.session.dataTask(with: request) {(data, response, error) in
+        URLSession.shared.dataTask(with: request) {(data, response, error) in
             completion(data, response, error)
         }.resume()
     }
     
     func fetchMoviesByCategory(movieCategoryPath: String, page: Int, completion: @escaping (Result<MoviesResponse, Error>) -> ()) {
         var url = URLComponents(string: EndPoint.defaultLink + movieCategoryPath)!
-        provideService(url: &url, params: ["page": String(page), "language": "en-US"], completion: {(data, response, error) in
+        MoviesService.provideService(url: &url, params: ["page": String(page), "language": "en-US"], completion: {(data, response, error) in
             guard let data = data else {
                 return
             }
@@ -56,23 +59,21 @@ class MoviesService {
         }.resume()
     }
     
-    func fetchMoviesGenreList(completion: @escaping(Result<GenresResponse, Error>) -> ()){
-        let urlComponents = URLComponents(string: EndPoint.defaultLink + EndPoint.genresPath)
-        guard let url = urlComponents?.url else {
-            return
-        }
+    static func loadMoviesGenreList(){
+        var url = URLComponents(string: EndPoint.defaultLink + EndPoint.genresPath)!
         
-        self.session.dataTask(with: url) {(data, response, error) in
+        MoviesService.provideService(url: &url, params: ["language": "en-US"], completion: {(data, response, error) in
             guard let data = data else {
                 return
             }
             do {
-                let obj:GenresResponse = try JSONDecoder().decode(GenresResponse.self, from: data)
-                completion(.success(obj))
-            } catch let err {
-                completion(.failure(err))
+                let result: GenresResponse = try JSONDecoder().decode(GenresResponse.self, from: data)
+                MoviesService.genres = Dictionary(uniqueKeysWithValues: result.genres.map {($0.id, $0.name ?? "")})
+            } catch let err{
+                print(err)
+                MoviesService.genres = nil
             }
-        }
+        })
     }
 }
 

@@ -16,6 +16,7 @@ struct MovieResponse: Codable {
     let popularity: Float
     let releaseDate: String?
     let runtime: String?
+    let genreIds: [Int]?
     
     enum CodingKeys: String, CodingKey {
         case originalTitle = "original_title"
@@ -26,5 +27,6 @@ struct MovieResponse: Codable {
         case popularity = "popularity"
         case releaseDate = "release_date"
         case runtime = "runtime"
+        case genreIds = "genre_ids"
     }
 }

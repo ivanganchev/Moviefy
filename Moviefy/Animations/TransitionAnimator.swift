@@ -48,7 +48,7 @@ class TransitionAnimator: NSObject, UIViewControllerAnimatedTransitioning {
             guard let selectedCell = categoryCollectionViewController.selectedCell,
                   let window = categoryCollectionViewController.view.window ?? movieInfoViewController.view.window,
                   let cellImageSnapshot = selectedCell.imageView.snapshotView(afterScreenUpdates: true),
-                  let controllerImageSnapshot = movieInfoViewController.movieImage?.snapshotView(afterScreenUpdates: true)
+                  let controllerImageSnapshot = movieInfoViewController.movieImage.snapshotView(afterScreenUpdates: true)
             else {
                 transitionContext.completeTransition(true)
                 return
@@ -77,10 +77,10 @@ class TransitionAnimator: NSObject, UIViewControllerAnimatedTransitioning {
                 containerView.addSubview($0)
             }
             
-            let controllerImageViewRect = movieInfoViewController.movieImage?.convert(movieInfoViewController.movieImage!.bounds, to: window)
+            let controllerImageViewRect = movieInfoViewController.movieImage.convert(movieInfoViewController.movieImage.bounds, to: window)
             
             [self.selectedCellImageViewSnapshot, controllerImageSnapshot].forEach {
-                $0.frame = (isPresenting ? cellImageViewRect : controllerImageViewRect)!
+                $0.frame = (isPresenting ? cellImageViewRect : controllerImageViewRect)
             }
             
             controllerImageSnapshot.alpha = isPresenting ? 0 : 1
@@ -89,8 +89,8 @@ class TransitionAnimator: NSObject, UIViewControllerAnimatedTransitioning {
             
             UIView.animateKeyframes(withDuration: TransitionAnimator.duration, delay: 0, options: .calculationModeCubic, animations: {
                 UIView.addKeyframe(withRelativeStartTime: 0, relativeDuration: 1) {
-                    self.selectedCellImageViewSnapshot.frame = isPresenting ? controllerImageViewRect! : self.cellImageViewRect
-                    controllerImageSnapshot.frame = isPresenting ? controllerImageViewRect! : self.cellImageViewRect
+                    self.selectedCellImageViewSnapshot.frame = isPresenting ? controllerImageViewRect : self.cellImageViewRect
+                    controllerImageSnapshot.frame = isPresenting ? controllerImageViewRect : self.cellImageViewRect
                     fadeView.alpha = isPresenting ? 1 : 0
                 }
                 
