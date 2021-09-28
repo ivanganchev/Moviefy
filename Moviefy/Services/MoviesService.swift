@@ -11,7 +11,7 @@ class MoviesService {
     let session = URLSession.shared
     static var genres: [Int:String]?
     
-    private static func provideService(url:inout URLComponents, params: [String:String]?, completion: @escaping (Data?, URLResponse?, Error?) -> ()) {
+    private static func provideService(url: inout URLComponents, params: [String:String]?, completion: @escaping (Data?, URLResponse?, Error?) -> ()) {
         var queryItems: [URLQueryItem] = url.queryItems ?? []
         params?.forEach({ (key: String, value: String) in
             let queryItem = URLQueryItem(name: key, value: value)
@@ -29,7 +29,9 @@ class MoviesService {
     }
     
     func fetchMoviesByCategory(movieCategoryPath: String, page: Int, completion: @escaping (Result<MoviesResponse, Error>) -> ()) {
-        var url = URLComponents(string: EndPoint.defaultLink + movieCategoryPath)!
+        guard var url = URLComponents(string: EndPoint.defaultLink + movieCategoryPath) else {
+            return
+        }
         MoviesService.provideService(url: &url, params: ["page": String(page), "language": "en-US"], completion: {(data, response, error) in
             guard let data = data else {
                 return
@@ -60,7 +62,9 @@ class MoviesService {
     }
     
     static func loadMoviesGenreList(){
-        var url = URLComponents(string: EndPoint.defaultLink + EndPoint.genresPath)!
+        guard var url = URLComponents(string: EndPoint.defaultLink + EndPoint.genresPath) else {
+            return
+        }
         
         MoviesService.provideService(url: &url, params: ["language": "en-US"], completion: {(data, response, error) in
             guard let data = data else {
@@ -72,6 +76,25 @@ class MoviesService {
             } catch let err{
                 print(err)
                 MoviesService.genres = nil
+            }
+        })
+    }
+    
+    func searchMovies(text: String, completion: @escaping (Result<MoviesResponse, Error>) -> ()) {
+        guard var url = URLComponents(string: EndPoint.defaultLink + EndPoint.searchPath) else {
+            return
+        }
+        
+        MoviesService.provideService(url: &url, params: ["query": text], completion: {(data, response, error) in
+            guard let data = data else {
+                return
+            }
+            do {
+                let obj:MoviesResponse = try JSONDecoder().decode(MoviesResponse.self, from: data)
+                completion(.success(obj))
+            } catch let err {
+                completion(.failure(err))
+                print(err)
             }
         })
     }

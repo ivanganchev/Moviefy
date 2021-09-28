@@ -8,15 +8,18 @@
 import Foundation
 import UIKit
 
-class CategoryCollectionViewViewController: UIViewController, UIViewControllerTransitioningDelegate, UISearchResultsUpdating {
+class CategoryCollectionViewViewController: UIViewController, UIViewControllerTransitioningDelegate, GenreChipsViewDelegate {
    
     var categoryCollectionView: UICollectionView?
-    var categoryType: String?
-    var categoryCollectionViewDataSource: CategoryCollectionViewDataSource?
+    var categoryType: String = ""
+    var categoryCollectionViewDataSource: CategoryCollectionViewDataSource = CategoryCollectionViewDataSource()
     var movieCategoryPath: MovieCategoryEndPoint?
-    var searchController: UISearchController = UISearchController(searchResultsController: nil)
-    var currentPage:Int = 1
+    var genreChipsView: GenreChipsView?
+    
+    //var searchController: UISearchController = UISearchController(searchResultsController: nil)
+    var currentPage: Int = 1
     var isFetching = false
+    var guide: UILayoutGuide =  UILayoutGuide()
     
     let interItemSpacing: CGFloat = 5.0
     let lineSpacingForSection: CGFloat = 5.0
@@ -30,8 +33,10 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
     override func viewDidLoad() {
         self.navigationController?.navigationBar.isHidden = false
         
-        self.searchController.searchResultsUpdater = self
-        self.navigationItem.searchController = self.searchController
+        self.guide = self.view.safeAreaLayoutGuide
+        
+//        self.searchController.searchResultsUpdater = self
+//        self.navigationItem.searchController = self.searchController
         self.navigationItem.hidesSearchBarWhenScrolling = false
         let barTitle: UILabel = UILabel(frame: CGRect(x: 0, y: 0, width: 50, height: 40))
         barTitle.font = UIFont(name: "Helvetica-Bold", size: 16)
@@ -39,28 +44,46 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
         
         self.navigationItem.titleView = barTitle
         
-        let layout = UICollectionViewFlowLayout()
-        layout.scrollDirection = .vertical
+        let categoryCollectionViewLayout = UICollectionViewFlowLayout()
+        categoryCollectionViewLayout.scrollDirection = .vertical
         
-        self.categoryCollectionView = UICollectionView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height), collectionViewLayout: layout)
+        self.categoryCollectionView = UICollectionView(frame: .zero, collectionViewLayout: categoryCollectionViewLayout)
         self.categoryCollectionView?.backgroundColor = .white
+        self.categoryCollectionView?.translatesAutoresizingMaskIntoConstraints = false
         
-        self.categoryCollectionViewDataSource = CategoryCollectionViewDataSource()
-        self.categoryCollectionViewDataSource?.movieCategoryPath = self.movieCategoryPath?.rawValue
+        self.categoryCollectionViewDataSource.movieCategoryPath = self.movieCategoryPath?.rawValue
         self.categoryCollectionView?.dataSource = self.categoryCollectionViewDataSource
         self.categoryCollectionView?.prefetchDataSource = self.categoryCollectionViewDataSource
-        
         self.categoryCollectionView?.delegate = self
+        self.categoryCollectionView?.register(CategoryCollectionViewCell.self, forCellWithReuseIdentifier: CategoryCollectionViewCell.identifier)
+        self.categoryCollectionView?.refreshControl = UIRefreshControl()
+        self.categoryCollectionView?.refreshControl?.addTarget(self, action: #selector(pullToRefresh), for: .valueChanged)
         
-        self.categoryCollectionView!.register(CategoryCollectionViewCell.self, forCellWithReuseIdentifier: CategoryCollectionViewCell.identifier)
+        let chipsGenreCollectionViewLayout = UICollectionViewFlowLayout()
+        chipsGenreCollectionViewLayout.scrollDirection = .horizontal
         
+        self.genreChipsView = GenreChipsView(frame: .zero)
+        self.genreChipsView?.translatesAutoresizingMaskIntoConstraints = false
+        self.genreChipsView?.delegate = self
+        // Not sure about it
+        self.view.addSubview(self.categoryCollectionView ?? UICollectionView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height), collectionViewLayout: categoryCollectionViewLayout))
+        self.view.addSubview(self.genreChipsView!)
         
-        self.view.addSubview(self.categoryCollectionView!)
+        self.genreChipsView?.topAnchor.constraint(equalTo: self.guide.topAnchor).isActive = true
+        self.genreChipsView?.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
+        self.genreChipsView?.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
+        self.genreChipsView?.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        self.genreChipsView?.widthAnchor.constraint(equalTo: self.view.widthAnchor).isActive = true
         
+        self.categoryCollectionView?.topAnchor.constraint(equalTo: self.genreChipsView!.bottomAnchor).isActive = true
+        self.categoryCollectionView?.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
+        self.categoryCollectionView?.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
+        self.categoryCollectionView?.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
+
         for n in 1...3 {
-            self.categoryCollectionViewDataSource?.fetchMovies(page: self.currentPage, completion: {
+            self.categoryCollectionViewDataSource.fetchMovies(page: self.currentPage, completion: {
                 self.currentPage += 1
-                self.categoryCollectionViewDataSource?.loadImages(completion: {
+                self.categoryCollectionViewDataSource.loadImages(completion: {
                     DispatchQueue.main.async {
                         self.categoryCollectionView?.reloadData()
                     }
@@ -69,8 +92,63 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
         }
     }
     
-    override func viewWillAppear(_ animated: Bool) {
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         self.navigationController?.navigationBar.isHidden = false
+        super.viewWillTransition(to: size, with: coordinator)
+    }
+    
+    @objc func pullToRefresh() {
+        self.currentPage = 1
+        self.categoryCollectionViewDataSource.fetchMovies(page: self.currentPage, completion: {
+            self.currentPage += 1
+            self.categoryCollectionViewDataSource.loadImages(completion: {
+                DispatchQueue.main.async {
+                    self.categoryCollectionView?.reloadData()
+                    self.categoryCollectionView?.refreshControl?.endRefreshing()
+                }
+            })
+        })
+    }
+    
+    func presentGenrePickerViewController() {
+        self.tabBarController?.tabBar.isHidden = true
+        let genrePickerViewController = GenrePickerViewController()
+        genrePickerViewController.selectedGenres = self.genreChipsView?.genreChipsCollectionViewDataSource.genres ?? []
+        genrePickerViewController.onDoneBlock = {genre in
+            self.tabBarController?.tabBar.isHidden = false
+            if genre != "" {
+                self.genreChipsView?.genreChipsCollectionViewDataSource.genres.append(genre)
+                self.genreChipsView?.genreChipsCollectionView?.reloadData()
+                self.filterMovies()
+            }
+        }
+        genrePickerViewController.modalPresentationStyle = .overCurrentContext
+        self.present(genrePickerViewController, animated: false, completion: nil)
+    }
+    
+    func refreshMovies() {
+        self.filterMovies()
+    }
+    
+    func filterMovies() {
+        let movies = self.categoryCollectionViewDataSource.movies
+        let allGenres = MoviesService.genres
+        let selectedGenres = self.genreChipsView?.genreChipsCollectionViewDataSource.genres
+        var newFilteredMovies: [Movie] = movies
+        
+        selectedGenres?.forEach({ genre in
+            var tempArr: [Movie] = []
+            newFilteredMovies.forEach { movie in
+                let id = allGenres?.first(where: {$0.value == genre})?.key
+                if movie.movieResponse.genreIds!.contains(id!) {
+                    tempArr.append(movie)
+                }
+            }
+            newFilteredMovies = tempArr
+        })
+        
+        self.categoryCollectionViewDataSource.filteredMovies = newFilteredMovies.count == 0 ? movies : newFilteredMovies
+        self.categoryCollectionView?.reloadData()
     }
 }
 
@@ -78,7 +156,13 @@ extension CategoryCollectionViewViewController: UICollectionViewDelegateFlowLayo
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
 //        let movie = self.categoryCollectionViewDataSource?.getLoadedImage()
-        let width = (collectionView.bounds.width - self.interItemSpacing - self.interItemSpacing) / self.itemsInRow
+        var ratio = 0.0
+        if collectionView.bounds.width < collectionView.bounds.height {
+            ratio = 0.33
+        } else {
+            ratio = 0.33 / 2
+        }
+        let width = (collectionView.bounds.width - self.interItemSpacing - self.interItemSpacing) * CGFloat(ratio)
 //        guard let imageData = movie?.imageData, let image: UIImage = UIImage(data: imageData) else {
 //            return CGSize(width: collectionView.bounds.width / itemsInRow - self.interItemSpacing, height: collectionView.bounds.height / itemsInColumn)
 //        }
@@ -120,7 +204,7 @@ extension CategoryCollectionViewViewController: UICollectionViewDelegateFlowLayo
             self.currentPage += 1
             self.isFetching = true
             for n in 1...3 {
-                self.categoryCollectionViewDataSource?.fetchMovies(page: self.currentPage, completion: {
+                self.categoryCollectionViewDataSource.fetchMovies(page: self.currentPage, completion: {
                     self.isFetching = false
                 })
             }
@@ -131,7 +215,7 @@ extension CategoryCollectionViewViewController: UICollectionViewDelegateFlowLayo
     
     
     func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
-        if self.categoryCollectionViewDataSource?.movies.count ?? 0 > self.categoryCollectionView?.numberOfItems(inSection: 0) ?? 0 {
+        if self.categoryCollectionViewDataSource.movies.count ?? 0 > self.categoryCollectionView?.numberOfItems(inSection: 0) ?? 0 {
             DispatchQueue.main.async {
                 self.categoryCollectionView?.reloadData()
             }
@@ -145,8 +229,8 @@ extension CategoryCollectionViewViewController: UICollectionViewDelegateFlowLayo
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         self.selectedCell = collectionView.cellForItem(at: indexPath) as? CategoryCollectionViewCell
-        self.selectedCellImageViewSnapshot = selectedCell?.imageView.snapshotView(afterScreenUpdates: false)
-        self.presentMovieInfoViewController(with: (self.categoryCollectionViewDataSource?.movies[indexPath.row])!)
+        self.selectedCellImageViewSnapshot = selectedCell?.imageView.snapshotView(afterScreenUpdates: true)
+        self.presentMovieInfoViewController(with: self.categoryCollectionViewDataSource.filteredMovies[indexPath.row])
     }
     
     func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
@@ -175,10 +259,6 @@ extension CategoryCollectionViewViewController: UICollectionViewDelegateFlowLayo
         movieInfoViewController.modalPresentationStyle = .fullScreen
         movieInfoViewController.transitioningDelegate = self
         present(movieInfoViewController, animated: true)
-    }
-    
-    func updateSearchResults(for searchController: UISearchController) {
-        
     }
 }
 

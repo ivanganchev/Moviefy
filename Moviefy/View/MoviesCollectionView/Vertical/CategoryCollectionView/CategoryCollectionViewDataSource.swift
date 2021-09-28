@@ -11,39 +11,38 @@ import UIKit
 class CategoryCollectionViewDataSource: NSObject,  UICollectionViewDataSource, UICollectionViewDataSourcePrefetching {
 
     var movies:[Movie] = []
+    var filteredMovies:[Movie] = []
     var movieCategoryPath: String?
     var loadedImages: [Data] = []
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self.movies.count
+        return self.filteredMovies.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CategoryCollectionViewCell.identifier, for: indexPath) as! CategoryCollectionViewCell
         
         cell.image = nil
-
-        let model = self.movies[indexPath.row]
+        let model = self.filteredMovies[indexPath.row]
         cell.image = model.imageData == nil ? nil : UIImage(data: model.imageData!)
     
-                
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
         indexPaths.forEach { (indexPath) in
-            if movies[indexPath.row].imageData == nil {
+            if filteredMovies[indexPath.row].imageData == nil {
                 loadImage(movie: movies[indexPath.row])
             }
         }
     }
     
     func getMovieAtIndexPath(_ indexPath: IndexPath) -> Movie {
-        return self.movies[indexPath.row]
+        return self.filteredMovies[indexPath.row]
     }
     
     func getLoadedImage() -> Movie?{
-        return self.movies.first(where: { movie in
+        return self.filteredMovies.first(where: { movie in
             movie.imageData != nil
         })
     }
@@ -60,6 +59,7 @@ extension CategoryCollectionViewDataSource {
                     return Movie(movieResponse: movieResponse)
                 }
                 self.movies.append(contentsOf: movies ?? [])
+                self.filteredMovies = self.movies
                 completion()
                case .failure(let err):
                    print(err)
@@ -68,28 +68,41 @@ extension CategoryCollectionViewDataSource {
        }
     
     func loadImages(completion: @escaping () -> ()) {
-        self.movies.forEach { (movie) in
+        self.filteredMovies.forEach { (movie) in
             guard let path = movie.movieResponse.posterPath else {
                 return
             }
 
             MoviesService().fetchMovieImage(imageUrl: path, completion: {data in
                 movie.imageData = data
-                
             })
         }
         completion()
     }
     
     func loadImage(movie: Movie) {
-        guard let posetPath = movie.movieResponse.posterPath else {
+        guard let path = movie.movieResponse.posterPath else {
             return
         }
     
-        MoviesService().fetchMovieImage(imageUrl: posetPath , completion: {data in
+        MoviesService().fetchMovieImage(imageUrl: path, completion: {data in
             movie.imageData = data
         })
     }
+    
+    //Don't need
+//    func searchImage(text: String, completion: @escaping () -> ()) {
+//        MoviesService().searchMovies(text: text, completion: {result in
+//            switch result {
+//            case .success(let moviesResponse):
+//                let movies = moviesResponse.movies?.map { (movieResponse) -> Movie in
+//                    return Movie(movieResponse: movieResponse)
+//                }
+//                self.movies = movies ?? []
+//                completion()
+//            case.failure(let err):
+//                print(err)
+//            }
+//        })
+//    }
 }
-
-

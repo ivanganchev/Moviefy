@@ -14,7 +14,6 @@ class MoviesTableViewDataSource: NSObject, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: MoviesTableViewCell.identifier, for: indexPath) as! MoviesTableViewCell
-        
         cell.movieCategoryPath = movieCategoryCases[indexPath.section].rawValue
         return cell
     }

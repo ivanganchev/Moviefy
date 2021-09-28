@@ -36,7 +36,7 @@ extension MoviesCollectionViewDataSource {
         MoviesService().fetchMoviesByCategory(movieCategoryPath: movieCategoryPath, page: 1, completion: { result in
             switch result {
             case .success(let moviesResponse):
-                self.movies = moviesResponse.movies!
+                self.movies = moviesResponse.movies ?? []
                 completion()
             case .failure(let err):
                 print(err)
