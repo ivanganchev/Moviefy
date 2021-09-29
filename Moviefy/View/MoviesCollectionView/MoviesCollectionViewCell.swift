@@ -33,24 +33,9 @@ class MoviesCollectionViewCell: UICollectionViewCell {
     }
     
     override func layoutSubviews() {
-        var ratio = 0.0
-        let orientation = UIDevice.current.orientation
-        switch orientation {
-            case .portrait:
-                ratio = 0.33
-            case .portraitUpsideDown:
-                ratio = 0.33
-            case .landscapeLeft:
-                ratio = 0.33 / 2
-            case .landscapeRight:
-                ratio = 0.33 / 2
-            default:
-                ratio = 0
-        }
-        let width = UIScreen.main.bounds.width * CGFloat(ratio)
-        let height = width * (750 / 500)
+        
         DispatchQueue.main.async {
-            self.myImageView.frame = CGRect(x: 0, y: 0, width: width, height: height)
+            self.myImageView.frame = CGRect(origin: .zero, size: ThumbnailImageProperties.getSize())
         }
     }
 }

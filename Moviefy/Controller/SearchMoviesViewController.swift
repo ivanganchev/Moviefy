@@ -104,17 +104,8 @@ class SearchMoviesViewController: UIViewController, UISearchBarDelegate, UISearc
 
 extension SearchMoviesViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        var ratio = 0.0
-        
-        if tableView.bounds.width < tableView.bounds.height {
-            ratio = 0.33
-        } else {
-            ratio = 0.33 / 2
-        }
-        
-        let width = UIScreen.main.bounds.width * CGFloat(ratio)
-        let height = width * (750 / 500)
-        return height
+        let size = ThumbnailImageProperties.getSize()
+        return size.height
     }
     
 //    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

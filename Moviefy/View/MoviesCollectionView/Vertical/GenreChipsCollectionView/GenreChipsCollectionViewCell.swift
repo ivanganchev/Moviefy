@@ -75,18 +75,12 @@ class GenreChipsCollectionViewCell: UICollectionViewCell {
         self.containerView.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 10).isActive = true
         self.containerView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -10).isActive = true
         self.containerView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
-//        self.containerView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
-        
-//        self.removeButton.centerYAnchor.constraint(equalTo: self.containerView.centerYAnchor).isActive = true
-//        self.removeButton.leadingAnchor.constraint(equalTo: self.genreLabel.trailingAnchor, constant: 20).isActive = true
+
         self.removeButton.widthAnchor.constraint(equalToConstant: 20).isActive = true
         self.removeButton.heightAnchor.constraint(equalToConstant: 20).isActive = true
         
-//        self.genreLabel.widthAnchor.constraint(equalToConstant: 60).isActive = true
         self.genreLabel.heightAnchor.constraint(equalToConstant: 25).isActive = true
         self.genreLabel.leadingAnchor.constraint(equalTo: self.containerView.leadingAnchor, constant: 5).isActive = true
-//        self.genreLabel.topAnchor.constraint(equalTo: self.containerView.topAnchor).isActive = true
-//        self.genreLabel.bottomAnchor.constraint(equalTo: self.containerView.bottomAnchor).isActive = true
         
         self.containerView.layer.cornerRadius = 12.0
         self.containerView.backgroundColor = .lightGray

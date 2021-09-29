@@ -51,25 +51,10 @@ class MoviesTableViewCell : UITableViewCell {
     }
     
     private func setLayout() -> UICollectionViewFlowLayout{
-        var ratio = 1.0
-        let orientation = UIDevice.current.orientation
-        switch orientation {
-            case .portrait:
-                ratio = 0.33
-            case .portraitUpsideDown:
-                ratio = 0.33
-            case .landscapeLeft:
-                ratio = 0.33 / 2
-            case .landscapeRight:
-                ratio = 0.33 / 2
-            default:
-                ratio = 1.0
-        }
-        let width = UIScreen.main.bounds.width * CGFloat(ratio)
-        let height = width * (750 / 500)
+        let size = ThumbnailImageProperties.getSize()
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
-        layout.itemSize = CGSize(width: width, height: height)
+        layout.itemSize = CGSize(width: size.width, height: size.height)
     
         return layout
     }

@@ -46,7 +46,6 @@ class CategoryCollectionViewDataSource: NSObject,  UICollectionViewDataSource, U
             movie.imageData != nil
         })
     }
-    
 }
 
 extension CategoryCollectionViewDataSource {
@@ -89,20 +88,4 @@ extension CategoryCollectionViewDataSource {
             movie.imageData = data
         })
     }
-    
-    //Don't need
-//    func searchImage(text: String, completion: @escaping () -> ()) {
-//        MoviesService().searchMovies(text: text, completion: {result in
-//            switch result {
-//            case .success(let moviesResponse):
-//                let movies = moviesResponse.movies?.map { (movieResponse) -> Movie in
-//                    return Movie(movieResponse: movieResponse)
-//                }
-//                self.movies = movies ?? []
-//                completion()
-//            case.failure(let err):
-//                print(err)
-//            }
-//        })
-//    }
 }

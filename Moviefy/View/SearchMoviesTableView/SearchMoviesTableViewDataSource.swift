@@ -74,13 +74,12 @@ extension SearchMoviesTableViewDataSource {
     
     func loadImages(completion: @escaping () -> ()) {
         self.movies.forEach { (movie) in
-//            guard let path = movie.movieResponse.posterPath else {
-//                return
-//            }
             if let path = movie.movieResponse.posterPath {
                 MoviesService().fetchMovieImage(imageUrl: path, completion: {data in
                     movie.imageData = data
                 })
+            } else {
+                
             }
         }
         completion()

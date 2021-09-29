@@ -16,7 +16,6 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
     var movieCategoryPath: MovieCategoryEndPoint?
     var genreChipsView: GenreChipsView?
     
-    //var searchController: UISearchController = UISearchController(searchResultsController: nil)
     var currentPage: Int = 1
     var isFetching = false
     var guide: UILayoutGuide =  UILayoutGuide()
@@ -35,8 +34,6 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
         
         self.guide = self.view.safeAreaLayoutGuide
         
-//        self.searchController.searchResultsUpdater = self
-//        self.navigationItem.searchController = self.searchController
         self.navigationItem.hidesSearchBarWhenScrolling = false
         let barTitle: UILabel = UILabel(frame: CGRect(x: 0, y: 0, width: 50, height: 40))
         barTitle.font = UIFont(name: "Helvetica-Bold", size: 16)
@@ -155,19 +152,9 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
 extension CategoryCollectionViewViewController: UICollectionViewDelegateFlowLayout {
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-//        let movie = self.categoryCollectionViewDataSource?.getLoadedImage()
-        var ratio = 0.0
-        if collectionView.bounds.width < collectionView.bounds.height {
-            ratio = 0.33
-        } else {
-            ratio = 0.33 / 2
-        }
+        let ratio = ThumbnailImageProperties.getRatio()
+        
         let width = (collectionView.bounds.width - self.interItemSpacing - self.interItemSpacing) * CGFloat(ratio)
-//        guard let imageData = movie?.imageData, let image: UIImage = UIImage(data: imageData) else {
-//            return CGSize(width: collectionView.bounds.width / itemsInRow - self.interItemSpacing, height: collectionView.bounds.height / itemsInColumn)
-//        }
-//        let height = width * (image.size.height / image.size.width)
-//        let height = collectionView.bounds.size.height / 4 * (collectionView.bounds.size.height / collectionView.bounds.size.width)
         let height = width * (750 / 500)
         return CGSize(width: width, height: height)
     }
