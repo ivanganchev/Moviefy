@@ -20,7 +20,7 @@ class CategoryCollectionViewCell: UICollectionViewCell {
         }
     }
     
-     let imageView: UIImageView = {
+    let imageView: UIImageView = {
         let imageView = UIImageView()
         return imageView
     }()
@@ -35,12 +35,6 @@ class CategoryCollectionViewCell: UICollectionViewCell {
     }
     
     override func layoutSubviews() {
-//        self.imageView.translatesAutoresizingMaskIntoConstraints = false
-//        self.imageView.contentMode = .scaleAspectFill
-//        self.imageView.topAnchor.constraint(equalTo: self.contentView.topAnchor).isActive = true
-//        self.imageView.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor).isActive = true
-//        self.imageView.trailingAnchor.constraint(equalTo: self.contentView.trailingAnchor).isActive = true
-//        self.imageView.bottomAnchor.constraint(equalTo: self.contentView.bottomAnchor).isActive = true
         let width = self.bounds.width
         let height = width * (750 / 500)
         let layout = UICollectionViewFlowLayout()

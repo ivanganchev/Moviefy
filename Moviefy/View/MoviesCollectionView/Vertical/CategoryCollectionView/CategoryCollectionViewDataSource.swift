@@ -24,15 +24,29 @@ class CategoryCollectionViewDataSource: NSObject,  UICollectionViewDataSource, U
         
         cell.image = nil
         let model = self.filteredMovies[indexPath.row]
-        cell.image = model.imageData == nil ? nil : UIImage(data: model.imageData!)
-    
+        
+        if model.movieResponse.posterPath != nil {
+            if let imageData = model.imageData {
+                cell.image = UIImage(data: imageData)
+            } else {
+                self.loadImage(movie: model) {
+                    DispatchQueue.main.async {
+                        cell.image = UIImage(data: self.movies[indexPath.row].imageData!)
+                    }
+                }
+            }
+        } else {
+            let defaultImage = UIImage(named: "not_loaded_image.jpg")
+            cell.image = defaultImage
+        }
+
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
         indexPaths.forEach { (indexPath) in
             if filteredMovies[indexPath.row].imageData == nil {
-                loadImage(movie: movies[indexPath.row])
+                loadImage(movie: movies[indexPath.row], completion: {}) 
             }
         }
     }
@@ -66,26 +80,23 @@ extension CategoryCollectionViewDataSource {
            })
        }
     
+    
     func loadImages(completion: @escaping () -> ()) {
         self.filteredMovies.forEach { (movie) in
-            guard let path = movie.movieResponse.posterPath else {
-                return
+            if let path = movie.movieResponse.posterPath {
+                MoviesService().fetchMovieImage(imageUrl: path, completion: {data in
+                    movie.imageData = data
+                })
             }
-
-            MoviesService().fetchMovieImage(imageUrl: path, completion: {data in
-                movie.imageData = data
-            })
         }
         completion()
     }
     
-    func loadImage(movie: Movie) {
-        guard let path = movie.movieResponse.posterPath else {
-            return
+    func loadImage(movie: Movie, completion: @escaping () -> ()) {
+        if let path = movie.movieResponse.posterPath {
+            MoviesService().fetchMovieImage(imageUrl: path, completion: {data in
+                movie.imageData = data
+            })
         }
-    
-        MoviesService().fetchMovieImage(imageUrl: path, completion: {data in
-            movie.imageData = data
-        })
     }
 }

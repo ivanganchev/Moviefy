@@ -8,12 +8,12 @@
 import Foundation
 import UIKit
 
-class SearchMoviesViewController: UIViewController, UISearchBarDelegate, UISearchDisplayDelegate, UIViewControllerTransitioningDelegate {
+class SearchMoviesViewController: UIViewController, UISearchBarDelegate, UISearchDisplayDelegate {
     var searchBar: UISearchBar = UISearchBar()
     var searchMoviesTableView: UITableView = UITableView(frame: .zero, style: .plain)
     var searchMoviesTableViewDataSource: SearchMoviesTableViewDataSource?
     
-    var selectedCell: SearchMovieTableViewCell?
+    var selectedCellImageView: UIImageView? 
     var selectedCellImageViewSnapshot: UIView?
     var transitionAnimator: TransitionAnimator?
     
@@ -28,6 +28,7 @@ class SearchMoviesViewController: UIViewController, UISearchBarDelegate, UISearc
         self.searchMoviesTableView.dataSource = self.searchMoviesTableViewDataSource
         self.searchMoviesTableView.delegate = self
         self.searchMoviesTableView.register(SearchMovieTableViewCell.self, forCellReuseIdentifier: SearchMovieTableViewCell.identifier)
+        self.searchMoviesTableView.keyboardDismissMode = .onDrag
         
         self.view.addSubview(self.searchMoviesTableView)
         
@@ -74,32 +75,9 @@ class SearchMoviesViewController: UIViewController, UISearchBarDelegate, UISearc
         })
     }
     
-//    func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-//        guard let categoryCollectionViewViewController = source as? CategoryCollectionViewViewController,
-//                let movieInfoViewController = presented as? MovieInfoViewController,
-//                let selectedCellImageViewSnapshot = self.selectedCellImageViewSnapshot
-//                else { return nil }
-//
-//        self.transitionAnimator = TransitionAnimator(type: .present, categoryCollectionViewController: categoryCollectionViewViewController, movieInfoViewController: movieInfoViewController, selectedCellImageViewSnapshot: selectedCellImageViewSnapshot)
-//        return self.transitionAnimator
-//    }
-//
-//    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-//        guard let movieInfoViewController = dismissed as? MovieInfoViewController,
-//              let selectedCellImageViewSnapshot = self.selectedCellImageViewSnapshot
-//            else { return nil }
-//
-//        self.transitionAnimator = TransitionAnimator(type: .dismiss, categoryCollectionViewController: self, movieInfoViewController: movieInfoViewController, selectedCellImageViewSnapshot: selectedCellImageViewSnapshot)
-//        return self.transitionAnimator
-//    }
-//
-//    func presentMovieInfoViewController(with movie: Movie) {
-//        let movieInfoViewController = MovieInfoViewController()
-//        movieInfoViewController.movie = movie
-//        movieInfoViewController.modalPresentationStyle = .fullScreen
-//        movieInfoViewController.transitioningDelegate = self
-//        present(movieInfoViewController, animated: true)
-//    }
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        self.searchBar.endEditing(true)
+    }
 }
 
 extension SearchMoviesViewController: UITableViewDelegate {
@@ -108,11 +86,40 @@ extension SearchMoviesViewController: UITableViewDelegate {
         return size.height
     }
     
-//    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-//        let currentCell = tableView.cellForRow(at: indexPath) as! SearchMovieTableViewCell
-//        
-//        self.selectedCell = currentCell
-//        self.selectedCellImageViewSnapshot = currentCell.movieImage.snapshotView(afterScreenUpdates: false)
-//        self.presentMovieInfoViewController(with: (self.searchMoviesTableViewDataSource?.movies[indexPath.row])!)
-//    }
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let selectedCell = tableView.cellForRow(at: indexPath) as! SearchMovieTableViewCell
+        self.selectedCellImageView = selectedCell.movieImage
+        self.selectedCellImageViewSnapshot = self.selectedCellImageView?.snapshotView(afterScreenUpdates: true)
+        self.presentMovieInfoViewController(with: self.searchMoviesTableViewDataSource?.movies[indexPath.row])
+    }
+}
+
+extension SearchMoviesViewController: TransitionAnimatableContent, UIViewControllerTransitioningDelegate {
+    func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        guard let searchMoviesViewController = source as? SearchMoviesViewController,
+                let movieInfoViewController = presented as? MovieInfoViewController,
+                let selectedCellImageViewSnapshot = self.selectedCellImageViewSnapshot
+                else { return nil }
+
+        self.transitionAnimator = TransitionAnimator(type: .present, firstViewController: searchMoviesViewController, movieInfoViewController: movieInfoViewController, selectedCellImageViewSnapshot: selectedCellImageViewSnapshot)
+        return self.transitionAnimator
+    }
+
+    
+    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        guard let movieInfoViewController = dismissed as? MovieInfoViewController,
+              let selectedCellImageViewSnapshot = self.selectedCellImageViewSnapshot
+            else { return nil }
+
+        self.transitionAnimator = TransitionAnimator(type: .dismiss, firstViewController: self, movieInfoViewController: movieInfoViewController, selectedCellImageViewSnapshot: selectedCellImageViewSnapshot)
+        return self.transitionAnimator
+    }
+    
+    func presentMovieInfoViewController(with movie: Movie?) {
+        let movieInfoViewController = MovieInfoViewController()
+        movieInfoViewController.movie = movie
+        movieInfoViewController.modalPresentationStyle = .fullScreen
+        movieInfoViewController.transitioningDelegate = self
+        present(movieInfoViewController, animated: true)
+    }
 }

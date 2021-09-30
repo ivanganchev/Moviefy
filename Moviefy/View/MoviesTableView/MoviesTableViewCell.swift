@@ -8,18 +8,24 @@
 import Foundation
 import UIKit
 
+protocol MoviesTableViewCellDelegate {
+    func getClickedCollectionViewCell(cell: MoviesCollectionViewCell?, movie: Movie?)
+}
 class MoviesTableViewCell : UITableViewCell {
     
     static let identifier = "MoviesTableViewCell"
     var moviesCollectionViewDataSource: MoviesCollectionViewDataSource?
     var moviesCollectionView: UICollectionView?
     var moviesCollectionViewLayout: UICollectionViewFlowLayout?
+    var delegate: MoviesTableViewCellDelegate?
     
     var movieCategoryPath: String = "" {
         didSet {
             self.moviesCollectionViewDataSource?.fetchMovies(movieCategoryPath: movieCategoryPath, completion: {
-                DispatchQueue.main.async {
-                    self.moviesCollectionView?.reloadData()
+                self.moviesCollectionViewDataSource?.loadImages {
+                    DispatchQueue.main.async {
+                        self.moviesCollectionView?.reloadData()
+                    }
                 }
             })
         }
@@ -34,8 +40,9 @@ class MoviesTableViewCell : UITableViewCell {
         self.moviesCollectionView?.showsHorizontalScrollIndicator = false
         self.moviesCollectionViewDataSource = MoviesCollectionViewDataSource()
         self.moviesCollectionView!.dataSource = self.moviesCollectionViewDataSource
+        self.moviesCollectionView?.delegate = self
         self.moviesCollectionView!.register(MoviesCollectionViewCell.self, forCellWithReuseIdentifier: MoviesCollectionViewCell.identifier)
-        contentView.addSubview(moviesCollectionView!)
+        self.contentView.addSubview(moviesCollectionView!)
     }
     
     required init?(coder: NSCoder) {
@@ -57,5 +64,12 @@ class MoviesTableViewCell : UITableViewCell {
         layout.itemSize = CGSize(width: size.width, height: size.height)
     
         return layout
+    }
+}
+
+extension MoviesTableViewCell: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let selectedCell = collectionView.cellForItem(at: indexPath) as? MoviesCollectionViewCell
+        self.delegate?.getClickedCollectionViewCell(cell: selectedCell, movie: self.moviesCollectionViewDataSource?.movies[indexPath.row])
     }
 }

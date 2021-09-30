@@ -30,6 +30,7 @@
 		8E56E40426F38171001ADF70 /* RootTabBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E56E40326F38171001ADF70 /* RootTabBarViewController.swift */; };
 		8E56E40726F48B27001ADF70 /* SearchMoviesTableViewDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E56E40626F48B27001ADF70 /* SearchMoviesTableViewDataSource.swift */; };
 		8E56E40926F48B86001ADF70 /* SearchMovieTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E56E40826F48B86001ADF70 /* SearchMovieTableViewCell.swift */; };
+		8E99FEDB2704B2E0001DC33F /* TransitionAnimatableContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E99FEDA2704B2E0001DC33F /* TransitionAnimatableContent.swift */; };
 		8E9F27C426D7CE4C00E60D9F /* MovieResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E9F27C326D7CE4C00E60D9F /* MovieResponse.swift */; };
 		8E9F27CA26D7D5C500E60D9F /* Secrets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E9F27C926D7D5C500E60D9F /* Secrets.swift */; };
 		8E9F27D126D8C55A00E60D9F /* TokenResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E9F27D026D8C55A00E60D9F /* TokenResponse.swift */; };
@@ -69,6 +70,7 @@
 		8E56E40326F38171001ADF70 /* RootTabBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootTabBarViewController.swift; sourceTree = "<group>"; };
 		8E56E40626F48B27001ADF70 /* SearchMoviesTableViewDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchMoviesTableViewDataSource.swift; sourceTree = "<group>"; };
 		8E56E40826F48B86001ADF70 /* SearchMovieTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchMovieTableViewCell.swift; sourceTree = "<group>"; };
+		8E99FEDA2704B2E0001DC33F /* TransitionAnimatableContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransitionAnimatableContent.swift; sourceTree = "<group>"; };
 		8E9F27C326D7CE4C00E60D9F /* MovieResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieResponse.swift; sourceTree = "<group>"; };
 		8E9F27C926D7D5C500E60D9F /* Secrets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Secrets.swift; sourceTree = "<group>"; };
 		8E9F27D026D8C55A00E60D9F /* TokenResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenResponse.swift; sourceTree = "<group>"; };
@@ -126,6 +128,7 @@
 			isa = PBXGroup;
 			children = (
 				8E492C4226EB406C002FAF8C /* TransitionAnimator.swift */,
+				8E99FEDA2704B2E0001DC33F /* TransitionAnimatableContent.swift */,
 			);
 			path = Animations;
 			sourceTree = "<group>";
@@ -334,6 +337,7 @@
 				8E9F27E526D901A000E60D9F /* MoviesResponse.swift in Sources */,
 				8E56E40426F38171001ADF70 /* RootTabBarViewController.swift in Sources */,
 				8E9F27C426D7CE4C00E60D9F /* MovieResponse.swift in Sources */,
+				8E99FEDB2704B2E0001DC33F /* TransitionAnimatableContent.swift in Sources */,
 				8EE7782926FC855900C98DA5 /* GenreChipsCollectionViewDataSource.swift in Sources */,
 				8E492C0D26DF6994002FAF8C /* MoviesTableViewCell.swift in Sources */,
 				8EE7782E26FC9B6300C98DA5 /* GenreChipsView.swift in Sources */,

@@ -33,7 +33,7 @@ class MovieInfoViewController: UIViewController {
         self.movieInfoScrollView.contentInsetAdjustmentBehavior = .never
         
         self.containerView.translatesAutoresizingMaskIntoConstraints = false
-//        Ето тук не съм сигурен - изнасям 
+        
         if let imageData = self.movie?.imageData {
             self.movieImage.image = UIImage(data: imageData)
         }

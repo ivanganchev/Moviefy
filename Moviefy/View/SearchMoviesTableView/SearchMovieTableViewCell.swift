@@ -73,8 +73,8 @@ class SearchMovieTableViewCell: UITableViewCell {
         
         self.containerView.addArrangedSubview(self.movieTitle)
         self.containerView.addArrangedSubview(self.movieGenres)
-        self.addSubview(self.movieImage)
-        self.addSubview(self.containerView)
+        self.contentView.addSubview(self.movieImage)
+        self.contentView.addSubview(self.containerView)
     }
 
     required init(coder aDecoder: NSCoder) {
@@ -83,10 +83,13 @@ class SearchMovieTableViewCell: UITableViewCell {
     
     override func layoutSubviews() {
         self.movieImage.leadingAnchor.constraint(equalTo: self.leadingAnchor).isActive = true
-        self.movieImage.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
+//        self.movieImage.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
         self.movieImage.heightAnchor.constraint(equalTo: self.heightAnchor).isActive = true
         self.movieImage.widthAnchor.constraint(equalToConstant: self.bounds.height * (500/750)).isActive = true
-        
+//        let size = ThumbnailImageProperties.getSize()
+//        DispatchQueue.main.async {
+//            self.movieImage.frame = CGRect(origin: .zero, size: CGSize(width: size.height * (500/750), height: size.height))
+//        }
         self.containerView.leadingAnchor.constraint(equalTo: self.movieImage.trailingAnchor, constant: 15).isActive = true
         self.containerView.trailingAnchor.constraint(equalTo: self.trailingAnchor).isActive = true
         self.containerView.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true

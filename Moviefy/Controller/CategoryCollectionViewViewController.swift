@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 
 class CategoryCollectionViewViewController: UIViewController, UIViewControllerTransitioningDelegate, GenreChipsViewDelegate {
-   
+
     var categoryCollectionView: UICollectionView?
     var categoryType: String = ""
     var categoryCollectionViewDataSource: CategoryCollectionViewDataSource = CategoryCollectionViewDataSource()
@@ -25,7 +25,7 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
     let itemsInRow: CGFloat = 3.0
     let itemsInColumn : CGFloat = 4.0
     
-    var selectedCell: CategoryCollectionViewCell?
+    var selectedCellImageView: UIImageView?
     var selectedCellImageViewSnapshot: UIView?
     var transitionAnimator: TransitionAnimator?
     
@@ -215,18 +215,21 @@ extension CategoryCollectionViewViewController: UICollectionViewDelegateFlowLayo
 //    }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        self.selectedCell = collectionView.cellForItem(at: indexPath) as? CategoryCollectionViewCell
+        let selectedCell = collectionView.cellForItem(at: indexPath) as? CategoryCollectionViewCell
+        self.selectedCellImageView = selectedCell?.imageView
         self.selectedCellImageViewSnapshot = selectedCell?.imageView.snapshotView(afterScreenUpdates: true)
         self.presentMovieInfoViewController(with: self.categoryCollectionViewDataSource.filteredMovies[indexPath.row])
     }
-    
+}
+
+extension CategoryCollectionViewViewController: TransitionAnimatableContent {
     func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         guard let categoryCollectionViewViewController = source as? CategoryCollectionViewViewController,
                 let movieInfoViewController = presented as? MovieInfoViewController,
                 let selectedCellImageViewSnapshot = self.selectedCellImageViewSnapshot
                 else { return nil }
 
-        self.transitionAnimator = TransitionAnimator(type: .present, categoryCollectionViewController: categoryCollectionViewViewController, movieInfoViewController: movieInfoViewController, selectedCellImageViewSnapshot: selectedCellImageViewSnapshot)
+        self.transitionAnimator = TransitionAnimator(type: .present, firstViewController: categoryCollectionViewViewController, movieInfoViewController: movieInfoViewController, selectedCellImageViewSnapshot: selectedCellImageViewSnapshot)
         return self.transitionAnimator
     }
 
@@ -236,7 +239,7 @@ extension CategoryCollectionViewViewController: UICollectionViewDelegateFlowLayo
               let selectedCellImageViewSnapshot = self.selectedCellImageViewSnapshot
             else { return nil }
 
-        self.transitionAnimator = TransitionAnimator(type: .dismiss, categoryCollectionViewController: self, movieInfoViewController: movieInfoViewController, selectedCellImageViewSnapshot: selectedCellImageViewSnapshot)
+        self.transitionAnimator = TransitionAnimator(type: .dismiss, firstViewController: self, movieInfoViewController: movieInfoViewController, selectedCellImageViewSnapshot: selectedCellImageViewSnapshot)
         return self.transitionAnimator
     }
     

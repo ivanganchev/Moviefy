@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 
 class SearchMoviesTableViewDataSource:NSObject, UITableViewDataSource {
-    var movies:[Movie] = []
+    var movies: [Movie] = []
     let genres = MoviesService.genres
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -22,7 +22,22 @@ class SearchMoviesTableViewDataSource:NSObject, UITableViewDataSource {
         cell.image = nil
 
         let model = self.movies[indexPath.row]
-        cell.image = model.imageData == nil ? nil : UIImage(data: model.imageData!)
+        
+        if model.movieResponse.posterPath != nil {
+            if let imageData = model.imageData {
+                cell.image = UIImage(data: imageData)
+            } else {
+                self.loadImage(movie: model) {
+                    DispatchQueue.main.async {
+                        cell.image = UIImage(data: self.movies[indexPath.row].imageData!)
+                    }
+                }
+            }
+        } else {
+            let defaultImage = UIImage(named: "not_loaded_image.jpg")
+            cell.image = defaultImage
+        }
+
         cell.title = model.movieResponse.title
         
         let arrayOfGenres: [String] = model.movieResponse.genreIds?.compactMap({ id in
@@ -48,7 +63,7 @@ extension SearchMoviesTableViewDataSource {
                     let movies = moviesResponse.movies?.map { (movieResponse) -> Movie in
                         return Movie(movieResponse: movieResponse)
                     }
-                    self.movies.append(contentsOf: movies ?? [])
+                    self.movies = movies ?? []
                     completion()
                case .failure(let err):
                    print(err)
@@ -78,12 +93,16 @@ extension SearchMoviesTableViewDataSource {
                 MoviesService().fetchMovieImage(imageUrl: path, completion: {data in
                     movie.imageData = data
                 })
-            } else {
-                
             }
         }
         completion()
     }
     
-    
+    func loadImage(movie: Movie, completion: @escaping () -> ()) {
+        if let path = movie.movieResponse.posterPath {
+            MoviesService().fetchMovieImage(imageUrl: path, completion: {data in
+                movie.imageData = data
+            })
+        }
+    }
 }

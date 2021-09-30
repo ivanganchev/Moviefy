@@ -14,6 +14,10 @@ class ViewController: UIViewController, MoviesTableViewButtonTapDelegate {
     var moviesTableView: UITableView = UITableView(frame: .zero, style: .grouped)
     var guide: UILayoutGuide = UILayoutGuide()
     
+    var selectedCellImageView: UIImageView?
+    var selectedCellImageViewSnapshot: UIView?
+    var transitionAnimator: TransitionAnimator?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.navigationController?.navigationBar.isHidden = true
@@ -58,6 +62,42 @@ class ViewController: UIViewController, MoviesTableViewButtonTapDelegate {
     @objc func pullToRefresh() {
         self.moviesTableView.reloadData()
         self.moviesTableView.refreshControl?.endRefreshing()
+    }
+    
+    func setClickedCollectionViewCell(cell: MoviesCollectionViewCell?, movie: Movie?) {
+        self.selectedCellImageView = cell?.imageView
+        self.selectedCellImageViewSnapshot = self.selectedCellImageView?.snapshotView(afterScreenUpdates: true)
+        self.presentMovieInfoViewController(with: movie)
+    }
+}
+
+extension ViewController: TransitionAnimatableContent, UIViewControllerTransitioningDelegate {
+    func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        guard let searchMoviesViewController = source as? ViewController,
+                let movieInfoViewController = presented as? MovieInfoViewController,
+                let selectedCellImageViewSnapshot = self.selectedCellImageViewSnapshot
+                else { return nil }
+
+        self.transitionAnimator = TransitionAnimator(type: .present, firstViewController: searchMoviesViewController, movieInfoViewController: movieInfoViewController, selectedCellImageViewSnapshot: selectedCellImageViewSnapshot)
+        return self.transitionAnimator
+    }
+
+    
+    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        guard let movieInfoViewController = dismissed as? MovieInfoViewController,
+              let selectedCellImageViewSnapshot = self.selectedCellImageViewSnapshot
+            else { return nil }
+
+        self.transitionAnimator = TransitionAnimator(type: .dismiss, firstViewController: self, movieInfoViewController: movieInfoViewController, selectedCellImageViewSnapshot: selectedCellImageViewSnapshot)
+        return self.transitionAnimator
+    }
+    
+    func presentMovieInfoViewController(with movie: Movie?) {
+        let movieInfoViewController = MovieInfoViewController()
+        movieInfoViewController.movie = movie
+        movieInfoViewController.modalPresentationStyle = .fullScreen
+        movieInfoViewController.transitioningDelegate = self
+        present(movieInfoViewController, animated: true)
     }
 }
 

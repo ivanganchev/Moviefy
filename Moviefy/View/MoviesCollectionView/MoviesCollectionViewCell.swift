@@ -10,22 +10,30 @@ import UIKit
 class MoviesCollectionViewCell: UICollectionViewCell {
     static let identifier = "MoviesCollectionViewCell"
     
-    var data: Data? {
+//    var data: Data? {
+//        didSet {
+//            DispatchQueue.main.async {
+//                self.imageView.image = UIImage(data: self.data!)
+//            }
+//        }
+//    }
+    
+    var image: UIImage? {
         didSet {
             DispatchQueue.main.async {
-                self.myImageView.image = UIImage(data: self.data!)
+                self.imageView.image = self.image
             }
         }
     }
     
-    private let myImageView: UIImageView = {
+    let imageView: UIImageView = {
         let imageView = UIImageView()
         return imageView
     }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        contentView.addSubview(myImageView)
+        contentView.addSubview(imageView)
     }
     
     required init?(coder: NSCoder) {
@@ -35,7 +43,7 @@ class MoviesCollectionViewCell: UICollectionViewCell {
     override func layoutSubviews() {
         
         DispatchQueue.main.async {
-            self.myImageView.frame = CGRect(origin: .zero, size: ThumbnailImageProperties.getSize())
+            self.imageView.frame = CGRect(origin: .zero, size: ThumbnailImageProperties.getSize())
         }
     }
 }
