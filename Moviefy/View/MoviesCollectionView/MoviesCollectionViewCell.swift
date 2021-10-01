@@ -9,15 +9,7 @@ import UIKit
 
 class MoviesCollectionViewCell: UICollectionViewCell {
     static let identifier = "MoviesCollectionViewCell"
-    
-//    var data: Data? {
-//        didSet {
-//            DispatchQueue.main.async {
-//                self.imageView.image = UIImage(data: self.data!)
-//            }
-//        }
-//    }
-    
+
     var image: UIImage? {
         didSet {
             DispatchQueue.main.async {

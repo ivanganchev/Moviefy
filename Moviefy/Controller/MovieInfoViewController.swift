@@ -4,8 +4,8 @@
 //
 //  Created by A-Team Intern on 7.09.21.
 //
-
 import UIKit
+import RealmSwift
 
 class MovieInfoViewController: UIViewController {
 
@@ -16,12 +16,15 @@ class MovieInfoViewController: UIViewController {
     var movieImage: UIImageView = UIImageView()
     var shadowView: UIView = UIView()
     var closeButton: UIButton = UIButton()
+    var heartButton: UIButton = UIButton()
     var movieOverview: UILabel = UILabel()
     var movieGenres: UILabel = UILabel()
     var movieDateReleased: UILabel = UILabel()
     var movieOverviewLabel: UILabel = UILabel()
     var containerView: UIView = UIView()
     var topPartView: UIView = UIView()
+    var isHeartButtonTapped: Bool = false
+    var realm: Realm?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -62,17 +65,33 @@ class MovieInfoViewController: UIViewController {
         self.closeButton.addTarget(self, action: #selector(MovieInfoViewController.closeButtonTap), for: .touchUpInside)
         self.closeButton.isUserInteractionEnabled = true
         
+        self.heartButton.setImage(UIImage(systemName: "heart"), for: .normal)
+        self.heartButton.imageView?.contentMode = .scaleAspectFit
+        self.heartButton.contentHorizontalAlignment = .fill
+        self.heartButton.contentVerticalAlignment = .fill
+        self.heartButton.tintColor = .white
+        self.heartButton.translatesAutoresizingMaskIntoConstraints = false
+        self.heartButton.addTarget(self, action: #selector(MovieInfoViewController.heartButtonTap), for: .touchUpInside)
+        self.heartButton.isUserInteractionEnabled = true
+        
         self.shadowView.addSubview(self.closeButton)
+        self.shadowView.addSubview(self.heartButton)
         
         self.closeButton.centerYAnchor.constraint(equalTo: self.shadowView.centerYAnchor, constant: 10).isActive = true
         self.closeButton.leadingAnchor.constraint(equalTo: self.shadowView.leadingAnchor, constant: 20).isActive = true
         self.closeButton.widthAnchor.constraint(equalToConstant: 25).isActive = true
         self.closeButton.heightAnchor.constraint(equalToConstant: 25).isActive = true
         
+        self.heartButton.centerYAnchor.constraint(equalTo: self.shadowView.centerYAnchor, constant: 10).isActive = true
+        self.heartButton.trailingAnchor.constraint(equalTo: self.shadowView.trailingAnchor, constant: -20).isActive = true
+        self.heartButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
+        self.heartButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
+        
         self.topPartView = UIView()
         self.topPartView.translatesAutoresizingMaskIntoConstraints = false
         self.topPartView.addSubview(self.movieImage)
         self.topPartView.addSubview(self.shadowView)
+        
         self.movieImage.topAnchor.constraint(equalTo: self.topPartView.topAnchor).isActive = true
         self.movieImage.leadingAnchor.constraint(equalTo: self.topPartView.leadingAnchor).isActive = true
         self.movieImage.trailingAnchor.constraint(equalTo: self.topPartView.trailingAnchor).isActive = true
@@ -166,10 +185,34 @@ class MovieInfoViewController: UIViewController {
         self.movieInfoScrollView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
         self.movieInfoScrollView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
         self.movieInfoScrollView.widthAnchor.constraint(equalTo: self.view.widthAnchor).isActive = true
+        
+        self.realm = try! Realm()
     }
     
     @objc func closeButtonTap() {
         self.dismiss(animated: true, completion: nil)
+    }
+    
+    @objc func heartButtonTap() {
+        if self.isHeartButtonTapped == false {
+            self.heartButton.setImage(UIImage(systemName: "suit.heart.fill"), for: .normal)
+            self.heartButton.tintColor = .red
+            self.isHeartButtonTapped = true
+            
+            let movie = MovieEntity(movie: self.movie)
+            try! self.realm?.write({
+                realm?.add(movie)
+            })
+        } else {
+            self.heartButton.setImage(UIImage(systemName: "heart"), for: .normal)
+            self.heartButton.tintColor = .white
+            self.isHeartButtonTapped = false
+            
+            let movie = self.realm?.objects(MovieEntity.self).filter("title == %@", self.movie?.movieResponse.title ?? "")
+            try! self.realm?.write({
+                realm?.delete(movie!.first!)
+            })
+        }
     }
     
     private func setGenres() {
