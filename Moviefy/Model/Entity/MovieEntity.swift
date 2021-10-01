@@ -18,6 +18,7 @@ class MovieEntity: Object {
     @Persisted var popularity: Float = 0.0
     @Persisted var releaseDate: String?
     @Persisted var runtime: String?
+    @Persisted var imageData: Data?
     let genreIds = RealmSwift.List<Int>()
     
     convenience init(movie: Movie?) {
@@ -31,6 +32,7 @@ class MovieEntity: Object {
         self.popularity = movie?.movieResponse.popularity ?? 0.0
         self.releaseDate = movie?.movieResponse.releaseDate
         self.runtime = movie?.movieResponse.runtime
+        self.imageData = movie?.imageData
         self.genreIds.append(objectsIn: movie?.movieResponse.genreIds ?? [])
     }
 }

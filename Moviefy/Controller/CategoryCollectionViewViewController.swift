@@ -217,7 +217,7 @@ extension CategoryCollectionViewViewController: UICollectionViewDelegateFlowLayo
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let selectedCell = collectionView.cellForItem(at: indexPath) as? CategoryCollectionViewCell
         self.selectedCellImageView = selectedCell?.imageView
-        self.selectedCellImageViewSnapshot = selectedCell?.imageView.snapshotView(afterScreenUpdates: true)
+        self.selectedCellImageViewSnapshot = selectedCellImageView?.snapshotView(afterScreenUpdates: true)
         self.presentMovieInfoViewController(with: self.categoryCollectionViewDataSource.filteredMovies[indexPath.row])
     }
 }

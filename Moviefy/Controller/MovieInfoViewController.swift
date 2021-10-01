@@ -187,6 +187,12 @@ class MovieInfoViewController: UIViewController {
         self.movieInfoScrollView.widthAnchor.constraint(equalTo: self.view.widthAnchor).isActive = true
         
         self.realm = try! Realm()
+        
+        if let movie = self.realm?.objects(MovieEntity.self).filter("title == %@", self.movie?.movieResponse.title ?? "").first {
+            self.setHeartRed()
+        } else {
+            self.setHeartClear()
+        }
     }
     
     @objc func closeButtonTap() {
@@ -195,24 +201,32 @@ class MovieInfoViewController: UIViewController {
     
     @objc func heartButtonTap() {
         if self.isHeartButtonTapped == false {
-            self.heartButton.setImage(UIImage(systemName: "suit.heart.fill"), for: .normal)
-            self.heartButton.tintColor = .red
-            self.isHeartButtonTapped = true
-            
+            self.setHeartRed()
+                    
             let movie = MovieEntity(movie: self.movie)
             try! self.realm?.write({
                 realm?.add(movie)
             })
         } else {
-            self.heartButton.setImage(UIImage(systemName: "heart"), for: .normal)
-            self.heartButton.tintColor = .white
-            self.isHeartButtonTapped = false
-            
+            self.setHeartClear()
+
             let movie = self.realm?.objects(MovieEntity.self).filter("title == %@", self.movie?.movieResponse.title ?? "")
             try! self.realm?.write({
                 realm?.delete(movie!.first!)
             })
         }
+    }
+    
+    func setHeartClear(){
+        self.heartButton.setImage(UIImage(systemName: "heart"), for: .normal)
+        self.heartButton.tintColor = .white
+        self.isHeartButtonTapped = false
+    }
+    
+    func setHeartRed() {
+        self.heartButton.setImage(UIImage(systemName: "suit.heart.fill"), for: .normal)
+        self.heartButton.tintColor = .red
+        self.isHeartButtonTapped = true
     }
     
     private func setGenres() {

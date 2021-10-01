@@ -14,4 +14,9 @@ class Movie {
     init(movieResponse: MovieResponse) {
         self.movieResponse = movieResponse
     }
+    
+    init(movieEntity: MovieEntity, imageData: Data) {
+        self.movieResponse = MovieResponse(originalTitle: movieEntity.originalTitle, title: movieEntity.title, posterPath:  movieEntity.posterPath, budget: movieEntity.budget, overview: movieEntity.overview, popularity: movieEntity.popularity, releaseDate: movieEntity.releaseDate, runtime: movieEntity.runtime, genreIds: Array(movieEntity.genreIds))
+        self.imageData = imageData
+    }
 }
