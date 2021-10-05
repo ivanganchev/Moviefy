@@ -15,6 +15,8 @@ class CategoryCollectionViewDataSource: NSObject,  UICollectionViewDataSource, U
     var movieCategoryPath: String?
     var loadedImages: [Data] = []
     
+    let footerView = UIActivityIndicatorView(style: .medium)
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return self.filteredMovies.count
     }
@@ -49,6 +51,16 @@ class CategoryCollectionViewDataSource: NSObject,  UICollectionViewDataSource, U
                 loadImage(movie: movies[indexPath.row], completion: {}) 
             }
         }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        if kind == UICollectionView.elementKindSectionFooter {
+            let footer = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: IndicatorFooter.identifier, for: indexPath)
+            footer.addSubview(self.footerView)
+            self.footerView.frame = CGRect(origin: .zero, size: CGSize(width: collectionView.bounds.width, height: 50))
+            return footer
+        }
+        return UICollectionReusableView()
     }
     
     func getMovieAtIndexPath(_ indexPath: IndexPath) -> Movie {

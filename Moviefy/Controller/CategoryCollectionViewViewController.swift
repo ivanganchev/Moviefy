@@ -28,10 +28,8 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
     var selectedCellImageView: UIImageView?
     var selectedCellImageViewSnapshot: UIView?
     var transitionAnimator: TransitionAnimator?
-    
+
     override func viewDidLoad() {
-        self.navigationController?.navigationBar.isHidden = false
-        
         self.guide = self.view.safeAreaLayoutGuide
         
         self.navigationItem.hidesSearchBarWhenScrolling = false
@@ -53,6 +51,7 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
         self.categoryCollectionView?.prefetchDataSource = self.categoryCollectionViewDataSource
         self.categoryCollectionView?.delegate = self
         self.categoryCollectionView?.register(CategoryCollectionViewCell.self, forCellWithReuseIdentifier: CategoryCollectionViewCell.identifier)
+        self.categoryCollectionView?.register(IndicatorFooter.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: IndicatorFooter.identifier)
         self.categoryCollectionView?.refreshControl = UIRefreshControl()
         self.categoryCollectionView?.refreshControl?.addTarget(self, action: #selector(pullToRefresh), for: .valueChanged)
         
@@ -62,6 +61,7 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
         self.genreChipsView = GenreChipsView(frame: .zero)
         self.genreChipsView?.translatesAutoresizingMaskIntoConstraints = false
         self.genreChipsView?.delegate = self
+        
         // Not sure about it
         self.view.addSubview(self.categoryCollectionView ?? UICollectionView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height), collectionViewLayout: categoryCollectionViewLayout))
         self.view.addSubview(self.genreChipsView!)
@@ -73,25 +73,26 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
         self.genreChipsView?.widthAnchor.constraint(equalTo: self.view.widthAnchor).isActive = true
         
         self.categoryCollectionView?.topAnchor.constraint(equalTo: self.genreChipsView!.bottomAnchor).isActive = true
+        self.categoryCollectionView?.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
         self.categoryCollectionView?.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
         self.categoryCollectionView?.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
-        self.categoryCollectionView?.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
-
-        for n in 1...3 {
-            self.categoryCollectionViewDataSource.fetchMovies(page: self.currentPage, completion: {
-                self.currentPage += 1
-                self.categoryCollectionViewDataSource.loadImages(completion: {
-                    DispatchQueue.main.async {
-                        self.categoryCollectionView?.reloadData()
-                    }
-                })
+        
+        self.categoryCollectionViewDataSource.fetchMovies(page: self.currentPage, completion: {
+            self.currentPage += 1
+            self.categoryCollectionViewDataSource.loadImages(completion: {
+                DispatchQueue.main.async {
+                    self.categoryCollectionView?.reloadData()
+                }
             })
-        }
+        })
     }
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-        self.navigationController?.navigationBar.isHidden = false
         super.viewWillTransition(to: size, with: coordinator)
+    }
+    
+    override func viewDidLayoutSubviews() {
+        self.navigationController?.navigationBar.isHidden = false
     }
     
     @objc func pullToRefresh() {
@@ -150,13 +151,17 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
 }
 
 extension CategoryCollectionViewViewController: UICollectionViewDelegateFlowLayout {
-
+    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let ratio = ThumbnailImageProperties.getRatio()
         
         let width = (collectionView.bounds.width - self.interItemSpacing - self.interItemSpacing) * CGFloat(ratio)
         let height = width * (750 / 500)
         return CGSize(width: width, height: height)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
+        return CGSize(width: UIScreen.main.bounds.width, height: 50)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
@@ -172,47 +177,25 @@ extension CategoryCollectionViewViewController: UICollectionViewDelegateFlowLayo
     }
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-//        if indexPath.row == (self.categoryCollectionViewDataSource?.movies.count)! - 20 {
-//            print(indexPath.row)
-//            self.currentPage += 1
-//            self.categoryCollectionViewDataSource?.fetchMovies(page: self.currentPage)
-//            self.loadedMovies = 20
-//        } else if indexPath.row == (self.categoryCollectionViewDataSource?.movies.count)! - (1 + self.loadedMovies) {
-//            print(indexPath.row)
-//            DispatchQueue.main.async {
-//                self.categoryCollectionView?.reloadData()
-//            }
-//        }
-//        print(indexPath.row)
-//        print(self.categoryCollectionViewDataSource?.movies.count)
-//        print("loaded movies -" + String(self.loadedMovies))
-        
-        if indexPath.row == collectionView.numberOfItems(inSection: 0) - 60 && !self.isFetching {
-            self.currentPage += 1
-            self.isFetching = true
-            for n in 1...3 {
-                self.categoryCollectionViewDataSource.fetchMovies(page: self.currentPage, completion: {
-                    self.isFetching = false
-                })
-            }
-        }
-//        print(indexPath.row)
-//        print(self.categoryCollectionViewDataSource?.movies.count)
-    }
-    
-    
-    func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
-        if self.categoryCollectionViewDataSource.movies.count ?? 0 > self.categoryCollectionView?.numberOfItems(inSection: 0) ?? 0 {
-            DispatchQueue.main.async {
-                self.categoryCollectionView?.reloadData()
+        if indexPath.row == (self.categoryCollectionViewDataSource.filteredMovies.count - 1) {
+            self.categoryCollectionViewDataSource.footerView.startAnimating()
+            self.categoryCollectionViewDataSource.fetchMovies(page: self.currentPage) {
+                self.categoryCollectionViewDataSource.loadImages {
+                    DispatchQueue.main.async {
+                        self.categoryCollectionViewDataSource.footerView.stopAnimating()
+                        var paths = [IndexPath]()
+                        for item in 1...20 {
+                            let indexPath = IndexPath(row: item + indexPath.row, section: 0)
+                            paths.append(indexPath)
+                        }
+                        self.categoryCollectionView?.insertItems(at: paths)
+                        //self.categoryCollectionView?.reloadItems(at: paths)
+                        self.currentPage += 1
+                    }
+                }
             }
         }
     }
-    
-//    func executeMultiTask() {
-//        let taskGroup = DispatchGroup()
-//
-//    }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let selectedCell = collectionView.cellForItem(at: indexPath) as? CategoryCollectionViewCell

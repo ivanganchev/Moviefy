@@ -20,9 +20,15 @@ class ViewController: UIViewController, MoviesTableViewButtonTapDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        self.view.backgroundColor = .white
         self.navigationController?.navigationBar.isHidden = true
         self.guide = view.safeAreaLayoutGuide
         self.setLayout()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        self.navigationController?.navigationBar.isHidden = true
     }
     
     func switchView(path: MovieCategoryEndPoint, categoryType: String) {
@@ -34,7 +40,7 @@ class ViewController: UIViewController, MoviesTableViewButtonTapDelegate {
     
     private func setLayout() {
         self.navigationController?.navigationBar.isHidden = true
-        self.moviesTableView.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
+        self.moviesTableView.frame = CGRect(origin: .zero, size: .zero)
         self.moviesTableView.translatesAutoresizingMaskIntoConstraints = false
         self.moviesTableViewDataSource = MoviesTableViewDataSource()
         self.moviesTableViewDelegate = MoviesTableViewDelegate()
@@ -46,17 +52,16 @@ class ViewController: UIViewController, MoviesTableViewButtonTapDelegate {
         self.moviesTableView.refreshControl = UIRefreshControl()
         self.moviesTableView.refreshControl?.addTarget(self, action: #selector(pullToRefresh), for: .valueChanged)
         self.view.addSubview(self.moviesTableView)
+        let guide = self.view.safeAreaLayoutGuide
+        NSLayoutConstraint.activate([
+            self.moviesTableView.topAnchor.constraint(equalTo: self.view.topAnchor),
+            self.moviesTableView.bottomAnchor.constraint(equalTo:  guide.bottomAnchor),
+            self.moviesTableView.leadingAnchor.constraint(equalTo: guide.leadingAnchor),
+            self.moviesTableView.trailingAnchor.constraint(equalTo: guide.trailingAnchor)
+        ])
         self.moviesTableView.reloadData()
         self.moviesTableViewDelegate?.delegate = self
         MoviesService.loadMoviesGenreList()
-    }
-    
-    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-        coordinator.animate(alongsideTransition: {(_) in
-            self.setLayout()
-        }, completion: nil)
-
-        super.viewWillTransition(to: size, with: coordinator)
     }
     
     @objc func pullToRefresh() {
@@ -64,7 +69,7 @@ class ViewController: UIViewController, MoviesTableViewButtonTapDelegate {
         self.moviesTableView.refreshControl?.endRefreshing()
     }
     
-    func setClickedCollectionViewCell(cell: MoviesCollectionViewCell?, movie: Movie?) {
+    func setClickedCollectionViewCell(cell: MoviesCollectionViewCell?, movie: Movie) {
         self.selectedCellImageView = cell?.imageView
         self.selectedCellImageViewSnapshot = self.selectedCellImageView?.snapshotView(afterScreenUpdates: true)
         self.presentMovieInfoViewController(with: movie)
@@ -92,7 +97,7 @@ extension ViewController: TransitionAnimatableContent, UIViewControllerTransitio
         return self.transitionAnimator
     }
     
-    func presentMovieInfoViewController(with movie: Movie?) {
+    func presentMovieInfoViewController(with movie: Movie) {
         let movieInfoViewController = MovieInfoViewController()
         movieInfoViewController.movie = movie
         movieInfoViewController.modalPresentationStyle = .fullScreen

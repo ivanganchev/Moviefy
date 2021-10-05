@@ -12,7 +12,6 @@ import RealmSwift
 class SavedMoviesViewController: UIViewController, TransitionAnimatableContent {
     var savedMoviesCollectionView: UICollectionView?
     var savedMoviesCollectionViewDataSource: SavedMoviesCollectionViewDataSource = SavedMoviesCollectionViewDataSource()
-    var realm: Realm = try! Realm()
     
     let interItemSpacing: CGFloat = 5.0
     let lineSpacingForSection: CGFloat = 5.0
@@ -45,24 +44,20 @@ class SavedMoviesViewController: UIViewController, TransitionAnimatableContent {
         self.savedMoviesCollectionView?.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
         self.savedMoviesCollectionView?.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
         self.savedMoviesCollectionView?.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
-        
-        let results = self.realm.objects(MovieEntity.self)
-        
-        let token = results.observe {[weak self] (changes: RealmCollectionChange) in
+    
+        self.savedMoviesCollectionViewDataSource.loadSavedMovies {changes in
             switch changes {
             case .initial:
-                self?.savedMoviesCollectionView?.reloadData()
+                self.savedMoviesCollectionView?.reloadData()
             case .update(_, deletions: let deletions, insertions: let insertions, modifications: let modifications):
-                self?.savedMoviesCollectionView?.reloadItems(at: insertions.map({IndexPath(row: $0, section: 0)}))
+                self.savedMoviesCollectionView?.performBatchUpdates({
+                    self.savedMoviesCollectionView?.deleteItems(at: deletions.map({IndexPath(row: $0, section: 0)}))
+                    self.savedMoviesCollectionView?.insertItems(at: insertions.map({IndexPath(row: $0, section: 0)}))
+                    self.savedMoviesCollectionView?.reloadItems(at: modifications.map({ IndexPath(row: $0, section: 0) }))
+                }, completion: nil)
             case .error(let err):
                 print(err)
             }
-        }
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        self.savedMoviesCollectionViewDataSource.loadSavedMovies {
-            self.savedMoviesCollectionView?.reloadData()
         }
     }
 }

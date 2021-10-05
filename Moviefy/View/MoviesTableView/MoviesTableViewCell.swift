@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 
 protocol MoviesTableViewCellDelegate {
-    func getClickedCollectionViewCell(cell: MoviesCollectionViewCell?, movie: Movie?)
+    func getClickedCollectionViewCell(cell: MoviesCollectionViewCell?, movie: Movie)
 }
 class MoviesTableViewCell : UITableViewCell {
     
@@ -34,8 +34,8 @@ class MoviesTableViewCell : UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         let layout = self.setLayout()
-        self.moviesCollectionView = UICollectionView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: layout.itemSize.height), collectionViewLayout: layout)
-
+        self.moviesCollectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        self.moviesCollectionView?.translatesAutoresizingMaskIntoConstraints = false
         self.moviesCollectionView?.backgroundColor = .white
         self.moviesCollectionView?.showsHorizontalScrollIndicator = false
         self.moviesCollectionViewDataSource = MoviesCollectionViewDataSource()
@@ -43,6 +43,11 @@ class MoviesTableViewCell : UITableViewCell {
         self.moviesCollectionView?.delegate = self
         self.moviesCollectionView!.register(MoviesCollectionViewCell.self, forCellWithReuseIdentifier: MoviesCollectionViewCell.identifier)
         self.contentView.addSubview(moviesCollectionView!)
+        
+        self.moviesCollectionView?.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
+        self.moviesCollectionView?.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
+        self.moviesCollectionView?.leadingAnchor.constraint(equalTo: self.leadingAnchor).isActive = true
+        self.moviesCollectionView?.trailingAnchor.constraint(equalTo: self.trailingAnchor).isActive = true
     }
     
     required init?(coder: NSCoder) {
@@ -53,7 +58,6 @@ class MoviesTableViewCell : UITableViewCell {
         self.moviesCollectionView?.reloadData()
         let layout = setLayout()
         self.moviesCollectionView?.collectionViewLayout = layout
-        self.moviesCollectionView?.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: layout.itemSize.height)
         super.layoutSubviews()
     }
     
@@ -70,6 +74,9 @@ class MoviesTableViewCell : UITableViewCell {
 extension MoviesTableViewCell: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let selectedCell = collectionView.cellForItem(at: indexPath) as? MoviesCollectionViewCell
-        self.delegate?.getClickedCollectionViewCell(cell: selectedCell, movie: self.moviesCollectionViewDataSource?.movies[indexPath.row])
+        guard let movie = self.moviesCollectionViewDataSource?.movies[indexPath.row] else {
+            return
+        }
+        self.delegate?.getClickedCollectionViewCell(cell: selectedCell, movie: movie)
     }
 }

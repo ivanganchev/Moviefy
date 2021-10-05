@@ -10,12 +10,10 @@ import UIKit
 
 protocol MoviesTableViewButtonTapDelegate {
     func switchView(path: MovieCategoryEndPoint, categoryType: String)
-    func setClickedCollectionViewCell(cell: MoviesCollectionViewCell?, movie: Movie?)
+    func setClickedCollectionViewCell(cell: MoviesCollectionViewCell?, movie: Movie)
 }
 
-class MoviesTableViewDelegate: NSObject, UITableViewDelegate, MoviesTableViewCellDelegate{
-
-    
+class MoviesTableViewDelegate: NSObject, UITableViewDelegate, MoviesTableViewCellDelegate {
     var moviesSections: [String] = ["Top Rated", "Popular", "Upcoming", "Now Playing"]
     var delegate: MoviesTableViewButtonTapDelegate?
     var movieCategoryCases: [MovieCategoryEndPoint] = MovieCategoryEndPoint.allCases
@@ -66,7 +64,7 @@ class MoviesTableViewDelegate: NSObject, UITableViewDelegate, MoviesTableViewCel
         delegate?.switchView(path: self.movieCategoryCases[sender.tag], categoryType: self.moviesSections[sender.tag])
     }
     
-    func getClickedCollectionViewCell(cell: MoviesCollectionViewCell?, movie: Movie?) {
+    func getClickedCollectionViewCell(cell: MoviesCollectionViewCell?, movie: Movie) {
         self.delegate?.setClickedCollectionViewCell(cell: cell, movie: movie)
     }
     

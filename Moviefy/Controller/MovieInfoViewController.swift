@@ -15,6 +15,7 @@ class MovieInfoViewController: UIViewController {
     var movieTitle: UILabel = UILabel()
     var movieImage: UIImageView = UIImageView()
     var shadowView: UIView = UIView()
+    var gradient = CAGradientLayer()
     var closeButton: UIButton = UIButton()
     var heartButton: UIButton = UIButton()
     var movieOverview: UILabel = UILabel()
@@ -23,11 +24,14 @@ class MovieInfoViewController: UIViewController {
     var movieOverviewLabel: UILabel = UILabel()
     var containerView: UIView = UIView()
     var topPartView: UIView = UIView()
-    var isHeartButtonTapped: Bool = false
+    var guide: UILayoutGuide = UILayoutGuide()
+    
     var realm: Realm?
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        self.guide = self.view.safeAreaLayoutGuide
         
         self.view.backgroundColor = .white
         
@@ -46,14 +50,15 @@ class MovieInfoViewController: UIViewController {
         self.movieImage.layer.maskedCorners = [.layerMaxXMaxYCorner, .layerMinXMaxYCorner]
         self.movieImage.translatesAutoresizingMaskIntoConstraints = false
         
-        self.shadowView.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 100)
-        let gradient = CAGradientLayer()
-        gradient.frame = self.shadowView.bounds
-        gradient.colors = [UIColor.black.withAlphaComponent(0.6).cgColor, UIColor.black.withAlphaComponent(0.2).cgColor, UIColor.black.withAlphaComponent(0.0).cgColor]
-        gradient.locations = [0.0, 0.4, 1.0]
-        gradient.startPoint = CGPoint(x: 1.0, y: 0.0)
-        gradient.endPoint = CGPoint(x: 1.0, y: 1.0)
+        self.shadowView.frame = CGRect(origin: .zero, size: .zero)
+        
+//        self.gradient.frame = CGRect(origin: .zero, size: CGSize(width: UIScreen.main.bounds.width, height: 100))
+        self.gradient.colors = [UIColor.black.withAlphaComponent(0.6).cgColor, UIColor.black.withAlphaComponent(0.2).cgColor, UIColor.black.withAlphaComponent(0.0).cgColor]
+        self.gradient.locations = [0.0, 0.4, 1.0]
+        self.gradient.startPoint = CGPoint(x: 1.0, y: 0.0)
+        self.gradient.endPoint = CGPoint(x: 1.0, y: 1.0)
         self.shadowView.layer.addSublayer(gradient)
+        self.shadowView.translatesAutoresizingMaskIntoConstraints = false
         
         self.closeButton = UIButton(type: .custom)
         self.closeButton.setImage(UIImage(systemName: "xmark"), for: .normal)
@@ -97,7 +102,10 @@ class MovieInfoViewController: UIViewController {
         self.movieImage.trailingAnchor.constraint(equalTo: self.topPartView.trailingAnchor).isActive = true
 //        Ето тук ще изчезнат !, ако премахнем по-нагоре 
         self.movieImage.heightAnchor.constraint(equalTo: self.movieImage.widthAnchor, multiplier: self.movieImage.image!.size.height / self.movieImage.image!.size.width, constant: 0).isActive = true
-        self.shadowView.leadingAnchor.constraint(equalTo: self.topPartView.leadingAnchor).isActive = true
+//        self.shadowView.leadingAnchor.constraint(equalTo: self.topPartView.leadingAnchor).isActive = true
+//        self.shadowView.trailingAnchor.constraint(equalTo: self.topPartView.trailingAnchor).isActive = true
+        self.shadowView.widthAnchor.constraint(equalTo: self.topPartView.widthAnchor).isActive = true
+        self.shadowView.heightAnchor.constraint(equalToConstant: 100).isActive = true
         self.shadowView.topAnchor.constraint(equalTo: self.topPartView.topAnchor).isActive = true
         
         self.movieTitle = UILabel()
@@ -181,18 +189,18 @@ class MovieInfoViewController: UIViewController {
         self.view.addSubview(self.movieInfoScrollView)
 
         self.movieInfoScrollView.topAnchor.constraint(equalTo: self.view.topAnchor).isActive = true
-        self.movieInfoScrollView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
-        self.movieInfoScrollView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
-        self.movieInfoScrollView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
-        self.movieInfoScrollView.widthAnchor.constraint(equalTo: self.view.widthAnchor).isActive = true
+        self.movieInfoScrollView.bottomAnchor.constraint(equalTo: self.guide.bottomAnchor).isActive = true
+        self.movieInfoScrollView.leadingAnchor.constraint(equalTo: self.guide.leadingAnchor).isActive = true
+        self.movieInfoScrollView.trailingAnchor.constraint(equalTo: self.guide.trailingAnchor).isActive = true
+        self.movieInfoScrollView.widthAnchor.constraint(equalTo: self.guide.widthAnchor).isActive = true
         
         self.realm = try! Realm()
         
-        if let movie = self.realm?.objects(MovieEntity.self).filter("title == %@", self.movie?.movieResponse.title ?? "").first {
-            self.setHeartRed()
-        } else {
-            self.setHeartClear()
-        }
+        self.setHeart()
+    }
+
+    override func viewDidLayoutSubviews() {
+        self.gradient.frame = CGRect(origin: .zero, size: CGSize(width: self.topPartView.bounds.width, height: 100))
     }
     
     @objc func closeButtonTap() {
@@ -200,33 +208,32 @@ class MovieInfoViewController: UIViewController {
     }
     
     @objc func heartButtonTap() {
-        if self.isHeartButtonTapped == false {
-            self.setHeartRed()
-                    
-            let movie = MovieEntity(movie: self.movie)
+        guard let movie = self.movie else {
+            return
+        }
+        
+        if movie.isSaved, let movieEntity = self.realm?.object(ofType: MovieEntity.self, forPrimaryKey: movie.id){
             try! self.realm?.write({
-                realm?.add(movie)
+                realm?.delete(movieEntity)
+                try! realm?.commitWrite()
             })
+            self.movie?.id = nil
         } else {
-            self.setHeartClear()
-
-            let movie = self.realm?.objects(MovieEntity.self).filter("title == %@", self.movie?.movieResponse.title ?? "")
+            let movieEntity = MovieEntity(movie: movie)
+            self.movie?.id = movieEntity.id
             try! self.realm?.write({
-                realm?.delete(movie!.first!)
+                realm?.add(movieEntity, update: .all)
+                realm?.create(MovieEntity.self)
             })
         }
+        
+        self.setHeart()
     }
     
-    func setHeartClear(){
-        self.heartButton.setImage(UIImage(systemName: "heart"), for: .normal)
-        self.heartButton.tintColor = .white
-        self.isHeartButtonTapped = false
-    }
-    
-    func setHeartRed() {
-        self.heartButton.setImage(UIImage(systemName: "suit.heart.fill"), for: .normal)
-        self.heartButton.tintColor = .red
-        self.isHeartButtonTapped = true
+    func setHeart() {
+        let imageName = self.movie?.id != nil ? "suit.heart.fill" : "heart"
+        self.heartButton.setImage(UIImage(systemName: imageName), for: .normal)
+        self.heartButton.tintColor = self.movie?.id != nil ? .red : .white
     }
     
     private func setGenres() {

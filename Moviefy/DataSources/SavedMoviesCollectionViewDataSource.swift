@@ -11,7 +11,7 @@ import RealmSwift
 
 class SavedMoviesCollectionViewDataSource: NSObject, UICollectionViewDataSource {
     var savedMovies: [MovieEntity] = []
-    let realm: Realm = try! Realm()
+    var token: NotificationToken?
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return self.savedMovies.count
@@ -36,8 +36,13 @@ class SavedMoviesCollectionViewDataSource: NSObject, UICollectionViewDataSource 
 }
 
 extension SavedMoviesCollectionViewDataSource {
-    func loadSavedMovies(completion: @escaping () -> ()) {
-        self.savedMovies = Array(self.realm.objects(MovieEntity.self))
-        completion()
+    func loadSavedMovies(completion: @escaping (RealmCollectionChange<Results<MovieEntity>>) -> ()) {
+        let realm: Realm = try! Realm()
+        let results = realm.objects(MovieEntity.self)
+        self.savedMovies = Array(results)
+        self.token?.invalidate()
+        self.token = results.observe {[weak self] (changes: RealmCollectionChange) in
+            completion(changes)
+        }
     }
 }
