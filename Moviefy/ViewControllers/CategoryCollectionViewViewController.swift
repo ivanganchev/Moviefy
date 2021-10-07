@@ -118,6 +118,7 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
                 self.genreChipsView?.genreChipsCollectionViewDataSource.genres.append(genre)
                 self.genreChipsView?.genreChipsCollectionView?.reloadData()
                 self.filterMovies()
+                self.categoryCollectionView?.reloadData()
             }
         }
         genrePickerViewController.modalPresentationStyle = .overCurrentContext
@@ -126,6 +127,7 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
     
     func refreshMovies() {
         self.filterMovies()
+        self.categoryCollectionView?.reloadData()
     }
     
     func filterMovies() {
@@ -145,8 +147,30 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
             newFilteredMovies = tempArr
         })
         
-        self.categoryCollectionViewDataSource.filteredMovies = newFilteredMovies.count == 0 ? movies : newFilteredMovies
-        self.categoryCollectionView?.reloadData()
+        self.categoryCollectionViewDataSource.filteredMovies = newFilteredMovies
+    }
+    
+    func fetchFilteredMovies(currentCellIndex: Int, completion: @escaping () -> ()) {
+        self.categoryCollectionViewDataSource.fetchMovies(page: self.currentPage) {
+            self.filterMovies()
+            let moviesOnScreen = self.categoryCollectionViewDataSource.filteredMovies.count
+            if moviesOnScreen - currentCellIndex > 1 {
+                self.currentPage += 1
+                self.categoryCollectionViewDataSource.loadImages()
+                completion()
+            } else {
+                self.fetchFilteredMovies(currentCellIndex: self.categoryCollectionViewDataSource.filteredMovies.count - 1, completion: completion)
+                self.currentPage += 1
+            }
+        }
+    }
+    
+    func presentMovieInfoViewController(with movie: Movie) {
+        let movieInfoViewController = MovieInfoViewController()
+        movieInfoViewController.movie = movie
+        movieInfoViewController.modalPresentationStyle = .fullScreen
+        movieInfoViewController.transitioningDelegate = self
+        present(movieInfoViewController, animated: true)
     }
 }
 
@@ -179,19 +203,18 @@ extension CategoryCollectionViewViewController: UICollectionViewDelegateFlowLayo
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         if indexPath.row == (self.categoryCollectionViewDataSource.filteredMovies.count - 1) {
             self.categoryCollectionViewDataSource.footerView.startAnimating()
-            self.categoryCollectionViewDataSource.fetchMovies(page: self.currentPage) {
-                self.categoryCollectionViewDataSource.loadImages {
-                    DispatchQueue.main.async {
-                        self.categoryCollectionViewDataSource.footerView.stopAnimating()
-                        var paths = [IndexPath]()
-                        for item in 1...20 {
-                            let indexPath = IndexPath(row: item + indexPath.row, section: 0)
-                            paths.append(indexPath)
-                        }
-                        self.categoryCollectionView?.insertItems(at: paths)
-                        //self.categoryCollectionView?.reloadItems(at: paths)
-                        self.currentPage += 1
-                    }
+            self.fetchFilteredMovies(currentCellIndex: indexPath.row) {
+                var paths = [IndexPath]()
+                let moviesOnScreenCount = self.categoryCollectionViewDataSource.filteredMovies.count
+                let hiddenMoviesCount = moviesOnScreenCount - indexPath.row
+                for item in 1..<hiddenMoviesCount{
+                    let indexPath = IndexPath(row: item + indexPath.row, section: 0)
+                    paths.append(indexPath)
+                }
+                print(paths.count)
+                DispatchQueue.main.async {
+                    self.categoryCollectionViewDataSource.footerView.stopAnimating()
+                    self.categoryCollectionView?.insertItems(at: paths)
                 }
             }
         }
@@ -205,14 +228,14 @@ extension CategoryCollectionViewViewController: UICollectionViewDelegateFlowLayo
     }
 }
 
-extension CategoryCollectionViewViewController: TransitionAnimatableContent {
+extension CategoryCollectionViewViewController: InitialTransitionAnimatableContent {
     func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         guard let categoryCollectionViewViewController = source as? CategoryCollectionViewViewController,
                 let movieInfoViewController = presented as? MovieInfoViewController,
                 let selectedCellImageViewSnapshot = self.selectedCellImageViewSnapshot
                 else { return nil }
 
-        self.transitionAnimator = TransitionAnimator(type: .present, firstViewController: categoryCollectionViewViewController, movieInfoViewController: movieInfoViewController, selectedCellImageViewSnapshot: selectedCellImageViewSnapshot)
+        self.transitionAnimator = TransitionAnimator(type: .present, initialAnimatableContent: categoryCollectionViewViewController, presentedAnimatableContent: movieInfoViewController, selectedCellImageViewSnapshot: selectedCellImageViewSnapshot)
         return self.transitionAnimator
     }
 
@@ -222,16 +245,8 @@ extension CategoryCollectionViewViewController: TransitionAnimatableContent {
               let selectedCellImageViewSnapshot = self.selectedCellImageViewSnapshot
             else { return nil }
 
-        self.transitionAnimator = TransitionAnimator(type: .dismiss, firstViewController: self, movieInfoViewController: movieInfoViewController, selectedCellImageViewSnapshot: selectedCellImageViewSnapshot)
+        self.transitionAnimator = TransitionAnimator(type: .dismiss, initialAnimatableContent: self, presentedAnimatableContent: movieInfoViewController, selectedCellImageViewSnapshot: selectedCellImageViewSnapshot)
         return self.transitionAnimator
-    }
-    
-    func presentMovieInfoViewController(with movie: Movie) {
-        let movieInfoViewController = MovieInfoViewController()
-        movieInfoViewController.movie = movie
-        movieInfoViewController.modalPresentationStyle = .fullScreen
-        movieInfoViewController.transitioningDelegate = self
-        present(movieInfoViewController, animated: true)
     }
 }
 

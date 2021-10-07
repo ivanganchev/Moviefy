@@ -76,14 +76,14 @@ class ViewController: UIViewController, MoviesTableViewButtonTapDelegate {
     }
 }
 
-extension ViewController: TransitionAnimatableContent, UIViewControllerTransitioningDelegate {
+extension ViewController: InitialTransitionAnimatableContent, UIViewControllerTransitioningDelegate {
     func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         guard let searchMoviesViewController = source as? ViewController,
                 let movieInfoViewController = presented as? MovieInfoViewController,
                 let selectedCellImageViewSnapshot = self.selectedCellImageViewSnapshot
                 else { return nil }
 
-        self.transitionAnimator = TransitionAnimator(type: .present, firstViewController: searchMoviesViewController, movieInfoViewController: movieInfoViewController, selectedCellImageViewSnapshot: selectedCellImageViewSnapshot)
+        self.transitionAnimator = TransitionAnimator(type: .present, initialAnimatableContent: searchMoviesViewController, presentedAnimatableContent: movieInfoViewController, selectedCellImageViewSnapshot: selectedCellImageViewSnapshot)
         return self.transitionAnimator
     }
 
@@ -93,7 +93,7 @@ extension ViewController: TransitionAnimatableContent, UIViewControllerTransitio
               let selectedCellImageViewSnapshot = self.selectedCellImageViewSnapshot
             else { return nil }
 
-        self.transitionAnimator = TransitionAnimator(type: .dismiss, firstViewController: self, movieInfoViewController: movieInfoViewController, selectedCellImageViewSnapshot: selectedCellImageViewSnapshot)
+        self.transitionAnimator = TransitionAnimator(type: .dismiss, initialAnimatableContent: self, presentedAnimatableContent: movieInfoViewController, selectedCellImageViewSnapshot: selectedCellImageViewSnapshot)
         return self.transitionAnimator
     }
     

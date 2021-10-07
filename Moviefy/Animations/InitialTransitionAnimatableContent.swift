@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-protocol TransitionAnimatableContent: UIViewController{
+protocol InitialTransitionAnimatableContent: UIViewController{
     var selectedCellImageView: UIImageView? {get set}
     var selectedCellImageViewSnapshot: UIView? {get set}
 }

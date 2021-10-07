@@ -7,32 +7,30 @@
 
 import Foundation
 
+enum QueryItems: String {
+    case page = "page"
+    case language = "language"
+    case query = "query"
+}
+
 class MoviesService {
     let session = URLSession.shared
     static var genres: [Int:String]?
     
-    private static func provideService(url: inout URLComponents, params: [String:String]?, completion: @escaping (Data?, URLResponse?, Error?) -> ()) {
-        var queryItems: [URLQueryItem] = url.queryItems ?? []
-        params?.forEach({ (key: String, value: String) in
-            let queryItem = URLQueryItem(name: key, value: value)
-            queryItems.append(queryItem)
-        })
-        url.queryItems = queryItems
-        guard let url = url.url else { return }
-        let authHeader = "Bearer " + Secrets.apiKey
-        var request = URLRequest(url:url)
-        request.httpMethod = "GET"
-        request.setValue(authHeader, forHTTPHeaderField: "Authorization")
-        URLSession.shared.dataTask(with: request) {(data, response, error) in
+    private static func provideService(url: URLRequest, completion: @escaping (Data?, URLResponse?, Error?) -> ()) {
+        URLSession.shared.dataTask(with: url) {(data, response, error) in
             completion(data, response, error)
         }.resume()
     }
     
     func fetchMoviesByCategory(movieCategoryPath: String, page: Int, completion: @escaping (Result<MoviesResponse, Error>) -> ()) {
-        guard var url = URLComponents(string: EndPoint.defaultLink + movieCategoryPath) else {
+        guard var urlComponents = URLComponents(string: EndPoint.defaultLink + movieCategoryPath) else {
             return
         }
-        MoviesService.provideService(url: &url, params: ["page": String(page), "language": "en-US"], completion: {(data, response, error) in
+        let url = MoviesService.setQueryParams(urlComponents: &urlComponents, params: [QueryItems.page.rawValue: String(page), QueryItems.language.rawValue: "en-US"])
+        let request: URLRequest = MoviesService.setHeaders(url: url)
+        
+        MoviesService.provideService(url: request, completion: {(data, response, error) in
             guard let data = data else {
                 return
             }
@@ -47,26 +45,30 @@ class MoviesService {
         })
     }
     
-    func fetchMovieImage(imageUrl: String, completion: @escaping(Data?) -> ()) {
+    func fetchMovieImage(imageUrl: String, completion: @escaping(Result<Data, Error>) -> ()) {
         let urlComponents = URLComponents(string: EndPoint.imageLink + imageUrl)
         guard let url = urlComponents?.url else {
             return
         }
         
-        self.session.dataTask(with: url) {(data, response, error) in
+        let request = URLRequest(url: url)
+        
+        MoviesService.provideService(url: request) { (data, response, error) in
             guard let data = data else {
                 return
             }
-            completion(data)
-        }.resume()
+            completion(.success(data))
+        }
     }
     
     static func loadMoviesGenreList(){
-        guard var url = URLComponents(string: EndPoint.defaultLink + EndPoint.genresPath) else {
+        guard var urlComponents = URLComponents(string: EndPoint.defaultLink + EndPoint.genresPath) else {
             return
         }
+        let url = MoviesService.setQueryParams(urlComponents: &urlComponents, params: [QueryItems.language.rawValue: "en-US"])
+        let request: URLRequest = MoviesService.setHeaders(url: url)
         
-        MoviesService.provideService(url: &url, params: ["language": "en-US"], completion: {(data, response, error) in
+        MoviesService.provideService(url: request, completion: {(data, response, error) in
             guard let data = data else {
                 return
             }
@@ -81,11 +83,13 @@ class MoviesService {
     }
     
     func searchMovies(text: String, completion: @escaping (Result<MoviesResponse, Error>) -> ()) {
-        guard var url = URLComponents(string: EndPoint.defaultLink + EndPoint.searchPath) else {
+        guard var urlComponents = URLComponents(string: EndPoint.defaultLink + EndPoint.searchPath) else {
             return
         }
+        let url = MoviesService.setQueryParams(urlComponents: &urlComponents, params: [QueryItems.query.rawValue: text])
+        let request: URLRequest = MoviesService.setHeaders(url: url)
         
-        MoviesService.provideService(url: &url, params: ["query": text], completion: {(data, response, error) in
+        MoviesService.provideService(url: request, completion: {(data, response, error) in
             guard let data = data else {
                 return
             }
@@ -100,3 +104,23 @@ class MoviesService {
     }
 }
 
+extension MoviesService {
+    private static func setHeaders(url: URL) -> URLRequest {
+        let authHeader = "Bearer " + Secrets.apiKey
+        var request = URLRequest(url:url)
+        request.httpMethod = "GET"
+        request.setValue(authHeader, forHTTPHeaderField: "Authorization")
+        return request
+    }
+    
+    private static func setQueryParams(urlComponents: inout URLComponents, params: [String:String]) -> URL {
+        var queryItems: [URLQueryItem] = urlComponents.queryItems ?? []
+        params.forEach({ (key: String, value: String) in
+            let queryItem = URLQueryItem(name: key, value: value)
+            queryItems.append(queryItem)
+        })
+        urlComponents.queryItems = queryItems
+        let url = urlComponents.url!
+        return url
+    }
+}

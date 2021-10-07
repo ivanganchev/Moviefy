@@ -8,36 +8,45 @@
 import Foundation
 import UIKit
 
+enum PresentationType {
+    case present
+    case dismiss
+
+    var isPresenting: Bool {
+        return self == .present
+    }
+}
+
 class TransitionAnimator: NSObject, UIViewControllerAnimatedTransitioning {
     static let duration: TimeInterval = 0.5
 
-    private let type: PresentationType
-    private let firstViewController: TransitionAnimatableContent
-    private let movieInfoViewController: MovieInfoViewController
+    private let presentationType: PresentationType
+    private let initialAnimatableContent: InitialTransitionAnimatableContent
+    private let presentedAnimatableContent: PresentedTransitionAnimatableContent
     private var selectedCellImageViewSnapshot: UIView
     private let cellImageViewRect: CGRect
 
-    init?(type: PresentationType, firstViewController: TransitionAnimatableContent, movieInfoViewController: MovieInfoViewController, selectedCellImageViewSnapshot: UIView) {
-        self.type = type
-        self.firstViewController = firstViewController
-        self.movieInfoViewController = movieInfoViewController
+    init?(type: PresentationType, initialAnimatableContent: InitialTransitionAnimatableContent, presentedAnimatableContent: PresentedTransitionAnimatableContent, selectedCellImageViewSnapshot: UIView) {
+        self.presentationType = type
+        self.initialAnimatableContent = initialAnimatableContent
+        self.presentedAnimatableContent = presentedAnimatableContent
         self.selectedCellImageViewSnapshot = selectedCellImageViewSnapshot
 
-        guard let window = firstViewController.view.window ?? movieInfoViewController.view.window,
-            let selectedCellImageView = firstViewController.selectedCellImageView
+        guard let window = initialAnimatableContent.view.window ?? presentedAnimatableContent.view.window,
+            let selectedCellImageView = initialAnimatableContent.selectedCellImageView
             else { return nil }
 
         self.cellImageViewRect = selectedCellImageView.convert(selectedCellImageView.bounds, to: window)
     }
 
     func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
-        return Self.duration
+        Self.duration
     }
 
     func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
         let containerView = transitionContext.containerView
 
-        guard let toView = self.movieInfoViewController.view
+        guard let toView = self.presentedAnimatableContent.view
             else {
                 transitionContext.completeTransition(false)
                 return
@@ -45,20 +54,20 @@ class TransitionAnimator: NSObject, UIViewControllerAnimatedTransitioning {
 
         containerView.addSubview(toView)
         
-        guard let selectedCellImageView = firstViewController.selectedCellImageView,
-              let window = firstViewController.view.window ?? movieInfoViewController.view.window,
+        guard let selectedCellImageView = initialAnimatableContent.selectedCellImageView,
+              let window = initialAnimatableContent.view.window ?? presentedAnimatableContent.view.window,
               let cellImageSnapshot = selectedCellImageView.snapshotView(afterScreenUpdates: true),
-              let controllerImageSnapshot = movieInfoViewController.movieImage.snapshotView(afterScreenUpdates: true)
+              let controllerImageSnapshot = presentedAnimatableContent.movieImageView.snapshotView(afterScreenUpdates: true)
         else {
             transitionContext.completeTransition(true)
             return
         }
         
-        let isPresenting = type.isPresenting
+        let isPresenting = presentationType.isPresenting
         
         let backgroundView: UIView
         let fadeView = UIView(frame: containerView.bounds)
-        fadeView.backgroundColor = movieInfoViewController.view.backgroundColor
+        fadeView.backgroundColor = presentedAnimatableContent.view.backgroundColor
         
         if isPresenting {
             self.selectedCellImageViewSnapshot = cellImageSnapshot
@@ -67,7 +76,7 @@ class TransitionAnimator: NSObject, UIViewControllerAnimatedTransitioning {
             backgroundView.addSubview(fadeView)
             fadeView.alpha = 0
         } else {
-            backgroundView = firstViewController.view.snapshotView(afterScreenUpdates: true) ?? fadeView
+            backgroundView = initialAnimatableContent.view.snapshotView(afterScreenUpdates: true) ?? fadeView
             backgroundView.addSubview(fadeView)
         }
         
@@ -77,12 +86,12 @@ class TransitionAnimator: NSObject, UIViewControllerAnimatedTransitioning {
             containerView.addSubview($0)
         }
         
-        let controllerImageViewRect = movieInfoViewController.movieImage.convert(movieInfoViewController.movieImage.bounds, to: window)
+        let controllerImageViewRect = presentedAnimatableContent.movieImageView.convert(presentedAnimatableContent.movieImageView.bounds, to: window)
         
         [self.selectedCellImageViewSnapshot, controllerImageSnapshot].forEach {
             $0.frame = (isPresenting ? cellImageViewRect : controllerImageViewRect)
         }
-        
+        	
         controllerImageSnapshot.alpha = isPresenting ? 0 : 1
         
         self.selectedCellImageViewSnapshot.alpha = isPresenting ? 1 : 0
@@ -110,14 +119,3 @@ class TransitionAnimator: NSObject, UIViewControllerAnimatedTransitioning {
         })
     }
 }
-
-    enum PresentationType {
-
-        case present
-        case dismiss
-
-        var isPresenting: Bool {
-            return self == .present
-        }
-}
-

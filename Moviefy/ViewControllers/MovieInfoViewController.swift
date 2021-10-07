@@ -7,13 +7,12 @@
 import UIKit
 import RealmSwift
 
-class MovieInfoViewController: UIViewController {
-
+class MovieInfoViewController: UIViewController, PresentedTransitionAnimatableContent {
     var movie: Movie?
     var genres: [String]?
     var movieInfoScrollView: UIScrollView = UIScrollView()
     var movieTitle: UILabel = UILabel()
-    var movieImage: UIImageView = UIImageView()
+    var movieImageView: UIImageView = UIImageView()
     var shadowView: UIView = UIView()
     var gradient = CAGradientLayer()
     var closeButton: UIButton = UIButton()
@@ -42,17 +41,16 @@ class MovieInfoViewController: UIViewController {
         self.containerView.translatesAutoresizingMaskIntoConstraints = false
         
         if let imageData = self.movie?.imageData {
-            self.movieImage.image = UIImage(data: imageData)
+            self.movieImageView.image = UIImage(data: imageData)
         }
-        self.movieImage.contentMode = .scaleAspectFit
-        self.movieImage.clipsToBounds = true
-        self.movieImage.layer.cornerRadius = 20
-        self.movieImage.layer.maskedCorners = [.layerMaxXMaxYCorner, .layerMinXMaxYCorner]
-        self.movieImage.translatesAutoresizingMaskIntoConstraints = false
+        self.movieImageView.contentMode = .scaleAspectFit
+        self.movieImageView.clipsToBounds = true
+        self.movieImageView.layer.cornerRadius = 20
+        self.movieImageView.layer.maskedCorners = [.layerMaxXMaxYCorner, .layerMinXMaxYCorner]
+        self.movieImageView.translatesAutoresizingMaskIntoConstraints = false
         
         self.shadowView.frame = CGRect(origin: .zero, size: .zero)
         
-//        self.gradient.frame = CGRect(origin: .zero, size: CGSize(width: UIScreen.main.bounds.width, height: 100))
         self.gradient.colors = [UIColor.black.withAlphaComponent(0.6).cgColor, UIColor.black.withAlphaComponent(0.2).cgColor, UIColor.black.withAlphaComponent(0.0).cgColor]
         self.gradient.locations = [0.0, 0.4, 1.0]
         self.gradient.startPoint = CGPoint(x: 1.0, y: 0.0)
@@ -94,14 +92,14 @@ class MovieInfoViewController: UIViewController {
         
         self.topPartView = UIView()
         self.topPartView.translatesAutoresizingMaskIntoConstraints = false
-        self.topPartView.addSubview(self.movieImage)
+        self.topPartView.addSubview(self.movieImageView)
         self.topPartView.addSubview(self.shadowView)
         
-        self.movieImage.topAnchor.constraint(equalTo: self.topPartView.topAnchor).isActive = true
-        self.movieImage.leadingAnchor.constraint(equalTo: self.topPartView.leadingAnchor).isActive = true
-        self.movieImage.trailingAnchor.constraint(equalTo: self.topPartView.trailingAnchor).isActive = true
+        self.movieImageView.topAnchor.constraint(equalTo: self.topPartView.topAnchor).isActive = true
+        self.movieImageView.leadingAnchor.constraint(equalTo: self.topPartView.leadingAnchor).isActive = true
+        self.movieImageView.trailingAnchor.constraint(equalTo: self.topPartView.trailingAnchor).isActive = true
 //        Ето тук ще изчезнат !, ако премахнем по-нагоре 
-        self.movieImage.heightAnchor.constraint(equalTo: self.movieImage.widthAnchor, multiplier: self.movieImage.image!.size.height / self.movieImage.image!.size.width, constant: 0).isActive = true
+        self.movieImageView.heightAnchor.constraint(equalTo: self.movieImageView.widthAnchor, multiplier: self.movieImageView.image!.size.height / self.movieImageView.image!.size.width, constant: 0).isActive = true
 //        self.shadowView.leadingAnchor.constraint(equalTo: self.topPartView.leadingAnchor).isActive = true
 //        self.shadowView.trailingAnchor.constraint(equalTo: self.topPartView.trailingAnchor).isActive = true
         self.shadowView.widthAnchor.constraint(equalTo: self.topPartView.widthAnchor).isActive = true
@@ -155,7 +153,7 @@ class MovieInfoViewController: UIViewController {
         self.topPartView.topAnchor.constraint(equalTo: self.containerView.topAnchor).isActive = true
         self.topPartView.leadingAnchor.constraint(equalTo: self.containerView.leadingAnchor).isActive = true
         self.topPartView.widthAnchor.constraint(equalTo: self.containerView.widthAnchor).isActive = true
-        self.topPartView.heightAnchor.constraint(equalTo: self.movieImage.heightAnchor).isActive = true
+        self.topPartView.heightAnchor.constraint(equalTo: self.movieImageView.heightAnchor).isActive = true
         
         self.movieTitle.leadingAnchor.constraint(equalTo: self.containerView.leadingAnchor, constant: 10).isActive = true
         self.movieTitle.topAnchor.constraint(equalTo: self.topPartView.bottomAnchor, constant: 15).isActive = true

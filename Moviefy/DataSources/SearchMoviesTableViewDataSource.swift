@@ -90,8 +90,13 @@ extension SearchMoviesTableViewDataSource {
     func loadImages(completion: @escaping () -> ()) {
         self.movies.forEach { (movie) in
             if let path = movie.movieResponse.posterPath {
-                MoviesService().fetchMovieImage(imageUrl: path, completion: {data in
-                    movie.imageData = data
+                MoviesService().fetchMovieImage(imageUrl: path, completion: {result in
+                    switch result {
+                    case .success(let data):
+                        movie.imageData = data
+                    case .failure(let err):
+                        print(err)
+                    }
                 })
             }
         }
@@ -100,8 +105,13 @@ extension SearchMoviesTableViewDataSource {
     
     func loadImage(movie: Movie, completion: @escaping () -> ()) {
         if let path = movie.movieResponse.posterPath {
-            MoviesService().fetchMovieImage(imageUrl: path, completion: {data in
-                movie.imageData = data
+            MoviesService().fetchMovieImage(imageUrl: path, completion: {result in
+                switch result {
+                case .success(let data):
+                    movie.imageData = data
+                case .failure(let err):
+                    print(err)
+                }
             })
         }
     }

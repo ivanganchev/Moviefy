@@ -92,22 +92,31 @@ extension CategoryCollectionViewDataSource {
            })
        }
     
-    
-    func loadImages(completion: @escaping () -> ()) {
+    func loadImages(completion: (() -> ())? = nil) {
         self.filteredMovies.forEach { (movie) in
             if let path = movie.movieResponse.posterPath {
-                MoviesService().fetchMovieImage(imageUrl: path, completion: {data in
-                    movie.imageData = data
+                MoviesService().fetchMovieImage(imageUrl: path, completion: {result in
+                    switch result {
+                    case .success(let data):
+                        movie.imageData = data
+                    case .failure(let err):
+                        print(err)
+                    }
                 })
             }
         }
-        completion()
+        completion?()
     }
     
-    func loadImage(movie: Movie, completion: @escaping () -> ()) {
+    func loadImage(movie: Movie, completion: (() -> ())? = nil) {
         if let path = movie.movieResponse.posterPath {
-            MoviesService().fetchMovieImage(imageUrl: path, completion: {data in
-                movie.imageData = data
+            MoviesService().fetchMovieImage(imageUrl: path, completion: {result in
+                switch result {
+                case .success(let data):
+                    movie.imageData = data
+                case .failure(let err):
+                    print(err)
+                }
             })
         }
     }

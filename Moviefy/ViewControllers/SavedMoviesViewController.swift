@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 import RealmSwift
 
-class SavedMoviesViewController: UIViewController, TransitionAnimatableContent {
+class SavedMoviesViewController: UIViewController, InitialTransitionAnimatableContent {
     var savedMoviesCollectionView: UICollectionView?
     var savedMoviesCollectionViewDataSource: SavedMoviesCollectionViewDataSource = SavedMoviesCollectionViewDataSource()
     
@@ -99,7 +99,7 @@ extension SavedMoviesViewController: UIViewControllerTransitioningDelegate {
                 let selectedCellImageViewSnapshot = self.selectedCellImageViewSnapshot
                 else { return nil }
 
-        self.transitionAnimator = TransitionAnimator(type: .present, firstViewController: savedMoviesViewController, movieInfoViewController: movieInfoViewController, selectedCellImageViewSnapshot: selectedCellImageViewSnapshot)
+        self.transitionAnimator = TransitionAnimator(type: .present, initialAnimatableContent: savedMoviesViewController, presentedAnimatableContent: movieInfoViewController, selectedCellImageViewSnapshot: selectedCellImageViewSnapshot)
         return self.transitionAnimator
     }
 
@@ -109,7 +109,7 @@ extension SavedMoviesViewController: UIViewControllerTransitioningDelegate {
               let selectedCellImageViewSnapshot = self.selectedCellImageViewSnapshot
             else { return nil }
 
-        self.transitionAnimator = TransitionAnimator(type: .dismiss, firstViewController: self, movieInfoViewController: movieInfoViewController, selectedCellImageViewSnapshot: selectedCellImageViewSnapshot)
+        self.transitionAnimator = TransitionAnimator(type: .dismiss, initialAnimatableContent: self, presentedAnimatableContent: movieInfoViewController, selectedCellImageViewSnapshot: selectedCellImageViewSnapshot)
         return self.transitionAnimator
     }
     
