@@ -8,27 +8,33 @@
 import Foundation
 import UIKit
 
+struct TabBarController {
+    var controller: UINavigationController
+    var title: String
+    var image: String
+}
+
 class RootTabBarViewController: UITabBarController {
+    var tabBarControllers: [TabBarController] = []
+    
     override func viewDidLoad() {
+        self.tabBarControllers = [
+            TabBarController(controller: UINavigationController(rootViewController: ViewController()),
+                             title: "Home",
+                             image: "house"),
+            TabBarController(controller: UINavigationController(rootViewController: SearchMoviesViewController()),
+                             title: "Search",
+                             image: "magnifyingglass"),
+            TabBarController(controller: UINavigationController(rootViewController: SavedMoviesViewController()),
+                             title: "My List",
+                             image: "list.and.film")
+        ]
         
-        let viewControllerMovies = UINavigationController(rootViewController: ViewController())
-        let searchMoviesViewController = UINavigationController(rootViewController: SearchMoviesViewController())
-        let savedMoviesViewController = UINavigationController(rootViewController: SavedMoviesViewController())
+        self.viewControllers = self.tabBarControllers.map {$0.controller}
         
-        viewControllerMovies.title = "Home"
-        searchMoviesViewController.title = "Search"
-        savedMoviesViewController.title = "My List"
-        
-        self.viewControllers = [viewControllerMovies, searchMoviesViewController, savedMoviesViewController]
-        
-        guard let items = self.tabBar.items else {
-            return
+        self.tabBarControllers.forEach { controller in
+            let item = UITabBarItem(title: controller.title, image: UIImage(systemName: controller.image), tag: 0)
+            controller.controller.tabBarItem = item
         }
-        
-        let images = ["house", "magnifyingglass", "list.and.film"]
-        
-        for i in 0..<items.count {
-            items[i].image = UIImage(systemName: images[i])
-        }        
-    }
+    } 
 }

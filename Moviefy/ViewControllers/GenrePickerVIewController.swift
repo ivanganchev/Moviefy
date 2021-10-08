@@ -8,15 +8,18 @@
 import Foundation
 import UIKit
 
+protocol GenrePickerViewControllerDelegate {
+    func getSelectedGenre(genre: String)
+}
+
 class GenrePickerViewController: UIViewController {
     let maxDimmedAlpha: CGFloat = 0.6
     let defaultHeight: CGFloat = 300
     var currentContainerHeight: CGFloat = 300
     let dismissibleHeight: CGFloat = 200
-    // Тук също не съм сигурен
-    var genres: [String] = Array(MoviesService.genres!.values)
+    var genres = [String]()
     var selectedGenres: [String] = []
-    var onDoneBlock: ((String) -> Void)?
+    var delegate: GenrePickerViewControllerDelegate? 
     
     lazy var containerView: UIView = {
         let view = UIView()
@@ -92,6 +95,10 @@ class GenrePickerViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        if let genres = MoviesService.genres {
+            self.genres = Array(genres.values)
+        }
+        
         self.view.backgroundColor = .clear
         self.setupConstraints()
         self.setupPanGesture()
@@ -184,13 +191,13 @@ class GenrePickerViewController: UIViewController {
     }
     
     @objc func closeButtonTap() {
-        self.onDoneBlock!("")
+        self.delegate?.getSelectedGenre(genre: "")
         self.animateDismissView()
     }
     
     @objc func doneButtonTap() {
         let chosenGenre = self.genres[self.genrePickerView.selectedRow(inComponent: 0)]
-        self.onDoneBlock!(chosenGenre)
+        self.delegate?.getSelectedGenre(genre: chosenGenre)
         self.animateDismissView()
     }
     
@@ -284,7 +291,7 @@ extension GenrePickerViewController: UIPickerViewDelegate, UIPickerViewDataSourc
     }
     
     func pickerView(_ pickerView: UIPickerView, attributedTitleForRow row: Int, forComponent component: Int) -> NSAttributedString? {
-        let color: UIColor
+        var color: UIColor
         if selectedGenres.contains(self.genres[row]){
             color = UIColor.lightGray
         } else {

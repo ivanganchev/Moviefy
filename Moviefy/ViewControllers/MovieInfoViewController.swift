@@ -10,36 +10,56 @@ import RealmSwift
 class MovieInfoViewController: UIViewController, PresentedTransitionAnimatableContent {
     var movie: Movie?
     var genres: [String]?
-    var movieInfoScrollView: UIScrollView = UIScrollView()
-    var movieTitle: UILabel = UILabel()
-    var movieImageView: UIImageView = UIImageView()
-    var shadowView: UIView = UIView()
+    var movieInfoScrollView = UIScrollView()
+    var movieTitle = UILabel()
+    var movieImageView = UIImageView()
+    var shadowView = UIView()
     var gradient = CAGradientLayer()
-    var closeButton: UIButton = UIButton()
-    var heartButton: UIButton = UIButton()
-    var movieOverview: UILabel = UILabel()
-    var movieGenres: UILabel = UILabel()
-    var movieDateReleased: UILabel = UILabel()
-    var movieOverviewLabel: UILabel = UILabel()
-    var containerView: UIView = UIView()
-    var topPartView: UIView = UIView()
-    var guide: UILayoutGuide = UILayoutGuide()
-    
-    var realm: Realm?
+    var closeButton = UIButton()
+    var heartButton = UIButton()
+    var movieOverview = UILabel()
+    var movieGenres = UILabel()
+    var movieDateReleased = UILabel()
+    var movieOverviewLabel = UILabel()
+    var containerView = UIView()
+    var topPartView = UIView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        self.guide = self.view.safeAreaLayoutGuide
-        
         self.view.backgroundColor = .white
-        
+                
+        self.setMovieInfoScrollView()
+        self.setMovieTitle()
+        self.setMovieImageView()
+        self.setShadowView()
+        self.setCloseButton()
+        self.setHeartButton()
+        self.setMovieOverview()
+        self.setMovieGenres()
+        self.setMovieDateReleased()
+        self.setMovieOverviewLabel()
+        self.setContainerView()
+        self.setTopPartView()
+        self.setConstraints()
+        self.setHeart()
+    }
+    
+    func setMovieInfoScrollView() {
         self.movieInfoScrollView = UIScrollView()
         self.movieInfoScrollView.translatesAutoresizingMaskIntoConstraints = false
         self.movieInfoScrollView.contentInsetAdjustmentBehavior = .never
-        
-        self.containerView.translatesAutoresizingMaskIntoConstraints = false
-        
+    }
+    
+    func setMovieTitle() {
+        self.movieTitle = UILabel()
+        self.movieTitle.numberOfLines = 0
+        self.movieTitle.lineBreakMode = .byWordWrapping
+        self.movieTitle.font = UIFont(name: "Helvetica-Bold", size: 28)
+        self.movieTitle.translatesAutoresizingMaskIntoConstraints = false
+        self.movieTitle.text = self.movie?.movieResponse.title
+    }
+    
+    func setMovieImageView() {
         if let imageData = self.movie?.imageData {
             self.movieImageView.image = UIImage(data: imageData)
         }
@@ -48,16 +68,19 @@ class MovieInfoViewController: UIViewController, PresentedTransitionAnimatableCo
         self.movieImageView.layer.cornerRadius = 20
         self.movieImageView.layer.maskedCorners = [.layerMaxXMaxYCorner, .layerMinXMaxYCorner]
         self.movieImageView.translatesAutoresizingMaskIntoConstraints = false
-        
+    }
+    
+    func setShadowView() {
         self.shadowView.frame = CGRect(origin: .zero, size: .zero)
-        
         self.gradient.colors = [UIColor.black.withAlphaComponent(0.6).cgColor, UIColor.black.withAlphaComponent(0.2).cgColor, UIColor.black.withAlphaComponent(0.0).cgColor]
         self.gradient.locations = [0.0, 0.4, 1.0]
         self.gradient.startPoint = CGPoint(x: 1.0, y: 0.0)
         self.gradient.endPoint = CGPoint(x: 1.0, y: 1.0)
         self.shadowView.layer.addSublayer(gradient)
         self.shadowView.translatesAutoresizingMaskIntoConstraints = false
-        
+    }
+    
+    func setCloseButton() {
         self.closeButton = UIButton(type: .custom)
         self.closeButton.setImage(UIImage(systemName: "xmark"), for: .normal)
         self.closeButton.imageView?.contentMode = .scaleAspectFit
@@ -67,7 +90,9 @@ class MovieInfoViewController: UIViewController, PresentedTransitionAnimatableCo
         self.closeButton.translatesAutoresizingMaskIntoConstraints = false
         self.closeButton.addTarget(self, action: #selector(MovieInfoViewController.closeButtonTap), for: .touchUpInside)
         self.closeButton.isUserInteractionEnabled = true
-        
+    }
+    
+    func setHeartButton() {
         self.heartButton.setImage(UIImage(systemName: "heart"), for: .normal)
         self.heartButton.imageView?.contentMode = .scaleAspectFit
         self.heartButton.contentHorizontalAlignment = .fill
@@ -76,6 +101,57 @@ class MovieInfoViewController: UIViewController, PresentedTransitionAnimatableCo
         self.heartButton.translatesAutoresizingMaskIntoConstraints = false
         self.heartButton.addTarget(self, action: #selector(MovieInfoViewController.heartButtonTap), for: .touchUpInside)
         self.heartButton.isUserInteractionEnabled = true
+    }
+    
+    func setMovieOverview() {
+        self.movieOverview = UILabel()
+        self.movieOverview.numberOfLines = 0
+        self.movieOverview.lineBreakMode = .byWordWrapping
+        self.movieOverview.font = UIFont(name: "Helvetica", size: 18)
+        self.movieOverview.translatesAutoresizingMaskIntoConstraints = false
+        self.movieOverview.tintColor = .lightGray
+        self.movieOverview.alpha = 0.9
+        self.movieOverview.text = self.movie?.movieResponse.overview
+    }
+    
+    func setMovieGenres() {
+        self.movieGenres = UILabel()
+        self.movieGenres.numberOfLines = 0
+        self.movieGenres.font = UIFont(name: "Helvetica", size: 14)
+        self.movieGenres.translatesAutoresizingMaskIntoConstraints = false
+        self.movieGenres.tintColor = .lightGray
+        self.movieGenres.alpha = 0.7
+        self.setGenres()
+    }
+    
+    func setMovieDateReleased() {
+        self.movieDateReleased = UILabel()
+        self.movieDateReleased.numberOfLines = 0
+        self.movieDateReleased.font = UIFont(name: "Helvetica", size: 14)
+        self.movieDateReleased.translatesAutoresizingMaskIntoConstraints = false
+        self.movieDateReleased.tintColor = .lightGray
+        self.movieDateReleased.alpha = 0.7
+        self.movieDateReleased.text = self.movie?.movieResponse.releaseDate
+    }
+    
+    func setMovieOverviewLabel() {
+        self.movieOverviewLabel = UILabel()
+        self.movieOverviewLabel.font = UIFont(name: "Helvetica-Bold", size: 24)
+        self.movieOverviewLabel.translatesAutoresizingMaskIntoConstraints = false
+        self.movieOverviewLabel.text = "Description"
+    }
+    
+    func setContainerView() {
+        self.containerView.translatesAutoresizingMaskIntoConstraints = false
+    }
+    
+    func setTopPartView() {
+        self.topPartView = UIView()
+        self.topPartView.translatesAutoresizingMaskIntoConstraints = false
+    }
+    
+    func setConstraints() {
+        let guide = self.view.safeAreaLayoutGuide
         
         self.shadowView.addSubview(self.closeButton)
         self.shadowView.addSubview(self.heartButton)
@@ -90,58 +166,16 @@ class MovieInfoViewController: UIViewController, PresentedTransitionAnimatableCo
         self.heartButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
         self.heartButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
         
-        self.topPartView = UIView()
-        self.topPartView.translatesAutoresizingMaskIntoConstraints = false
         self.topPartView.addSubview(self.movieImageView)
         self.topPartView.addSubview(self.shadowView)
         
         self.movieImageView.topAnchor.constraint(equalTo: self.topPartView.topAnchor).isActive = true
         self.movieImageView.leadingAnchor.constraint(equalTo: self.topPartView.leadingAnchor).isActive = true
         self.movieImageView.trailingAnchor.constraint(equalTo: self.topPartView.trailingAnchor).isActive = true
-//        Ето тук ще изчезнат !, ако премахнем по-нагоре 
-        self.movieImageView.heightAnchor.constraint(equalTo: self.movieImageView.widthAnchor, multiplier: self.movieImageView.image!.size.height / self.movieImageView.image!.size.width, constant: 0).isActive = true
-//        self.shadowView.leadingAnchor.constraint(equalTo: self.topPartView.leadingAnchor).isActive = true
-//        self.shadowView.trailingAnchor.constraint(equalTo: self.topPartView.trailingAnchor).isActive = true
+         self.movieImageView.heightAnchor.constraint(equalTo: self.movieImageView.widthAnchor, multiplier: self.movieImageView.image!.size.height / self.movieImageView.image!.size.width, constant: 0).isActive = true
         self.shadowView.widthAnchor.constraint(equalTo: self.topPartView.widthAnchor).isActive = true
         self.shadowView.heightAnchor.constraint(equalToConstant: 100).isActive = true
         self.shadowView.topAnchor.constraint(equalTo: self.topPartView.topAnchor).isActive = true
-        
-        self.movieTitle = UILabel()
-        self.movieTitle.numberOfLines = 0
-        self.movieTitle.lineBreakMode = .byWordWrapping
-        self.movieTitle.font = UIFont(name: "Helvetica-Bold", size: 28)
-        self.movieTitle.translatesAutoresizingMaskIntoConstraints = false
-        self.movieTitle.text = self.movie?.movieResponse.title
-        
-        self.movieGenres = UILabel()
-        self.movieGenres.numberOfLines = 0
-        self.movieGenres.font = UIFont(name: "Helvetica", size: 14)
-        self.movieGenres.translatesAutoresizingMaskIntoConstraints = false
-        self.movieGenres.tintColor = .lightGray
-        self.movieGenres.alpha = 0.7
-        self.setGenres()
-        
-        self.movieDateReleased = UILabel()
-        self.movieDateReleased.numberOfLines = 0
-        self.movieDateReleased.font = UIFont(name: "Helvetica", size: 14)
-        self.movieDateReleased.translatesAutoresizingMaskIntoConstraints = false
-        self.movieDateReleased.tintColor = .lightGray
-        self.movieDateReleased.alpha = 0.7
-        self.movieDateReleased.text = self.movie?.movieResponse.releaseDate
-        
-        self.movieOverviewLabel = UILabel()
-        self.movieOverviewLabel.font = UIFont(name: "Helvetica-Bold", size: 24)
-        self.movieOverviewLabel.translatesAutoresizingMaskIntoConstraints = false
-        self.movieOverviewLabel.text = "Description"
-        
-        self.movieOverview = UILabel()
-        self.movieOverview.numberOfLines = 0
-        self.movieOverview.lineBreakMode = .byWordWrapping
-        self.movieOverview.font = UIFont(name: "Helvetica", size: 18)
-        self.movieOverview.translatesAutoresizingMaskIntoConstraints = false
-        self.movieOverview.tintColor = .lightGray
-        self.movieOverview.alpha = 0.9
-        self.movieOverview.text = self.movie?.movieResponse.overview
     
         self.containerView.addSubview(self.topPartView)
         self.containerView.addSubview(self.movieTitle)
@@ -187,14 +221,10 @@ class MovieInfoViewController: UIViewController, PresentedTransitionAnimatableCo
         self.view.addSubview(self.movieInfoScrollView)
 
         self.movieInfoScrollView.topAnchor.constraint(equalTo: self.view.topAnchor).isActive = true
-        self.movieInfoScrollView.bottomAnchor.constraint(equalTo: self.guide.bottomAnchor).isActive = true
-        self.movieInfoScrollView.leadingAnchor.constraint(equalTo: self.guide.leadingAnchor).isActive = true
-        self.movieInfoScrollView.trailingAnchor.constraint(equalTo: self.guide.trailingAnchor).isActive = true
-        self.movieInfoScrollView.widthAnchor.constraint(equalTo: self.guide.widthAnchor).isActive = true
-        
-        self.realm = try! Realm()
-        
-        self.setHeart()
+        self.movieInfoScrollView.bottomAnchor.constraint(equalTo: guide.bottomAnchor).isActive = true
+        self.movieInfoScrollView.leadingAnchor.constraint(equalTo: guide.leadingAnchor).isActive = true
+        self.movieInfoScrollView.trailingAnchor.constraint(equalTo: guide.trailingAnchor).isActive = true
+        self.movieInfoScrollView.widthAnchor.constraint(equalTo: guide.widthAnchor).isActive = true
     }
 
     override func viewDidLayoutSubviews() {
@@ -210,18 +240,20 @@ class MovieInfoViewController: UIViewController, PresentedTransitionAnimatableCo
             return
         }
         
-        if movie.isSaved, let movieEntity = self.realm?.object(ofType: MovieEntity.self, forPrimaryKey: movie.id){
-            try! self.realm?.write({
-                realm?.delete(movieEntity)
-                try! realm?.commitWrite()
+        let realm = try! Realm()
+        
+        if movie.isSaved, let movieEntity = realm.object(ofType: MovieEntity.self, forPrimaryKey: movie.id){
+            try! realm.write({
+                realm.delete(movieEntity)
+                try! realm.commitWrite()
             })
             self.movie?.id = nil
         } else {
             let movieEntity = MovieEntity(movie: movie)
             self.movie?.id = movieEntity.id
-            try! self.realm?.write({
-                realm?.add(movieEntity, update: .all)
-                realm?.create(MovieEntity.self)
+            try! realm.write({
+                realm.add(movieEntity, update: .all)
+                realm.create(MovieEntity.self)
             })
         }
         

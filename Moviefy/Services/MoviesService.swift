@@ -24,7 +24,7 @@ class MoviesService {
     }
     
     func fetchMoviesByCategory(movieCategoryPath: String, page: Int, completion: @escaping (Result<MoviesResponse, Error>) -> ()) {
-        guard var urlComponents = URLComponents(string: EndPoint.defaultLink + movieCategoryPath) else {
+        guard var urlComponents = URLComponents(string: Link.defaultLink + movieCategoryPath) else {
             return
         }
         let url = MoviesService.setQueryParams(urlComponents: &urlComponents, params: [QueryItems.page.rawValue: String(page), QueryItems.language.rawValue: "en-US"])
@@ -46,7 +46,7 @@ class MoviesService {
     }
     
     func fetchMovieImage(imageUrl: String, completion: @escaping(Result<Data, Error>) -> ()) {
-        let urlComponents = URLComponents(string: EndPoint.imageLink + imageUrl)
+        let urlComponents = URLComponents(string: Link.imageLink + imageUrl)
         guard let url = urlComponents?.url else {
             return
         }
@@ -62,7 +62,7 @@ class MoviesService {
     }
     
     static func loadMoviesGenreList(){
-        guard var urlComponents = URLComponents(string: EndPoint.defaultLink + EndPoint.genresPath) else {
+        guard var urlComponents = URLComponents(string: Link.defaultLink + EndPoint.genresPath) else {
             return
         }
         let url = MoviesService.setQueryParams(urlComponents: &urlComponents, params: [QueryItems.language.rawValue: "en-US"])
@@ -83,7 +83,7 @@ class MoviesService {
     }
     
     func searchMovies(text: String, completion: @escaping (Result<MoviesResponse, Error>) -> ()) {
-        guard var urlComponents = URLComponents(string: EndPoint.defaultLink + EndPoint.searchPath) else {
+        guard var urlComponents = URLComponents(string: Link.defaultLink + EndPoint.searchPath) else {
             return
         }
         let url = MoviesService.setQueryParams(urlComponents: &urlComponents, params: [QueryItems.query.rawValue: text])

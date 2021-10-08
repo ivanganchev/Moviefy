@@ -10,55 +10,76 @@ import UIKit
 import RealmSwift
 
 class SavedMoviesViewController: UIViewController, InitialTransitionAnimatableContent {
-    var savedMoviesCollectionView: UICollectionView?
-    var savedMoviesCollectionViewDataSource: SavedMoviesCollectionViewDataSource = SavedMoviesCollectionViewDataSource()
+    var savedMoviesCollectionView: UICollectionView = {
+        let savedMoviesCollectionViewFlowLayout = UICollectionViewFlowLayout()
+        savedMoviesCollectionViewFlowLayout.scrollDirection = .vertical
+    
+        return UICollectionView(frame: .zero, collectionViewLayout: savedMoviesCollectionViewFlowLayout)
+    }()
+    
+    var savedMoviesCollectionViewDataSource = SavedMoviesCollectionViewDataSource()
     
     let interItemSpacing: CGFloat = 5.0
     let lineSpacingForSection: CGFloat = 5.0
     
     var selectedCellImageView: UIImageView?
     var selectedCellImageViewSnapshot: UIView?
-    var transitionAnimator: TransitionAnimator?
+    let transitioningContentDelegate = TransitioningDelegate()
 
     override func viewDidLoad() {
+        self.view.backgroundColor = .white
+        self.setBarTitle()
+        self.setSavedMoviesCollectionView()
+        self.setConstraints()
+        self.loadSavedMovies()
+    }
+    
+    func setBarTitle() {
         let barTitle: UILabel = UILabel(frame: CGRect(x: 0, y: 0, width: 50, height: 40))
         barTitle.font = UIFont(name: "Helvetica-Bold", size: 16)
         barTitle.text = "My List"
-        
         self.navigationItem.titleView = barTitle
-        self.view.backgroundColor = .white
-        
-        let savedMoviesCollectionViewFlowLayout = UICollectionViewFlowLayout()
-        savedMoviesCollectionViewFlowLayout.scrollDirection = .vertical
+    }
     
-        self.savedMoviesCollectionView = UICollectionView(frame: .zero, collectionViewLayout: savedMoviesCollectionViewFlowLayout)
-        self.savedMoviesCollectionView?.backgroundColor = .white
-        self.savedMoviesCollectionView?.dataSource = self.savedMoviesCollectionViewDataSource
-        self.savedMoviesCollectionView?.delegate = self
-        self.savedMoviesCollectionView?.register(CategoryCollectionViewCell.self, forCellWithReuseIdentifier: CategoryCollectionViewCell.identifier)
-        self.savedMoviesCollectionView?.translatesAutoresizingMaskIntoConstraints = false
-        
-        self.view.addSubview(self.savedMoviesCollectionView!)
-        
-        self.savedMoviesCollectionView?.topAnchor.constraint(equalTo: self.view.topAnchor).isActive = true
-        self.savedMoviesCollectionView?.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
-        self.savedMoviesCollectionView?.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
-        self.savedMoviesCollectionView?.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
+    func setSavedMoviesCollectionView() {
+        self.savedMoviesCollectionView.backgroundColor = .white
+        self.savedMoviesCollectionView.dataSource = self.savedMoviesCollectionViewDataSource
+        self.savedMoviesCollectionView.delegate = self
+        self.savedMoviesCollectionView.register(CategoryCollectionViewCell.self, forCellWithReuseIdentifier: CategoryCollectionViewCell.identifier)
+        self.savedMoviesCollectionView.translatesAutoresizingMaskIntoConstraints = false
+    }
     
+    func setConstraints() {
+        self.view.addSubview(self.savedMoviesCollectionView)
+        
+        self.savedMoviesCollectionView.topAnchor.constraint(equalTo: self.view.topAnchor).isActive = true
+        self.savedMoviesCollectionView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
+        self.savedMoviesCollectionView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
+        self.savedMoviesCollectionView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
+    }
+    
+    func loadSavedMovies() {
         self.savedMoviesCollectionViewDataSource.loadSavedMovies {changes in
             switch changes {
             case .initial:
-                self.savedMoviesCollectionView?.reloadData()
+                self.savedMoviesCollectionView.reloadData()
             case .update(_, deletions: let deletions, insertions: let insertions, modifications: let modifications):
-                self.savedMoviesCollectionView?.performBatchUpdates({
-                    self.savedMoviesCollectionView?.deleteItems(at: deletions.map({IndexPath(row: $0, section: 0)}))
-                    self.savedMoviesCollectionView?.insertItems(at: insertions.map({IndexPath(row: $0, section: 0)}))
-                    self.savedMoviesCollectionView?.reloadItems(at: modifications.map({ IndexPath(row: $0, section: 0) }))
+                self.savedMoviesCollectionView.performBatchUpdates({
+                    self.savedMoviesCollectionView.deleteItems(at: deletions.map({IndexPath(row: $0, section: 0)}))
+                    self.savedMoviesCollectionView.insertItems(at: insertions.map({IndexPath(row: $0, section: 0)}))
+                    self.savedMoviesCollectionView.reloadItems(at: modifications.map({ IndexPath(row: $0, section: 0) }))
                 }, completion: nil)
             case .error(let err):
                 print(err)
             }
         }
+    }
+    func presentMovieInfoViewController(with movie: Movie) {
+        let movieInfoViewController = MovieInfoViewController()
+        movieInfoViewController.movie = movie
+        movieInfoViewController.modalPresentationStyle = .fullScreen
+        movieInfoViewController.transitioningDelegate = self.transitioningContentDelegate
+        present(movieInfoViewController, animated: true)
     }
 }
 
@@ -89,35 +110,5 @@ extension SavedMoviesViewController: UICollectionViewDelegateFlowLayout {
         self.selectedCellImageViewSnapshot = selectedCellImageView?.snapshotView(afterScreenUpdates: true)
         let savedMovie = self.savedMoviesCollectionViewDataSource.savedMovies[indexPath.row]
         self.presentMovieInfoViewController(with: Movie(movieEntity: savedMovie, imageData: savedMovie.imageData!))
-    }
-}
-
-extension SavedMoviesViewController: UIViewControllerTransitioningDelegate {
-    func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        guard let savedMoviesViewController = source as? SavedMoviesViewController,
-                let movieInfoViewController = presented as? MovieInfoViewController,
-                let selectedCellImageViewSnapshot = self.selectedCellImageViewSnapshot
-                else { return nil }
-
-        self.transitionAnimator = TransitionAnimator(type: .present, initialAnimatableContent: savedMoviesViewController, presentedAnimatableContent: movieInfoViewController, selectedCellImageViewSnapshot: selectedCellImageViewSnapshot)
-        return self.transitionAnimator
-    }
-
-    
-    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        guard let movieInfoViewController = dismissed as? MovieInfoViewController,
-              let selectedCellImageViewSnapshot = self.selectedCellImageViewSnapshot
-            else { return nil }
-
-        self.transitionAnimator = TransitionAnimator(type: .dismiss, initialAnimatableContent: self, presentedAnimatableContent: movieInfoViewController, selectedCellImageViewSnapshot: selectedCellImageViewSnapshot)
-        return self.transitionAnimator
-    }
-    
-    func presentMovieInfoViewController(with movie: Movie) {
-        let movieInfoViewController = MovieInfoViewController()
-        movieInfoViewController.movie = movie
-        movieInfoViewController.modalPresentationStyle = .fullScreen
-        movieInfoViewController.transitioningDelegate = self
-        present(movieInfoViewController, animated: true)
     }
 }

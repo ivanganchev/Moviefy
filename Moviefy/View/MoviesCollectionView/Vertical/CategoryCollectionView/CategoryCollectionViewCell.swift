@@ -12,6 +12,8 @@ import UIKit
 class CategoryCollectionViewCell: UICollectionViewCell {
     static let identifier = "CategoryCollectionViewCell"
     
+    let imageView = UIImageView()
+    
     var image: UIImage? {
         didSet {
             DispatchQueue.main.async {
@@ -19,11 +21,6 @@ class CategoryCollectionViewCell: UICollectionViewCell {
             }
         }
     }
-    
-    let imageView: UIImageView = {
-        let imageView = UIImageView()
-        return imageView
-    }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)

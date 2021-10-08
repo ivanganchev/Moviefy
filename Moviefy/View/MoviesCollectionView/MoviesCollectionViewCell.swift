@@ -10,6 +10,8 @@ import UIKit
 class MoviesCollectionViewCell: UICollectionViewCell {
     static let identifier = "MoviesCollectionViewCell"
 
+    let imageView = UIImageView()
+    
     var image: UIImage? {
         didSet {
             DispatchQueue.main.async {
@@ -17,12 +19,7 @@ class MoviesCollectionViewCell: UICollectionViewCell {
             }
         }
     }
-    
-    let imageView: UIImageView = {
-        let imageView = UIImageView()
-        return imageView
-    }()
-    
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         contentView.addSubview(imageView)

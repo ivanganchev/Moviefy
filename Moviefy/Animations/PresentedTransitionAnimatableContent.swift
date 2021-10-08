@@ -9,5 +9,5 @@ import Foundation
 import UIKit
 
 protocol PresentedTransitionAnimatableContent: UIViewController {
-    var movieImageView: UIImageView {get set}
+    var movieImageView: UIImageView { get set }
 }

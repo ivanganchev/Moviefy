@@ -8,159 +8,120 @@
 import Foundation
 import UIKit
 
-class CategoryCollectionViewViewController: UIViewController, UIViewControllerTransitioningDelegate, GenreChipsViewDelegate {
-
-    var categoryCollectionView: UICollectionView?
+class CategoryCollectionViewViewController: UIViewController, UIViewControllerTransitioningDelegate, InitialTransitionAnimatableContent {
+    let categoryCollectionView: UICollectionView = {
+        let categoryCollectionViewLayout = UICollectionViewFlowLayout()
+        categoryCollectionViewLayout.scrollDirection = .vertical
+        
+        return UICollectionView(frame: .zero, collectionViewLayout: categoryCollectionViewLayout)
+    }()
     var categoryType: String = ""
-    var categoryCollectionViewDataSource: CategoryCollectionViewDataSource = CategoryCollectionViewDataSource()
+    var categoryCollectionViewDataSource = CategoryCollectionViewDataSource()
     var movieCategoryPath: MovieCategoryEndPoint?
-    var genreChipsView: GenreChipsView?
-    
-    var currentPage: Int = 1
-    var isFetching = false
-    var guide: UILayoutGuide =  UILayoutGuide()
-    
+    var genreChipsView: GenreChipsView = GenreChipsView(frame: .zero)
+    let transitioningContentDelegate = TransitioningDelegate()
+
     let interItemSpacing: CGFloat = 5.0
     let lineSpacingForSection: CGFloat = 5.0
-    let itemsInRow: CGFloat = 3.0
     let itemsInColumn : CGFloat = 4.0
     
     var selectedCellImageView: UIImageView?
     var selectedCellImageViewSnapshot: UIView?
-    var transitionAnimator: TransitionAnimator?
 
     override func viewDidLoad() {
-        self.guide = self.view.safeAreaLayoutGuide
-        
         self.navigationItem.hidesSearchBarWhenScrolling = false
-        let barTitle: UILabel = UILabel(frame: CGRect(x: 0, y: 0, width: 50, height: 40))
-        barTitle.font = UIFont(name: "Helvetica-Bold", size: 16)
-        barTitle.text = self.categoryType
-        
-        self.navigationItem.titleView = barTitle
-        
-        let categoryCollectionViewLayout = UICollectionViewFlowLayout()
-        categoryCollectionViewLayout.scrollDirection = .vertical
-        
-        self.categoryCollectionView = UICollectionView(frame: .zero, collectionViewLayout: categoryCollectionViewLayout)
-        self.categoryCollectionView?.backgroundColor = .white
-        self.categoryCollectionView?.translatesAutoresizingMaskIntoConstraints = false
-        
-        self.categoryCollectionViewDataSource.movieCategoryPath = self.movieCategoryPath?.rawValue
-        self.categoryCollectionView?.dataSource = self.categoryCollectionViewDataSource
-        self.categoryCollectionView?.prefetchDataSource = self.categoryCollectionViewDataSource
-        self.categoryCollectionView?.delegate = self
-        self.categoryCollectionView?.register(CategoryCollectionViewCell.self, forCellWithReuseIdentifier: CategoryCollectionViewCell.identifier)
-        self.categoryCollectionView?.register(IndicatorFooter.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: IndicatorFooter.identifier)
-        self.categoryCollectionView?.refreshControl = UIRefreshControl()
-        self.categoryCollectionView?.refreshControl?.addTarget(self, action: #selector(pullToRefresh), for: .valueChanged)
-        
-        let chipsGenreCollectionViewLayout = UICollectionViewFlowLayout()
-        chipsGenreCollectionViewLayout.scrollDirection = .horizontal
-        
-        self.genreChipsView = GenreChipsView(frame: .zero)
-        self.genreChipsView?.translatesAutoresizingMaskIntoConstraints = false
-        self.genreChipsView?.delegate = self
-        
-        // Not sure about it
-        self.view.addSubview(self.categoryCollectionView ?? UICollectionView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height), collectionViewLayout: categoryCollectionViewLayout))
-        self.view.addSubview(self.genreChipsView!)
-        
-        self.genreChipsView?.topAnchor.constraint(equalTo: self.guide.topAnchor).isActive = true
-        self.genreChipsView?.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
-        self.genreChipsView?.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
-        self.genreChipsView?.heightAnchor.constraint(equalToConstant: 50).isActive = true
-        self.genreChipsView?.widthAnchor.constraint(equalTo: self.view.widthAnchor).isActive = true
-        
-        self.categoryCollectionView?.topAnchor.constraint(equalTo: self.genreChipsView!.bottomAnchor).isActive = true
-        self.categoryCollectionView?.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
-        self.categoryCollectionView?.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
-        self.categoryCollectionView?.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
-        
-        self.categoryCollectionViewDataSource.fetchMovies(page: self.currentPage, completion: {
-            self.currentPage += 1
-            self.categoryCollectionViewDataSource.loadImages(completion: {
-                DispatchQueue.main.async {
-                    self.categoryCollectionView?.reloadData()
-                }
-            })
-        })
-    }
     
-    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-        super.viewWillTransition(to: size, with: coordinator)
+        self.setBarTitle()
+        self.setCategoryCollectionView()
+        self.setGenreChipsView()
+        self.setConstraints()
+        
+        self.fetchMovies()
     }
     
     override func viewDidLayoutSubviews() {
         self.navigationController?.navigationBar.isHidden = false
     }
     
-    @objc func pullToRefresh() {
-        self.currentPage = 1
-        self.categoryCollectionViewDataSource.fetchMovies(page: self.currentPage, completion: {
-            self.currentPage += 1
+    func setBarTitle() {
+        let barTitle: UILabel = UILabel(frame: CGRect(x: 0, y: 0, width: 50, height: 40))
+        barTitle.font = UIFont(name: "Helvetica-Bold", size: 16)
+        barTitle.text = self.categoryType
+        self.navigationItem.titleView = barTitle
+    }
+    
+    func setCategoryCollectionView() {
+        self.categoryCollectionView.backgroundColor = .white
+        self.categoryCollectionView.translatesAutoresizingMaskIntoConstraints = false
+        
+        self.categoryCollectionViewDataSource.movieCategoryPath = self.movieCategoryPath?.rawValue
+        self.categoryCollectionView.dataSource = self.categoryCollectionViewDataSource
+        self.categoryCollectionView.prefetchDataSource = self.categoryCollectionViewDataSource
+        self.categoryCollectionView.delegate = self
+        self.categoryCollectionView.register(CategoryCollectionViewCell.self, forCellWithReuseIdentifier: CategoryCollectionViewCell.identifier)
+        self.categoryCollectionView.register(IndicatorFooter.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: IndicatorFooter.identifier)
+        self.categoryCollectionView.refreshControl = UIRefreshControl()
+        self.categoryCollectionView.refreshControl?.addTarget(self, action: #selector(pullToRefresh), for: .valueChanged)
+        
+        self.view.addSubview(self.categoryCollectionView)
+    }
+    
+    func setGenreChipsView() {
+        let chipsGenreCollectionViewLayout = UICollectionViewFlowLayout()
+        chipsGenreCollectionViewLayout.scrollDirection = .horizontal
+        
+        self.genreChipsView.translatesAutoresizingMaskIntoConstraints = false
+        self.genreChipsView.delegate = self
+        
+        self.view.addSubview(self.genreChipsView)
+    }
+    
+    func setConstraints() {
+        let guide = self.view.safeAreaLayoutGuide
+    
+        self.categoryCollectionView.topAnchor.constraint(equalTo: self.genreChipsView.bottomAnchor).isActive = true
+        self.categoryCollectionView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
+        self.categoryCollectionView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
+        self.categoryCollectionView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
+        
+        self.genreChipsView.topAnchor.constraint(equalTo: guide.topAnchor).isActive = true
+        self.genreChipsView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
+        self.genreChipsView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
+        self.genreChipsView.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        self.genreChipsView.widthAnchor.constraint(equalTo: self.view.widthAnchor).isActive = true
+    }
+
+    func fetchMovies() {
+        self.categoryCollectionViewDataSource.fetchMovies(completion: {
             self.categoryCollectionViewDataSource.loadImages(completion: {
                 DispatchQueue.main.async {
-                    self.categoryCollectionView?.reloadData()
-                    self.categoryCollectionView?.refreshControl?.endRefreshing()
+                    self.categoryCollectionView.reloadData()
                 }
             })
         })
     }
     
-    func presentGenrePickerViewController() {
-        self.tabBarController?.tabBar.isHidden = true
-        let genrePickerViewController = GenrePickerViewController()
-        genrePickerViewController.selectedGenres = self.genreChipsView?.genreChipsCollectionViewDataSource.genres ?? []
-        genrePickerViewController.onDoneBlock = {genre in
-            self.tabBarController?.tabBar.isHidden = false
-            if genre != "" {
-                self.genreChipsView?.genreChipsCollectionViewDataSource.genres.append(genre)
-                self.genreChipsView?.genreChipsCollectionView?.reloadData()
-                self.filterMovies()
-                self.categoryCollectionView?.reloadData()
-            }
-        }
-        genrePickerViewController.modalPresentationStyle = .overCurrentContext
-        self.present(genrePickerViewController, animated: false, completion: nil)
-    }
-    
-    func refreshMovies() {
-        self.filterMovies()
-        self.categoryCollectionView?.reloadData()
-    }
-    
-    func filterMovies() {
-        let movies = self.categoryCollectionViewDataSource.movies
-        let allGenres = MoviesService.genres
-        let selectedGenres = self.genreChipsView?.genreChipsCollectionViewDataSource.genres
-        var newFilteredMovies: [Movie] = movies
-        
-        selectedGenres?.forEach({ genre in
-            var tempArr: [Movie] = []
-            newFilteredMovies.forEach { movie in
-                let id = allGenres?.first(where: {$0.value == genre})?.key
-                if movie.movieResponse.genreIds!.contains(id!) {
-                    tempArr.append(movie)
+    @objc func pullToRefresh() {
+        self.categoryCollectionViewDataSource.currentPage = 1
+        self.categoryCollectionViewDataSource.fetchMovies(completion: {
+            self.categoryCollectionViewDataSource.loadImages(completion: {
+                DispatchQueue.main.async {
+                    self.categoryCollectionView.reloadData()
+                    self.categoryCollectionView.refreshControl?.endRefreshing()
                 }
-            }
-            newFilteredMovies = tempArr
+            })
         })
-        
-        self.categoryCollectionViewDataSource.filteredMovies = newFilteredMovies
     }
-    
+        
     func fetchFilteredMovies(currentCellIndex: Int, completion: @escaping () -> ()) {
-        self.categoryCollectionViewDataSource.fetchMovies(page: self.currentPage) {
-            self.filterMovies()
+        self.categoryCollectionViewDataSource.fetchMovies() {
+            self.categoryCollectionViewDataSource.filterMovies(genres: self.genreChipsView.genreChipsCollectionViewDataSource.genres)
             let moviesOnScreen = self.categoryCollectionViewDataSource.filteredMovies.count
             if moviesOnScreen - currentCellIndex > 1 {
-                self.currentPage += 1
                 self.categoryCollectionViewDataSource.loadImages()
                 completion()
             } else {
                 self.fetchFilteredMovies(currentCellIndex: self.categoryCollectionViewDataSource.filteredMovies.count - 1, completion: completion)
-                self.currentPage += 1
             }
         }
     }
@@ -169,7 +130,7 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
         let movieInfoViewController = MovieInfoViewController()
         movieInfoViewController.movie = movie
         movieInfoViewController.modalPresentationStyle = .fullScreen
-        movieInfoViewController.transitioningDelegate = self
+        movieInfoViewController.transitioningDelegate = self.transitioningContentDelegate
         present(movieInfoViewController, animated: true)
     }
 }
@@ -202,7 +163,7 @@ extension CategoryCollectionViewViewController: UICollectionViewDelegateFlowLayo
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         if indexPath.row == (self.categoryCollectionViewDataSource.filteredMovies.count - 1) {
-            self.categoryCollectionViewDataSource.footerView.startAnimating()
+            self.categoryCollectionViewDataSource.activityIndicatorView.startAnimating()
             self.fetchFilteredMovies(currentCellIndex: indexPath.row) {
                 var paths = [IndexPath]()
                 let moviesOnScreenCount = self.categoryCollectionViewDataSource.filteredMovies.count
@@ -213,8 +174,8 @@ extension CategoryCollectionViewViewController: UICollectionViewDelegateFlowLayo
                 }
                 print(paths.count)
                 DispatchQueue.main.async {
-                    self.categoryCollectionViewDataSource.footerView.stopAnimating()
-                    self.categoryCollectionView?.insertItems(at: paths)
+                    self.categoryCollectionViewDataSource.activityIndicatorView.stopAnimating()
+                    self.categoryCollectionView.insertItems(at: paths)
                 }
             }
         }
@@ -228,26 +189,32 @@ extension CategoryCollectionViewViewController: UICollectionViewDelegateFlowLayo
     }
 }
 
-extension CategoryCollectionViewViewController: InitialTransitionAnimatableContent {
-    func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        guard let categoryCollectionViewViewController = source as? CategoryCollectionViewViewController,
-                let movieInfoViewController = presented as? MovieInfoViewController,
-                let selectedCellImageViewSnapshot = self.selectedCellImageViewSnapshot
-                else { return nil }
-
-        self.transitionAnimator = TransitionAnimator(type: .present, initialAnimatableContent: categoryCollectionViewViewController, presentedAnimatableContent: movieInfoViewController, selectedCellImageViewSnapshot: selectedCellImageViewSnapshot)
-        return self.transitionAnimator
+extension CategoryCollectionViewViewController: GenreChipsViewDelegate {
+    func presentGenrePickerViewController() {
+        self.tabBarController?.tabBar.isHidden = true
+        let selectedGenres = self.genreChipsView.genreChipsCollectionViewDataSource.genres
+        let genrePickerViewController = GenrePickerViewController()
+        genrePickerViewController.selectedGenres = selectedGenres
+        genrePickerViewController.delegate = self
+        genrePickerViewController.modalPresentationStyle = .overCurrentContext
+        self.present(genrePickerViewController, animated: false, completion: nil)
     }
-
     
-    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        guard let movieInfoViewController = dismissed as? MovieInfoViewController,
-              let selectedCellImageViewSnapshot = self.selectedCellImageViewSnapshot
-            else { return nil }
-
-        self.transitionAnimator = TransitionAnimator(type: .dismiss, initialAnimatableContent: self, presentedAnimatableContent: movieInfoViewController, selectedCellImageViewSnapshot: selectedCellImageViewSnapshot)
-        return self.transitionAnimator
+    func refreshMovies() {
+        let selectedGenres: [String] = self.genreChipsView.genreChipsCollectionViewDataSource.genres
+        self.categoryCollectionViewDataSource.filterMovies(genres: selectedGenres)
+        self.categoryCollectionView.reloadData()
     }
 }
 
-
+extension CategoryCollectionViewViewController: GenrePickerViewControllerDelegate {
+    func getSelectedGenre(genre: String) {
+        self.tabBarController?.tabBar.isHidden = false
+        if genre != "" {
+            self.genreChipsView.genreChipsCollectionViewDataSource.genres.append(genre)
+            self.genreChipsView.genreChipsCollectionView?.reloadData()
+            self.categoryCollectionViewDataSource.filterMovies(genres: self.genreChipsView.genreChipsCollectionViewDataSource.genres)
+            self.categoryCollectionView.reloadData()
+        }
+    }
+}

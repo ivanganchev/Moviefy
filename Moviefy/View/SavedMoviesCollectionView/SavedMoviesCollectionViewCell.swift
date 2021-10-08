@@ -10,7 +10,9 @@ import UIKit
 
 class SavedMoviesCollectionViewCell: UICollectionViewCell {
     static let identifier = "SavedMoviesCollectionViewCell"
-    
+        
+    let imageView = UIImageView()
+
     var image: UIImage? {
         didSet {
             DispatchQueue.main.async {
@@ -18,12 +20,7 @@ class SavedMoviesCollectionViewCell: UICollectionViewCell {
             }
         }
     }
-    
-    let imageView: UIImageView = {
-        let imageView = UIImageView()
-        return imageView
-    }()
-    
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         contentView.addSubview(imageView)

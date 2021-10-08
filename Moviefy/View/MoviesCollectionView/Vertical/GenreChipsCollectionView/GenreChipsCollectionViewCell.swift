@@ -18,14 +18,25 @@ class GenreChipsCollectionViewCell: UICollectionViewCell {
             }
         }
     }
-    //Why private?
+    
     var genreLabel: UILabel = {
         let genreLabel = UILabel()
+        genreLabel.font = UIFont(name: "Helvetica", size: 20)
+        genreLabel.textColor = .black
+        genreLabel.translatesAutoresizingMaskIntoConstraints = false
+        
         return genreLabel
     }()
     
     var removeButton: UIButton = {
         let removeButton = UIButton()
+        removeButton.setImage(UIImage(systemName: "xmark.circle"), for: .normal)
+        removeButton.imageView?.contentMode = .scaleAspectFit
+        removeButton.contentHorizontalAlignment = .fill
+        removeButton.contentVerticalAlignment = .fill
+        removeButton.tintColor = .black
+        removeButton.translatesAutoresizingMaskIntoConstraints = false
+        
         return removeButton
     }()
     
@@ -33,29 +44,15 @@ class GenreChipsCollectionViewCell: UICollectionViewCell {
         let containerView = UIStackView()
         containerView.axis = .horizontal
         containerView.spacing = 5
+        containerView.translatesAutoresizingMaskIntoConstraints = false
         return containerView
     }()
     
-    var view: UIView = {
-        let view = UIView()
-        return view
-    }()
+    var view = UIView()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-
-        self.genreLabel.font = UIFont(name: "Helvetica", size: 20)
-        self.genreLabel.textColor = .black
-        self.genreLabel.translatesAutoresizingMaskIntoConstraints = false
     
-        self.removeButton.setImage(UIImage(systemName: "xmark.circle"), for: .normal)
-        self.removeButton.imageView?.contentMode = .scaleAspectFit
-        self.removeButton.contentHorizontalAlignment = .fill
-        self.removeButton.contentVerticalAlignment = .fill
-        self.removeButton.tintColor = .black
-        self.removeButton.translatesAutoresizingMaskIntoConstraints = false
-        
-        self.containerView.translatesAutoresizingMaskIntoConstraints = false
         self.containerView.addArrangedSubview(self.genreLabel)
         self.containerView.addArrangedSubview(self.removeButton)
         self.containerView.addArrangedSubview(UIView(frame: CGRect(x: 0, y: 0, width: 1, height: 1)))
@@ -65,31 +62,29 @@ class GenreChipsCollectionViewCell: UICollectionViewCell {
         self.view.addSubview(self.containerView)
 
         self.addSubview(self.view)
+        
+        NSLayoutConstraint.activate([
+            self.containerView.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 10),
+            self.containerView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -10),
+            self.containerView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
+            
+            self.removeButton.widthAnchor.constraint(equalToConstant: 20),
+            self.removeButton.heightAnchor.constraint(equalToConstant: 20),
+            
+            self.genreLabel.heightAnchor.constraint(equalToConstant: 25),
+            self.genreLabel.leadingAnchor.constraint(equalTo: self.containerView.leadingAnchor, constant: 5),
+            
+            self.view.topAnchor.constraint(equalTo: self.topAnchor),
+            self.view.bottomAnchor.constraint(equalTo: self.bottomAnchor),
+            self.view.leadingAnchor.constraint(equalTo: self.leadingAnchor),
+            self.view.trailingAnchor.constraint(equalTo: self.trailingAnchor)
+        ])
+        
+        self.containerView.layer.cornerRadius = 12.0
+        self.containerView.backgroundColor = .lightGray
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    override func layoutSubviews() {
-        self.containerView.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 10).isActive = true
-        self.containerView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -10).isActive = true
-        self.containerView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
-
-        self.removeButton.widthAnchor.constraint(equalToConstant: 20).isActive = true
-        self.removeButton.heightAnchor.constraint(equalToConstant: 20).isActive = true
-        
-        self.genreLabel.heightAnchor.constraint(equalToConstant: 25).isActive = true
-        self.genreLabel.leadingAnchor.constraint(equalTo: self.containerView.leadingAnchor, constant: 5).isActive = true
-        
-        self.containerView.layer.cornerRadius = 12.0
-        self.containerView.backgroundColor = .lightGray
-        
-        self.view.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
-        self.view.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
-        self.view.leadingAnchor.constraint(equalTo: self.leadingAnchor).isActive = true
-        self.view.trailingAnchor.constraint(equalTo: self.trailingAnchor).isActive = true
-    }
-    
-    
 }
