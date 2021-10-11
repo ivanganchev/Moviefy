@@ -50,7 +50,6 @@ class MoviesService {
         guard let url = urlComponents?.url else {
             return
         }
-        
         let request = URLRequest(url: url)
         
         MoviesService.provideService(url: request) { (data, response, error) in

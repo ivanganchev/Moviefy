@@ -156,26 +156,30 @@ class MovieInfoViewController: UIViewController, PresentedTransitionAnimatableCo
         self.shadowView.addSubview(self.closeButton)
         self.shadowView.addSubview(self.heartButton)
         
-        self.closeButton.centerYAnchor.constraint(equalTo: self.shadowView.centerYAnchor, constant: 10).isActive = true
-        self.closeButton.leadingAnchor.constraint(equalTo: self.shadowView.leadingAnchor, constant: 20).isActive = true
-        self.closeButton.widthAnchor.constraint(equalToConstant: 25).isActive = true
-        self.closeButton.heightAnchor.constraint(equalToConstant: 25).isActive = true
-        
-        self.heartButton.centerYAnchor.constraint(equalTo: self.shadowView.centerYAnchor, constant: 10).isActive = true
-        self.heartButton.trailingAnchor.constraint(equalTo: self.shadowView.trailingAnchor, constant: -20).isActive = true
-        self.heartButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
-        self.heartButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
-        
+        NSLayoutConstraint.activate([
+            self.closeButton.centerYAnchor.constraint(equalTo: self.shadowView.centerYAnchor, constant: 10),
+            self.closeButton.leadingAnchor.constraint(equalTo: self.shadowView.leadingAnchor, constant: 20),
+            self.closeButton.widthAnchor.constraint(equalToConstant: 25),
+            self.closeButton.heightAnchor.constraint(equalToConstant: 25),
+            
+            self.heartButton.centerYAnchor.constraint(equalTo: self.shadowView.centerYAnchor, constant: 10),
+            self.heartButton.trailingAnchor.constraint(equalTo: self.shadowView.trailingAnchor, constant: -20),
+            self.heartButton.widthAnchor.constraint(equalToConstant: 30),
+            self.heartButton.heightAnchor.constraint(equalToConstant: 30)
+        ])
+
         self.topPartView.addSubview(self.movieImageView)
         self.topPartView.addSubview(self.shadowView)
         
-        self.movieImageView.topAnchor.constraint(equalTo: self.topPartView.topAnchor).isActive = true
-        self.movieImageView.leadingAnchor.constraint(equalTo: self.topPartView.leadingAnchor).isActive = true
-        self.movieImageView.trailingAnchor.constraint(equalTo: self.topPartView.trailingAnchor).isActive = true
-         self.movieImageView.heightAnchor.constraint(equalTo: self.movieImageView.widthAnchor, multiplier: self.movieImageView.image!.size.height / self.movieImageView.image!.size.width, constant: 0).isActive = true
-        self.shadowView.widthAnchor.constraint(equalTo: self.topPartView.widthAnchor).isActive = true
-        self.shadowView.heightAnchor.constraint(equalToConstant: 100).isActive = true
-        self.shadowView.topAnchor.constraint(equalTo: self.topPartView.topAnchor).isActive = true
+        NSLayoutConstraint.activate([
+            self.movieImageView.topAnchor.constraint(equalTo: self.topPartView.topAnchor),
+            self.movieImageView.leadingAnchor.constraint(equalTo: self.topPartView.leadingAnchor),
+            self.movieImageView.trailingAnchor.constraint(equalTo: self.topPartView.trailingAnchor),
+             self.movieImageView.heightAnchor.constraint(equalTo: self.movieImageView.widthAnchor, multiplier: self.movieImageView.image!.size.height / self.movieImageView.image!.size.width, constant: 0),
+            self.shadowView.widthAnchor.constraint(equalTo: self.topPartView.widthAnchor),
+            self.shadowView.heightAnchor.constraint(equalToConstant: 100),
+            self.shadowView.topAnchor.constraint(equalTo: self.topPartView.topAnchor)
+        ])
     
         self.containerView.addSubview(self.topPartView)
         self.containerView.addSubview(self.movieTitle)
@@ -184,47 +188,53 @@ class MovieInfoViewController: UIViewController, PresentedTransitionAnimatableCo
         self.containerView.addSubview(self.movieOverviewLabel)
         self.containerView.addSubview(self.movieOverview)
         
-        self.topPartView.topAnchor.constraint(equalTo: self.containerView.topAnchor).isActive = true
-        self.topPartView.leadingAnchor.constraint(equalTo: self.containerView.leadingAnchor).isActive = true
-        self.topPartView.widthAnchor.constraint(equalTo: self.containerView.widthAnchor).isActive = true
-        self.topPartView.heightAnchor.constraint(equalTo: self.movieImageView.heightAnchor).isActive = true
-        
-        self.movieTitle.leadingAnchor.constraint(equalTo: self.containerView.leadingAnchor, constant: 10).isActive = true
-        self.movieTitle.topAnchor.constraint(equalTo: self.topPartView.bottomAnchor, constant: 15).isActive = true
-        self.movieTitle.trailingAnchor.constraint(equalTo: self.containerView.trailingAnchor, constant: -10).isActive = true
-        
-        self.movieGenres.leadingAnchor.constraint(equalTo: self.containerView.leadingAnchor, constant: 10).isActive = true
-        self.movieGenres.topAnchor.constraint(equalTo: self.movieTitle.bottomAnchor, constant: 5).isActive = true
-        self.movieGenres.trailingAnchor.constraint(equalTo: self.containerView.trailingAnchor, constant: -10).isActive = true
-        
-        self.movieDateReleased.leadingAnchor.constraint(equalTo: self.containerView.leadingAnchor, constant: 10).isActive = true
-        self.movieDateReleased.topAnchor.constraint(equalTo: self.movieGenres.bottomAnchor, constant: 5).isActive = true
-        self.movieDateReleased.trailingAnchor.constraint(equalTo: self.containerView.trailingAnchor, constant: -10).isActive = true
-        
-        self.movieOverviewLabel.leadingAnchor.constraint(equalTo: self.containerView.leadingAnchor, constant: 10).isActive = true
-        self.movieOverviewLabel.topAnchor.constraint(equalTo: self.movieDateReleased.bottomAnchor, constant: 15).isActive = true
-        self.movieOverviewLabel.trailingAnchor.constraint(equalTo: self.containerView.trailingAnchor, constant: -10).isActive = true
-        
-        self.movieOverview.leadingAnchor.constraint(equalTo: self.containerView.leadingAnchor, constant: 10).isActive = true
-        self.movieOverview.topAnchor.constraint(equalTo: self.movieOverviewLabel.bottomAnchor, constant: 5).isActive = true
-        self.movieOverview.bottomAnchor.constraint(equalTo: self.containerView.bottomAnchor, constant: -20).isActive = true
-        self.movieOverview.trailingAnchor.constraint(equalTo: self.containerView.trailingAnchor, constant: -10).isActive = true
-        
+        NSLayoutConstraint.activate([
+            self.topPartView.topAnchor.constraint(equalTo: self.containerView.topAnchor),
+            self.topPartView.leadingAnchor.constraint(equalTo: self.containerView.leadingAnchor),
+            self.topPartView.widthAnchor.constraint(equalTo: self.containerView.widthAnchor),
+            self.topPartView.heightAnchor.constraint(equalTo: self.movieImageView.heightAnchor),
+            
+            self.movieTitle.leadingAnchor.constraint(equalTo: self.containerView.leadingAnchor, constant: 10),
+            self.movieTitle.topAnchor.constraint(equalTo: self.topPartView.bottomAnchor, constant: 15),
+            self.movieTitle.trailingAnchor.constraint(equalTo: self.containerView.trailingAnchor, constant: -10),
+            
+            self.movieGenres.leadingAnchor.constraint(equalTo: self.containerView.leadingAnchor, constant: 10),
+            self.movieGenres.topAnchor.constraint(equalTo: self.movieTitle.bottomAnchor, constant: 5),
+            self.movieGenres.trailingAnchor.constraint(equalTo: self.containerView.trailingAnchor, constant: -10),
+            
+            self.movieDateReleased.leadingAnchor.constraint(equalTo: self.containerView.leadingAnchor, constant: 10),
+            self.movieDateReleased.topAnchor.constraint(equalTo: self.movieGenres.bottomAnchor, constant: 5),
+            self.movieDateReleased.trailingAnchor.constraint(equalTo: self.containerView.trailingAnchor, constant: -10),
+            
+            self.movieOverviewLabel.leadingAnchor.constraint(equalTo: self.containerView.leadingAnchor, constant: 10),
+            self.movieOverviewLabel.topAnchor.constraint(equalTo: self.movieDateReleased.bottomAnchor, constant: 15),
+            self.movieOverviewLabel.trailingAnchor.constraint(equalTo: self.containerView.trailingAnchor, constant: -10),
+            
+            self.movieOverview.leadingAnchor.constraint(equalTo: self.containerView.leadingAnchor, constant: 10),
+            self.movieOverview.topAnchor.constraint(equalTo: self.movieOverviewLabel.bottomAnchor, constant: 5),
+            self.movieOverview.bottomAnchor.constraint(equalTo: self.containerView.bottomAnchor, constant: -20),
+            self.movieOverview.trailingAnchor.constraint(equalTo: self.containerView.trailingAnchor, constant: -10)
+        ])
+
         self.movieInfoScrollView.addSubview(self.containerView)
         
-        self.containerView.topAnchor.constraint(equalTo: self.movieInfoScrollView.topAnchor).isActive = true
-        self.containerView.leadingAnchor.constraint(equalTo: self.movieInfoScrollView.leadingAnchor).isActive = true
-        self.containerView.trailingAnchor.constraint(equalTo: self.movieInfoScrollView.trailingAnchor).isActive = true
-        self.containerView.bottomAnchor.constraint(equalTo: self.movieInfoScrollView.bottomAnchor).isActive = true
-        self.containerView.widthAnchor.constraint(equalTo: self.movieInfoScrollView.widthAnchor).isActive = true
-
+        NSLayoutConstraint.activate([
+            self.containerView.topAnchor.constraint(equalTo: self.movieInfoScrollView.topAnchor),
+            self.containerView.leadingAnchor.constraint(equalTo: self.movieInfoScrollView.leadingAnchor),
+            self.containerView.trailingAnchor.constraint(equalTo: self.movieInfoScrollView.trailingAnchor),
+            self.containerView.bottomAnchor.constraint(equalTo: self.movieInfoScrollView.bottomAnchor),
+            self.containerView.widthAnchor.constraint(equalTo: self.movieInfoScrollView.widthAnchor)
+        ])
+        
         self.view.addSubview(self.movieInfoScrollView)
 
-        self.movieInfoScrollView.topAnchor.constraint(equalTo: self.view.topAnchor).isActive = true
-        self.movieInfoScrollView.bottomAnchor.constraint(equalTo: guide.bottomAnchor).isActive = true
-        self.movieInfoScrollView.leadingAnchor.constraint(equalTo: guide.leadingAnchor).isActive = true
-        self.movieInfoScrollView.trailingAnchor.constraint(equalTo: guide.trailingAnchor).isActive = true
-        self.movieInfoScrollView.widthAnchor.constraint(equalTo: guide.widthAnchor).isActive = true
+        NSLayoutConstraint.activate([
+            self.movieInfoScrollView.topAnchor.constraint(equalTo: self.view.topAnchor),
+            self.movieInfoScrollView.bottomAnchor.constraint(equalTo: guide.bottomAnchor),
+            self.movieInfoScrollView.leadingAnchor.constraint(equalTo: guide.leadingAnchor),
+            self.movieInfoScrollView.trailingAnchor.constraint(equalTo: guide.trailingAnchor),
+            self.movieInfoScrollView.widthAnchor.constraint(equalTo: guide.widthAnchor)
+        ])
     }
 
     override func viewDidLayoutSubviews() {

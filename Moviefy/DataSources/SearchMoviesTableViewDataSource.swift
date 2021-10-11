@@ -57,7 +57,7 @@ class SearchMoviesTableViewDataSource:NSObject, UITableViewDataSource {
 extension SearchMoviesTableViewDataSource {
     
     func fetchMovies(page: Int, completion: @escaping () -> ()) {
-        MoviesService().fetchMoviesByCategory(movieCategoryPath: MovieCategoryEndPoint.topRatedMoviesEndPoint.rawValue, page: page, completion: { result in
+        MoviesService().fetchMoviesByCategory(movieCategoryPath: EndPoint.MovieCategoryEndPoint.topRated.rawValue, page: page, completion: { result in
            switch result {
                case .success(let moviesResponse):
                     let movies = moviesResponse.movies?.map { (movieResponse) -> Movie in

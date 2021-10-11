@@ -82,6 +82,23 @@ class CategoryCollectionViewDataSource: NSObject {
         self.filteredMovies = newFilteredMovies
     }
     
+    func refreshMovies(completion: @escaping () -> ()) {
+        MoviesService().fetchMoviesByCategory(movieCategoryPath: self.movieCategoryPath!, page: self.currentPage, completion: { result in
+           switch result {
+           case .success(let moviesResponse):
+            let movies = moviesResponse.movies?.map { (movieResponse) -> Movie in
+                return Movie(movieResponse: movieResponse)
+            }
+            self.movies = movies ?? []
+            self.filteredMovies = self.movies
+            self.currentPage += 1
+            completion()
+           case .failure(let err):
+               print(err)
+           }
+        })
+   }
+    
     func getMovieAtIndexPath(_ indexPath: IndexPath) -> Movie {
         return self.filteredMovies[indexPath.row]
     }

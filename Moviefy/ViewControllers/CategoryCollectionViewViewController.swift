@@ -17,8 +17,9 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
     }()
     var categoryType: String = ""
     var categoryCollectionViewDataSource = CategoryCollectionViewDataSource()
-    var movieCategoryPath: MovieCategoryEndPoint?
+    var movieCategoryPath: EndPoint.MovieCategoryEndPoint?
     var genreChipsView: GenreChipsView = GenreChipsView(frame: .zero)
+    var genreChipsCollectionViewDataSource = GenreChipsCollectionViewDataSource()
     let transitioningContentDelegate = TransitioningDelegate()
 
     let interItemSpacing: CGFloat = 5.0
@@ -71,6 +72,8 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
         chipsGenreCollectionViewLayout.scrollDirection = .horizontal
         
         self.genreChipsView.translatesAutoresizingMaskIntoConstraints = false
+        self.genreChipsView.genreChipsCollectionView.dataSource = self.genreChipsCollectionViewDataSource
+        self.genreChipsCollectionViewDataSource.delegate = self.genreChipsView
         self.genreChipsView.delegate = self
         
         self.view.addSubview(self.genreChipsView)
@@ -79,16 +82,18 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
     func setConstraints() {
         let guide = self.view.safeAreaLayoutGuide
     
-        self.categoryCollectionView.topAnchor.constraint(equalTo: self.genreChipsView.bottomAnchor).isActive = true
-        self.categoryCollectionView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
-        self.categoryCollectionView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
-        self.categoryCollectionView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
-        
-        self.genreChipsView.topAnchor.constraint(equalTo: guide.topAnchor).isActive = true
-        self.genreChipsView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
-        self.genreChipsView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
-        self.genreChipsView.heightAnchor.constraint(equalToConstant: 50).isActive = true
-        self.genreChipsView.widthAnchor.constraint(equalTo: self.view.widthAnchor).isActive = true
+        NSLayoutConstraint.activate([
+            self.categoryCollectionView.topAnchor.constraint(equalTo: self.genreChipsView.bottomAnchor),
+            self.categoryCollectionView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor),
+            self.categoryCollectionView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
+            self.categoryCollectionView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor),
+            
+            self.genreChipsView.topAnchor.constraint(equalTo: guide.topAnchor),
+            self.genreChipsView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
+            self.genreChipsView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor),
+            self.genreChipsView.heightAnchor.constraint(equalToConstant: 50),
+            self.genreChipsView.widthAnchor.constraint(equalTo: self.view.widthAnchor)
+        ])
     }
 
     func fetchMovies() {
@@ -103,7 +108,7 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
     
     @objc func pullToRefresh() {
         self.categoryCollectionViewDataSource.currentPage = 1
-        self.categoryCollectionViewDataSource.fetchMovies(completion: {
+        self.categoryCollectionViewDataSource.refreshMovies(completion: {
             self.categoryCollectionViewDataSource.loadImages(completion: {
                 DispatchQueue.main.async {
                     self.categoryCollectionView.reloadData()
@@ -115,7 +120,7 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
         
     func fetchFilteredMovies(currentCellIndex: Int, completion: @escaping () -> ()) {
         self.categoryCollectionViewDataSource.fetchMovies() {
-            self.categoryCollectionViewDataSource.filterMovies(genres: self.genreChipsView.genreChipsCollectionViewDataSource.genres)
+            self.categoryCollectionViewDataSource.filterMovies(genres: GenreChipsCollectionViewDataSource.genres)
             let moviesOnScreen = self.categoryCollectionViewDataSource.filteredMovies.count
             if moviesOnScreen - currentCellIndex > 1 {
                 self.categoryCollectionViewDataSource.loadImages()
@@ -124,6 +129,17 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
                 self.fetchFilteredMovies(currentCellIndex: self.categoryCollectionViewDataSource.filteredMovies.count - 1, completion: completion)
             }
         }
+    }
+    
+    func getIndexPathForPrefetchedMovies(currentCellIndex: Int) -> [IndexPath] {
+        var paths = [IndexPath]()
+        let moviesOnScreenCount = self.categoryCollectionViewDataSource.filteredMovies.count
+        let hiddenMoviesCount = moviesOnScreenCount - currentCellIndex
+        for item in 1..<hiddenMoviesCount{
+            let indexPath = IndexPath(row: item + currentCellIndex, section: 0)
+            paths.append(indexPath)
+        }
+        return paths
     }
     
     func presentMovieInfoViewController(with movie: Movie) {
@@ -165,14 +181,7 @@ extension CategoryCollectionViewViewController: UICollectionViewDelegateFlowLayo
         if indexPath.row == (self.categoryCollectionViewDataSource.filteredMovies.count - 1) {
             self.categoryCollectionViewDataSource.activityIndicatorView.startAnimating()
             self.fetchFilteredMovies(currentCellIndex: indexPath.row) {
-                var paths = [IndexPath]()
-                let moviesOnScreenCount = self.categoryCollectionViewDataSource.filteredMovies.count
-                let hiddenMoviesCount = moviesOnScreenCount - indexPath.row
-                for item in 1..<hiddenMoviesCount{
-                    let indexPath = IndexPath(row: item + indexPath.row, section: 0)
-                    paths.append(indexPath)
-                }
-                print(paths.count)
+                let paths = self.getIndexPathForPrefetchedMovies(currentCellIndex: indexPath.row)
                 DispatchQueue.main.async {
                     self.categoryCollectionViewDataSource.activityIndicatorView.stopAnimating()
                     self.categoryCollectionView.insertItems(at: paths)
@@ -192,7 +201,7 @@ extension CategoryCollectionViewViewController: UICollectionViewDelegateFlowLayo
 extension CategoryCollectionViewViewController: GenreChipsViewDelegate {
     func presentGenrePickerViewController() {
         self.tabBarController?.tabBar.isHidden = true
-        let selectedGenres = self.genreChipsView.genreChipsCollectionViewDataSource.genres
+        let selectedGenres = GenreChipsCollectionViewDataSource.genres
         let genrePickerViewController = GenrePickerViewController()
         genrePickerViewController.selectedGenres = selectedGenres
         genrePickerViewController.delegate = self
@@ -200,8 +209,8 @@ extension CategoryCollectionViewViewController: GenreChipsViewDelegate {
         self.present(genrePickerViewController, animated: false, completion: nil)
     }
     
-    func refreshMovies() {
-        let selectedGenres: [String] = self.genreChipsView.genreChipsCollectionViewDataSource.genres
+    func didSelectAddGenres() {
+        let selectedGenres: [String] = GenreChipsCollectionViewDataSource.genres
         self.categoryCollectionViewDataSource.filterMovies(genres: selectedGenres)
         self.categoryCollectionView.reloadData()
     }
@@ -210,11 +219,24 @@ extension CategoryCollectionViewViewController: GenreChipsViewDelegate {
 extension CategoryCollectionViewViewController: GenrePickerViewControllerDelegate {
     func getSelectedGenre(genre: String) {
         self.tabBarController?.tabBar.isHidden = false
-        if genre != "" {
-            self.genreChipsView.genreChipsCollectionViewDataSource.genres.append(genre)
-            self.genreChipsView.genreChipsCollectionView?.reloadData()
-            self.categoryCollectionViewDataSource.filterMovies(genres: self.genreChipsView.genreChipsCollectionViewDataSource.genres)
+        
+        guard genre != "" else {
+            return
+        }
+        GenreChipsCollectionViewDataSource.genres.append(genre)
+        self.genreChipsView.genreChipsCollectionView.reloadData()
+        self.categoryCollectionViewDataSource.filterMovies(genres: GenreChipsCollectionViewDataSource.genres)
+        let filteredMovies = self.categoryCollectionViewDataSource.filteredMovies
+        if filteredMovies.count > 0 {
             self.categoryCollectionView.reloadData()
+        } else {
+            self.categoryCollectionViewDataSource.activityIndicatorView.startAnimating()
+            self.fetchFilteredMovies(currentCellIndex: 0) {
+                DispatchQueue.main.async {
+                    self.categoryCollectionViewDataSource.activityIndicatorView.stopAnimating()
+                    self.categoryCollectionView.reloadData()
+                }
+            }
         }
     }
 }

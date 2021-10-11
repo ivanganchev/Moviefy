@@ -67,7 +67,7 @@ class ViewController: UIViewController, InitialTransitionAnimatableContent {
 }
 
 extension ViewController: MoviesTableViewButtonTapDelegate {
-    func switchView(path: MovieCategoryEndPoint, categoryType: String) {
+    func switchView(path: EndPoint.MovieCategoryEndPoint, categoryType: String) {
         let viewController = CategoryCollectionViewViewController()
         viewController.movieCategoryPath = path
         viewController.categoryType = categoryType

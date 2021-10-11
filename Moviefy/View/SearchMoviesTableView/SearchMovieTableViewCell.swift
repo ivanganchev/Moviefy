@@ -70,12 +70,14 @@ class SearchMovieTableViewCell: UITableViewCell {
         self.contentView.addSubview(self.movieImage)
         self.contentView.addSubview(self.containerView)
         
-        self.movieImage.leadingAnchor.constraint(equalTo: self.leadingAnchor).isActive = true
-        self.movieImage.heightAnchor.constraint(equalTo: self.heightAnchor).isActive = true
-        self.movieImage.widthAnchor.constraint(equalToConstant: self.bounds.height * (500/750)).isActive = true
-        self.containerView.leadingAnchor.constraint(equalTo: self.movieImage.trailingAnchor, constant: 15).isActive = true
-        self.containerView.trailingAnchor.constraint(equalTo: self.trailingAnchor).isActive = true
-        self.containerView.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true
+        NSLayoutConstraint.activate([
+            self.movieImage.leadingAnchor.constraint(equalTo: self.leadingAnchor),
+            self.movieImage.heightAnchor.constraint(equalTo: self.heightAnchor),
+            self.movieImage.widthAnchor.constraint(equalToConstant: self.bounds.height * (500/750)),
+            self.containerView.leadingAnchor.constraint(equalTo: self.movieImage.trailingAnchor, constant: 15),
+            self.containerView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
+            self.containerView.centerYAnchor.constraint(equalTo: self.centerYAnchor)
+        ])
     }
 
     required init(coder aDecoder: NSCoder) {

@@ -52,10 +52,12 @@ class SavedMoviesViewController: UIViewController, InitialTransitionAnimatableCo
     func setConstraints() {
         self.view.addSubview(self.savedMoviesCollectionView)
         
-        self.savedMoviesCollectionView.topAnchor.constraint(equalTo: self.view.topAnchor).isActive = true
-        self.savedMoviesCollectionView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
-        self.savedMoviesCollectionView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
-        self.savedMoviesCollectionView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
+        NSLayoutConstraint.activate([
+            self.savedMoviesCollectionView.topAnchor.constraint(equalTo: self.view.topAnchor),
+            self.savedMoviesCollectionView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor),
+            self.savedMoviesCollectionView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
+            self.savedMoviesCollectionView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor)
+        ])
     }
     
     func loadSavedMovies() {
