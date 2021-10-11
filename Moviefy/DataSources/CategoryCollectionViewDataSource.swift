@@ -63,9 +63,11 @@ class CategoryCollectionViewDataSource: NSObject {
         }
     }
     
-    func filterMovies(genres: [String]) {
+    func filterMovies(genres: [String]?) {
+        guard let selectedGenres = genres else {
+            return
+        }
         let allGenres = MoviesService.genres
-        let selectedGenres = genres
         var newFilteredMovies: [Movie] = movies
         
         selectedGenres.forEach({ genre in
@@ -83,20 +85,13 @@ class CategoryCollectionViewDataSource: NSObject {
     }
     
     func refreshMovies(completion: @escaping () -> ()) {
-        MoviesService().fetchMoviesByCategory(movieCategoryPath: self.movieCategoryPath!, page: self.currentPage, completion: { result in
-           switch result {
-           case .success(let moviesResponse):
-            let movies = moviesResponse.movies?.map { (movieResponse) -> Movie in
-                return Movie(movieResponse: movieResponse)
-            }
-            self.movies = movies ?? []
-            self.filteredMovies = self.movies
-            self.currentPage += 1
+        self.movies = []
+        self.filteredMovies = self.movies
+        self.currentPage = 1
+        self.fetchMovies {
+            self.filterMovies(genres: GenreChipsCollectionViewDataSource.genres)
             completion()
-           case .failure(let err):
-               print(err)
-           }
-        })
+        }
    }
     
     func getMovieAtIndexPath(_ indexPath: IndexPath) -> Movie {

@@ -107,7 +107,6 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
     }
     
     @objc func pullToRefresh() {
-        self.categoryCollectionViewDataSource.currentPage = 1
         self.categoryCollectionViewDataSource.refreshMovies(completion: {
             self.categoryCollectionViewDataSource.loadImages(completion: {
                 DispatchQueue.main.async {
@@ -227,14 +226,17 @@ extension CategoryCollectionViewViewController: GenrePickerViewControllerDelegat
         self.genreChipsView.genreChipsCollectionView.reloadData()
         self.categoryCollectionViewDataSource.filterMovies(genres: GenreChipsCollectionViewDataSource.genres)
         let filteredMovies = self.categoryCollectionViewDataSource.filteredMovies
-        if filteredMovies.count > 0 {
-            self.categoryCollectionView.reloadData()
+        let filteredMoviesCount = filteredMovies.count
+        if filteredMoviesCount > 0 {
+            let paths = self.getIndexPathForPrefetchedMovies(currentCellIndex: filteredMoviesCount - 1)
+            self.categoryCollectionView.insertItems(at: paths)
         } else {
             self.categoryCollectionViewDataSource.activityIndicatorView.startAnimating()
             self.fetchFilteredMovies(currentCellIndex: 0) {
                 DispatchQueue.main.async {
                     self.categoryCollectionViewDataSource.activityIndicatorView.stopAnimating()
-                    self.categoryCollectionView.reloadData()
+                    let paths = self.getIndexPathForPrefetchedMovies(currentCellIndex: 0)
+                    self.categoryCollectionView.insertItems(at: paths)
                 }
             }
         }
