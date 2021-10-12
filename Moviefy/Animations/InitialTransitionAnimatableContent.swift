@@ -12,4 +12,3 @@ protocol InitialTransitionAnimatableContent: UIViewController {
     var selectedCellImageView: UIImageView? { get }
     var selectedCellImageViewSnapshot: UIView? { get }
 }
-

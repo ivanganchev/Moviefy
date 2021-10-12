@@ -10,7 +10,7 @@ import UIKit
 
 class MoviesCollectionViewDataSource: NSObject, UICollectionViewDataSource {
     
-    var movies:[Movie] = []
+    var movies: [Movie] = []
     
      func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return self.movies.count
@@ -18,7 +18,9 @@ class MoviesCollectionViewDataSource: NSObject, UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MoviesCollectionViewCell.identifier, for: indexPath) as! MoviesCollectionViewCell
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MoviesCollectionViewCell.identifier, for: indexPath) as? MoviesCollectionViewCell else {
+            return MoviesCollectionViewCell()
+        }
         
         cell.image = nil
         let model = self.movies[indexPath.row]
@@ -47,22 +49,22 @@ class MoviesCollectionViewDataSource: NSObject, UICollectionViewDataSource {
 }
 
 extension MoviesCollectionViewDataSource {
-    func fetchMovies(movieCategoryPath: String, completion: @escaping () -> ()) {
+    func fetchMovies(movieCategoryPath: String, completion: @escaping () -> Void) {
         MoviesService().fetchMoviesByCategory(movieCategoryPath: movieCategoryPath, page: 1, completion: { result in
            switch result {
-               case .success(let moviesResponse):
-                    let movies = moviesResponse.movies?.map { (movieResponse) -> Movie in
-                        return Movie(movieResponse: movieResponse)
-                    }
-                    self.movies = movies ?? []
-                    completion()
-               case .failure(let err):
-                   print(err)
+           case .success(let moviesResponse):
+                let movies = moviesResponse.movies?.map { (movieResponse) -> Movie in
+                    return Movie(movieResponse: movieResponse)
+                }
+                self.movies = movies ?? []
+                completion()
+           case .failure(let err):
+               print(err)
            }
        })
     }
     
-    func loadImages(completion: @escaping () -> ()) {
+    func loadImages(completion: @escaping () -> Void) {
         self.movies.forEach { (movie) in
             if let path = movie.movieResponse.posterPath {
                 MoviesService().fetchMovieImage(imageUrl: path, completion: {result in
@@ -78,7 +80,7 @@ extension MoviesCollectionViewDataSource {
         completion()
     }
     
-    func loadImage(movie: Movie, completion: @escaping () -> ()) {
+    func loadImage(movie: Movie, completion: @escaping () -> Void) {
         if let path = movie.movieResponse.posterPath {
             MoviesService().fetchMovieImage(imageUrl: path, completion: {result in
                 switch result {
@@ -91,8 +93,3 @@ extension MoviesCollectionViewDataSource {
         }
     }
 }
-
-
-
-
-

@@ -7,10 +7,10 @@
 
 import Foundation
 
-struct GenresResponse : Codable {
+struct GenresResponse: Codable {
     let genres: [Genre]
         
     enum CodingKeys: String, CodingKey {
-        case genres = "genres"
+        case genres 
     }
 }

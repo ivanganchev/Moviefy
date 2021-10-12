@@ -13,7 +13,10 @@ class MoviesTableViewDataSource: NSObject, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: MoviesTableViewCell.identifier, for: indexPath) as! MoviesTableViewCell
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: MoviesTableViewCell.identifier, for: indexPath) as? MoviesTableViewCell else {
+            return MoviesTableViewCell()
+        }
+        
         cell.movieCategoryPath = movieCategoryCases[indexPath.section].rawValue
         return cell
     }
@@ -22,5 +25,3 @@ class MoviesTableViewDataSource: NSObject, UITableViewDataSource {
         return self.moviesSections.count
     }
 }
-
-    

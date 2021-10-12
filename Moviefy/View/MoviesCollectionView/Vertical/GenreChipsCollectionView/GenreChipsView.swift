@@ -8,19 +8,18 @@
 import Foundation
 import UIKit
 
-protocol GenreChipsViewDelegate {
+protocol GenreChipsViewDelegate: AnyObject {
     func presentGenrePickerViewController()
-    func didSelectAddGenres()
 }
 
-class GenreChipsView: UIView, GenreChipsLayoutDelegate {
+class GenreChipsView: UIView {
     var genreChipsCollectionView: UICollectionView = {
         let chipsGenreCollectionViewLayout = UICollectionViewFlowLayout()
         chipsGenreCollectionViewLayout.scrollDirection = .horizontal
         
         return UICollectionView(frame: .zero, collectionViewLayout: chipsGenreCollectionViewLayout)
     }()
-    var delegate: GenreChipsViewDelegate?
+    weak var delegate: GenreChipsViewDelegate?
     var addButton: UIButton = UIButton()
     var addFilterButton: UIButton = UIButton()
     let buttonWidth = 20
@@ -99,20 +98,9 @@ class GenreChipsView: UIView, GenreChipsLayoutDelegate {
     }
     
     func hideChipsCollectioNView(isHidden: Bool) {
-        if isHidden == true {
-            self.genreChipsCollectionView.isHidden = true
-            self.addButton.isHidden = true
-            self.addFilterButton.isHidden = false
-        } else {
-            self.genreChipsCollectionView.isHidden = false
-            self.addButton.isHidden = false
-            self.addFilterButton.isHidden = true
-        }
-    }
-    
-    func deleteGenre() {
-        self.genreChipsCollectionView.reloadData()
-        self.delegate?.didSelectAddGenres()
+        self.genreChipsCollectionView.isHidden = isHidden
+        self.addButton.isHidden = isHidden
+        self.addFilterButton.isHidden = !isHidden
     }
 }
 

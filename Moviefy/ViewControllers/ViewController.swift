@@ -10,9 +10,9 @@ import Foundation
 
 class ViewController: UIViewController, InitialTransitionAnimatableContent {
     var moviesTableViewDataSource = MoviesTableViewDataSource()
-    var moviesTableViewDelegate = MoviesTableViewDelegate()
+    var moviesTableViewDelegateInstance = MoviesTableViewDelegate()
     var moviesTableView = UITableView(frame: .zero, style: .grouped)
-    let transitioningContentDelegate = TransitioningDelegate()
+    var transitioningContentDelegateInstance = TransitioningDelegate()
     
     var selectedCellImageView: UIImageView?
     var selectedCellImageViewSnapshot: UIView?
@@ -33,7 +33,7 @@ class ViewController: UIViewController, InitialTransitionAnimatableContent {
         self.navigationController?.navigationBar.isHidden = true
         self.moviesTableView.translatesAutoresizingMaskIntoConstraints = false
         self.moviesTableView.dataSource = self.moviesTableViewDataSource
-        self.moviesTableView.delegate = self.moviesTableViewDelegate
+        self.moviesTableView.delegate = self.moviesTableViewDelegateInstance
         self.moviesTableView.register(MoviesTableViewCell.self, forCellReuseIdentifier: MoviesTableViewCell.identifier)
         self.moviesTableView.showsVerticalScrollIndicator = false
         self.moviesTableView.backgroundColor = .white
@@ -43,12 +43,12 @@ class ViewController: UIViewController, InitialTransitionAnimatableContent {
         let guide = self.view.safeAreaLayoutGuide
         NSLayoutConstraint.activate([
             self.moviesTableView.topAnchor.constraint(equalTo: self.view.topAnchor),
-            self.moviesTableView.bottomAnchor.constraint(equalTo:  guide.bottomAnchor),
+            self.moviesTableView.bottomAnchor.constraint(equalTo: guide.bottomAnchor),
             self.moviesTableView.leadingAnchor.constraint(equalTo: guide.leadingAnchor),
             self.moviesTableView.trailingAnchor.constraint(equalTo: guide.trailingAnchor)
         ])
         self.moviesTableView.reloadData()
-        self.moviesTableViewDelegate.delegate = self
+        self.moviesTableViewDelegateInstance.delegate = self
         MoviesService.loadMoviesGenreList()
     }
     
@@ -61,7 +61,7 @@ class ViewController: UIViewController, InitialTransitionAnimatableContent {
         let movieInfoViewController = MovieInfoViewController()
         movieInfoViewController.movie = movie
         movieInfoViewController.modalPresentationStyle = .fullScreen
-        movieInfoViewController.transitioningDelegate = self.transitioningContentDelegate
+        movieInfoViewController.transitioningDelegate = self.transitioningContentDelegateInstance
         present(movieInfoViewController, animated: true)
     }
 }
@@ -74,12 +74,9 @@ extension ViewController: MoviesTableViewButtonTapDelegate {
         self.navigationController?.pushViewController(viewController, animated: true)
     }
     
-    
     func setClickedCollectionViewCell(cell: MoviesCollectionViewCell?, movie: Movie) {
         self.selectedCellImageView = cell?.imageView
         self.selectedCellImageViewSnapshot = self.selectedCellImageView?.snapshotView(afterScreenUpdates: true)
         self.presentMovieInfoViewController(with: movie)
     }
 }
-
-

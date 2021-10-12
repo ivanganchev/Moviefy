@@ -9,14 +9,14 @@ import Foundation
 import UIKit
 
 class ThumbnailImageProperties {
-    static func getSize() -> CGSize{
+    static func getSize() -> CGSize {
         let width = UIScreen.main.bounds.width * CGFloat(self.getRatio())
         let height = width * (750 / 500)
         
         return CGSize(width: width, height: height)
     }
     
-    static func getRatio() -> Double{
+    static func getRatio() -> Double {
         var ratio: Double
         let size = UIScreen.main.bounds.size
         

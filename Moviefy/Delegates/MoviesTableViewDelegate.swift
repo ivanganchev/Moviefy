@@ -8,14 +8,14 @@
 import Foundation
 import UIKit
 
-protocol MoviesTableViewButtonTapDelegate {
+protocol MoviesTableViewButtonTapDelegate: AnyObject {
     func switchView(path: EndPoint.MovieCategoryEndPoint, categoryType: String)
     func setClickedCollectionViewCell(cell: MoviesCollectionViewCell?, movie: Movie)
 }
 
 class MoviesTableViewDelegate: NSObject, UITableViewDelegate, MoviesTableViewCellDelegate {
     var moviesSections: [String] = ["Top Rated", "Popular", "Upcoming", "Now Playing"]
-    var delegate: MoviesTableViewButtonTapDelegate?
+    weak var delegate: MoviesTableViewButtonTapDelegate?
     var movieCategoryCases: [EndPoint.MovieCategoryEndPoint] = EndPoint.MovieCategoryEndPoint.allCases
     var path: EndPoint.MovieCategoryEndPoint?
     
@@ -25,7 +25,7 @@ class MoviesTableViewDelegate: NSObject, UITableViewDelegate, MoviesTableViewCel
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let moviesTableViewHeader = MoviesTableViewHeader(frame:  CGRect(x: 0, y: 0, width: tableView.frame.width, height: 30))
+        let moviesTableViewHeader = MoviesTableViewHeader(frame: CGRect(x: 0, y: 0, width: tableView.frame.width, height: 30))
         moviesTableViewHeader.textLabel = self.moviesSections[section]
         moviesTableViewHeader.button.addTarget(self, action: #selector(MoviesTableViewDelegate.headerButtonTapped), for: .touchUpInside)
         moviesTableViewHeader.button.tag = section
@@ -37,7 +37,7 @@ class MoviesTableViewDelegate: NSObject, UITableViewDelegate, MoviesTableViewCel
         return 45
     }
     
-    @objc func headerButtonTapped(sender:UIButton) {
+    @objc func headerButtonTapped(sender: UIButton) {
         delegate?.switchView(path: self.movieCategoryCases[sender.tag], categoryType: self.moviesSections[sender.tag])
     }
     
@@ -46,7 +46,7 @@ class MoviesTableViewDelegate: NSObject, UITableViewDelegate, MoviesTableViewCel
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        let cell = cell as! MoviesTableViewCell
-        cell.delegate = self
+        let cell = cell as? MoviesTableViewCell
+        cell?.delegate = self
     }
 }

@@ -12,7 +12,7 @@ class SearchMoviesViewController: UIViewController, InitialTransitionAnimatableC
     var searchBar: UISearchBar = UISearchBar()
     var searchMoviesTableView: UITableView = UITableView(frame: .zero, style: .plain)
     var searchMoviesTableViewDataSource: SearchMoviesTableViewDataSource = SearchMoviesTableViewDataSource()
-    let transitioningContentDelegate = TransitioningDelegate()
+    let transitioningContentDelegateInstance = TransitioningDelegate()
     
     var selectedCellImageView: UIImageView?
     var selectedCellImageViewSnapshot: UIView?
@@ -77,7 +77,7 @@ class SearchMoviesViewController: UIViewController, InitialTransitionAnimatableC
         let movieInfoViewController = MovieInfoViewController()
         movieInfoViewController.movie = movie
         movieInfoViewController.modalPresentationStyle = .fullScreen
-        movieInfoViewController.transitioningDelegate = self.transitioningContentDelegate
+        movieInfoViewController.transitioningDelegate = self.transitioningContentDelegateInstance
         present(movieInfoViewController, animated: true)
     }
 }
@@ -89,8 +89,8 @@ extension SearchMoviesViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let selectedCell = tableView.cellForRow(at: indexPath) as! SearchMovieTableViewCell
-        self.selectedCellImageView = selectedCell.movieImage
+        let selectedCell = tableView.cellForRow(at: indexPath) as? SearchMovieTableViewCell
+        self.selectedCellImageView = selectedCell?.movieImage
         self.selectedCellImageViewSnapshot = self.selectedCellImageView?.snapshotView(afterScreenUpdates: true)
         self.presentMovieInfoViewController(with: self.searchMoviesTableViewDataSource.movies[indexPath.row])
     }

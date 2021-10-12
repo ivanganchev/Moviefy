@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-class SearchMoviesTableViewDataSource:NSObject, UITableViewDataSource {
+class SearchMoviesTableViewDataSource: NSObject, UITableViewDataSource {
     var movies: [Movie] = []
     let genres = MoviesService.genres
     
@@ -17,7 +17,9 @@ class SearchMoviesTableViewDataSource:NSObject, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: SearchMovieTableViewCell.identifier, for: indexPath) as! SearchMovieTableViewCell
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: SearchMovieTableViewCell.identifier, for: indexPath) as? SearchMovieTableViewCell else {
+            return SearchMovieTableViewCell()
+        }
         
         cell.image = nil
 
@@ -56,38 +58,37 @@ class SearchMoviesTableViewDataSource:NSObject, UITableViewDataSource {
 
 extension SearchMoviesTableViewDataSource {
     
-    func fetchMovies(page: Int, completion: @escaping () -> ()) {
+    func fetchMovies(page: Int, completion: @escaping () -> Void) {
         MoviesService().fetchMoviesByCategory(movieCategoryPath: EndPoint.MovieCategoryEndPoint.topRated.rawValue, page: page, completion: { result in
            switch result {
-               case .success(let moviesResponse):
-                    let movies = moviesResponse.movies?.map { (movieResponse) -> Movie in
-                        return Movie(movieResponse: movieResponse)
-                    }
-                    self.movies = movies ?? []
-                    completion()
-               case .failure(let err):
-                   print(err)
+           case .success(let moviesResponse):
+                let movies = moviesResponse.movies?.map { (movieResponse) -> Movie in
+                    return Movie(movieResponse: movieResponse)
+                }
+                self.movies = movies ?? []
+                completion()
+           case .failure(let err):
+                print(err)
            }
        })
     }
     
-    
-    func searchMovies(text: String, completion: @escaping () -> ()) {
+    func searchMovies(text: String, completion: @escaping () -> Void) {
         MoviesService().searchMovies(text: text, completion: {result in
             switch result {
-                case .success(let moviesResponse):
-                    let movies = moviesResponse.movies?.map { (movieResponse) -> Movie in
-                        return Movie(movieResponse: movieResponse)
-                    }
-                    self.movies = movies ?? []
-                    completion()
-                case.failure(let err):
-                    print(err)
+            case .success(let moviesResponse):
+                let movies = moviesResponse.movies?.map { (movieResponse) -> Movie in
+                    return Movie(movieResponse: movieResponse)
                 }
+                self.movies = movies ?? []
+                completion()
+            case.failure(let err):
+                print(err)
+            }
         })
     }
     
-    func loadImages(completion: @escaping () -> ()) {
+    func loadImages(completion: @escaping () -> Void) {
         self.movies.forEach { (movie) in
             if let path = movie.movieResponse.posterPath {
                 MoviesService().fetchMovieImage(imageUrl: path, completion: {result in
@@ -103,7 +104,7 @@ extension SearchMoviesTableViewDataSource {
         completion()
     }
     
-    func loadImage(movie: Movie, completion: @escaping () -> ()) {
+    func loadImage(movie: Movie, completion: @escaping () -> Void) {
         if let path = movie.movieResponse.posterPath {
             MoviesService().fetchMovieImage(imageUrl: path, completion: {result in
                 switch result {

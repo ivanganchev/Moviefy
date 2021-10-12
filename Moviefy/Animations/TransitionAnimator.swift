@@ -82,7 +82,7 @@ class TransitionAnimator: NSObject, UIViewControllerAnimatedTransitioning {
         
         toView.alpha = 0
         
-        [backgroundView, selectedCellImageViewSnapshot, controllerImageSnapshot].forEach{
+        [backgroundView, selectedCellImageViewSnapshot, controllerImageSnapshot].forEach {
             containerView.addSubview($0)
         }
         

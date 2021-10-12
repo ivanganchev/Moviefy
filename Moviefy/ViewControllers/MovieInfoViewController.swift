@@ -227,7 +227,7 @@ class MovieInfoViewController: UIViewController, PresentedTransitionAnimatableCo
         ])
         
         self.view.addSubview(self.movieInfoScrollView)
-
+        
         NSLayoutConstraint.activate([
             self.movieInfoScrollView.topAnchor.constraint(equalTo: self.view.topAnchor),
             self.movieInfoScrollView.bottomAnchor.constraint(equalTo: guide.bottomAnchor),
@@ -250,20 +250,20 @@ class MovieInfoViewController: UIViewController, PresentedTransitionAnimatableCo
             return
         }
         
-        let realm = try! Realm()
+        let realm = try? Realm()
         
-        if movie.isSaved, let movieEntity = realm.object(ofType: MovieEntity.self, forPrimaryKey: movie.id){
-            try! realm.write({
-                realm.delete(movieEntity)
-                try! realm.commitWrite()
+        if movie.isSaved, let movieEntity = realm?.object(ofType: MovieEntity.self, forPrimaryKey: movie.id) {
+            try? realm?.write({
+                realm?.delete(movieEntity)
+                try? realm?.commitWrite()
             })
             self.movie?.id = nil
         } else {
             let movieEntity = MovieEntity(movie: movie)
             self.movie?.id = movieEntity.id
-            try! realm.write({
-                realm.add(movieEntity, update: .all)
-                realm.create(MovieEntity.self)
+            try? realm?.write({
+                realm?.add(movieEntity, update: .all)
+                realm?.create(MovieEntity.self)
             })
         }
         

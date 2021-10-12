@@ -8,16 +8,16 @@
 import Foundation
 import UIKit
 
-protocol MoviesTableViewCellDelegate {
+protocol MoviesTableViewCellDelegate: AnyObject {
     func getClickedCollectionViewCell(cell: MoviesCollectionViewCell?, movie: Movie)
 }
-class MoviesTableViewCell : UITableViewCell {
+class MoviesTableViewCell: UITableViewCell {
     
     static let identifier = "MoviesTableViewCell"
     var moviesCollectionViewDataSource: MoviesCollectionViewDataSource?
     var moviesCollectionView: UICollectionView?
     var moviesCollectionViewLayout: UICollectionViewFlowLayout?
-    var delegate: MoviesTableViewCellDelegate?
+    weak var delegate: MoviesTableViewCellDelegate?
     
     var movieCategoryPath: String = "" {
         didSet {
@@ -64,7 +64,7 @@ class MoviesTableViewCell : UITableViewCell {
         super.layoutSubviews()
     }
     
-    private func setLayout() -> UICollectionViewFlowLayout{
+    private func setLayout() -> UICollectionViewFlowLayout {
         let size = ThumbnailImageProperties.getSize()
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal

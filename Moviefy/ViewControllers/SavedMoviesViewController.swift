@@ -24,7 +24,7 @@ class SavedMoviesViewController: UIViewController, InitialTransitionAnimatableCo
     
     var selectedCellImageView: UIImageView?
     var selectedCellImageViewSnapshot: UIView?
-    let transitioningContentDelegate = TransitioningDelegate()
+    let transitioningContentDelegateInstance = TransitioningDelegate()
 
     override func viewDidLoad() {
         self.view.backgroundColor = .white
@@ -80,7 +80,7 @@ class SavedMoviesViewController: UIViewController, InitialTransitionAnimatableCo
         let movieInfoViewController = MovieInfoViewController()
         movieInfoViewController.movie = movie
         movieInfoViewController.modalPresentationStyle = .fullScreen
-        movieInfoViewController.transitioningDelegate = self.transitioningContentDelegate
+        movieInfoViewController.transitioningDelegate = self.transitioningContentDelegateInstance
         present(movieInfoViewController, animated: true)
     }
 }

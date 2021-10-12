@@ -18,7 +18,9 @@ class SavedMoviesCollectionViewDataSource: NSObject, UICollectionViewDataSource 
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CategoryCollectionViewCell.identifier, for: indexPath) as! CategoryCollectionViewCell
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CategoryCollectionViewCell.identifier, for: indexPath) as? CategoryCollectionViewCell else {
+            return CategoryCollectionViewCell()
+        }
         
         cell.image = nil
         
@@ -36,12 +38,15 @@ class SavedMoviesCollectionViewDataSource: NSObject, UICollectionViewDataSource 
 }
 
 extension SavedMoviesCollectionViewDataSource {
-    func loadSavedMovies(completion: @escaping (RealmCollectionChange<Results<MovieEntity>>) -> ()) {
-        let realm: Realm = try! Realm()
-        let results = realm.objects(MovieEntity.self)
+    func loadSavedMovies(completion: @escaping (RealmCollectionChange<Results<MovieEntity>>) -> Void) {
+        let realm = try? Realm()
+        guard let results = realm?.objects(MovieEntity.self) else {
+            return 
+        }
         self.savedMovies = Array(results)
         self.token?.invalidate()
-        self.token = results.observe {[weak self] (changes: RealmCollectionChange) in
+        // values capturing
+        self.token = results.observe {(changes: RealmCollectionChange) in
             completion(changes)
         }
     }

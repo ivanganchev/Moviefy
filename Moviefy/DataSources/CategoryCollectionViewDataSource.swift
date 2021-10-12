@@ -17,7 +17,7 @@ class CategoryCollectionViewDataSource: NSObject {
     
     let activityIndicatorView = UIActivityIndicatorView(style: .medium)
     
-    func fetchMovies(completion: @escaping () -> ()) {
+    func fetchMovies(completion: @escaping () -> Void) {
         MoviesService().fetchMoviesByCategory(movieCategoryPath: self.movieCategoryPath!, page: self.currentPage, completion: { result in
                switch result {
                case .success(let moviesResponse):
@@ -34,7 +34,7 @@ class CategoryCollectionViewDataSource: NSObject {
            })
        }
     
-    func loadImages(completion: (() -> ())? = nil) {
+    func loadImages(completion: (() -> Void)? = nil) {
         self.filteredMovies.forEach { (movie) in
             if let path = movie.movieResponse.posterPath {
                 MoviesService().fetchMovieImage(imageUrl: path, completion: {result in
@@ -50,7 +50,7 @@ class CategoryCollectionViewDataSource: NSObject {
         completion?()
     }
     
-    func loadImage(movie: Movie, completion: (() -> ())? = nil) {
+    func loadImage(movie: Movie, completion: (() -> Void)? = nil) {
         if let path = movie.movieResponse.posterPath {
             MoviesService().fetchMovieImage(imageUrl: path, completion: {result in
                 switch result {
@@ -63,10 +63,12 @@ class CategoryCollectionViewDataSource: NSObject {
         }
     }
     
-    func filterMovies(genres: [String]?) {
-        guard let selectedGenres = genres else {
+    func filterMovies() {
+        guard !GenreChipsCollectionViewDataSource.genres.isEmpty else {
+            self.filteredMovies = self.movies
             return
         }
+        let selectedGenres = GenreChipsCollectionViewDataSource.genres
         let allGenres = MoviesService.genres
         var newFilteredMovies: [Movie] = movies
         
@@ -84,12 +86,12 @@ class CategoryCollectionViewDataSource: NSObject {
         self.filteredMovies = newFilteredMovies
     }
     
-    func refreshMovies(completion: @escaping () -> ()) {
+    func refreshMovies(completion: @escaping () -> Void) {
         self.movies = []
-        self.filteredMovies = self.movies
+        self.filteredMovies = []
         self.currentPage = 1
         self.fetchMovies {
-            self.filterMovies(genres: GenreChipsCollectionViewDataSource.genres)
+            self.filterMovies()
             completion()
         }
    }
@@ -98,7 +100,7 @@ class CategoryCollectionViewDataSource: NSObject {
         return self.filteredMovies[indexPath.row]
     }
     
-    func getLoadedImage() -> Movie?{
+    func getLoadedImage() -> Movie? {
         return self.filteredMovies.first(where: { movie in
             movie.imageData != nil
         })
@@ -111,7 +113,9 @@ extension CategoryCollectionViewDataSource: UICollectionViewDataSource, UICollec
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CategoryCollectionViewCell.identifier, for: indexPath) as! CategoryCollectionViewCell
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CategoryCollectionViewCell.identifier, for: indexPath) as? CategoryCollectionViewCell else {
+            return CategoryCollectionViewCell()
+        }
         
         cell.image = nil
         let model = self.filteredMovies[indexPath.row]
@@ -152,4 +156,3 @@ extension CategoryCollectionViewDataSource: UICollectionViewDataSource, UICollec
         return UICollectionReusableView()
     }
 }
-

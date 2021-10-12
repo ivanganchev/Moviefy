@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-protocol GenrePickerViewControllerDelegate {
+protocol GenrePickerViewControllerDelegate: AnyObject {
     func getSelectedGenre(genre: String)
 }
 
@@ -19,7 +19,7 @@ class GenrePickerViewController: UIViewController {
     let dismissibleHeight: CGFloat = 200
     var genres = [String]()
     var selectedGenres: [String] = []
-    var delegate: GenrePickerViewControllerDelegate? 
+    weak var delegate: GenrePickerViewControllerDelegate?
     
     lazy var containerView: UIView = {
         let view = UIView()
@@ -79,7 +79,7 @@ class GenrePickerViewController: UIViewController {
             closeButton.topAnchor.constraint(equalTo: barView.topAnchor),
             closeButton.bottomAnchor.constraint(equalTo: barView.bottomAnchor),
             
-            doneButton.trailingAnchor.constraint(equalTo: barView.trailingAnchor, constant:  -10),
+            doneButton.trailingAnchor.constraint(equalTo: barView.trailingAnchor, constant: -10),
             doneButton.topAnchor.constraint(equalTo: barView.topAnchor),
             doneButton.bottomAnchor.constraint(equalTo: barView.bottomAnchor),
             
@@ -256,7 +256,7 @@ extension GenrePickerViewController: UIPickerViewDelegate, UIPickerViewDataSourc
         let secondHalf: [Int] = Array((row + 1)...self.genres.count)
         
         if self.selectedGenres.contains(self.genres[row]) {
-            for(firstHalfIndex,secondHalfIndex) in zip(firstHalf, secondHalf) {
+            for(firstHalfIndex, secondHalfIndex) in zip(firstHalf, secondHalf) {
                 if !(self.selectedGenres.contains(self.genres[firstHalfIndex])) {
                     index = firstHalfIndex
                     break
@@ -292,7 +292,7 @@ extension GenrePickerViewController: UIPickerViewDelegate, UIPickerViewDataSourc
     
     func pickerView(_ pickerView: UIPickerView, attributedTitleForRow row: Int, forComponent component: Int) -> NSAttributedString? {
         var color: UIColor
-        if selectedGenres.contains(self.genres[row]){
+        if selectedGenres.contains(self.genres[row]) {
             color = UIColor.lightGray
         } else {
             color = UIColor.black
