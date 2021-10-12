@@ -19,7 +19,7 @@ class RootTabBarViewController: UITabBarController {
     
     override func viewDidLoad() {
         self.tabBarControllers = [
-            TabBarController(controller: UINavigationController(rootViewController: ViewController()),
+            TabBarController(controller: UINavigationController(rootViewController: MoviesTableViewViewController()),
                              title: "Home",
                              image: "house"),
             TabBarController(controller: UINavigationController(rootViewController: SearchMoviesViewController()),

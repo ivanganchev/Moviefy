@@ -9,8 +9,7 @@ import Foundation
 import UIKit
 
 class SearchMoviesViewController: UIViewController, InitialTransitionAnimatableContent {
-    var searchBar: UISearchBar = UISearchBar()
-    var searchMoviesTableView: UITableView = UITableView(frame: .zero, style: .plain)
+    let searchMoviesTableViewLayout = SearchMovieTableViewLayout()
     var searchMoviesTableViewDataSource: SearchMoviesTableViewDataSource = SearchMoviesTableViewDataSource()
     let transitioningContentDelegateInstance = TransitioningDelegate()
     
@@ -18,56 +17,30 @@ class SearchMoviesViewController: UIViewController, InitialTransitionAnimatableC
     var selectedCellImageViewSnapshot: UIView?
     
     override func viewDidLoad() {
-        self.view.backgroundColor = .white
-        self.setupSearchMoviesTableViewUI()
-        self.setupSearchBarUI()
+        self.view = self.searchMoviesTableViewLayout
+        self.searchMoviesTableViewLayout.searchMoviesTableView.dataSource = self.searchMoviesTableViewDataSource
+        self.searchMoviesTableViewLayout.searchMoviesTableView.delegate = self
+        self.searchMoviesTableViewLayout.searchBar.delegate = self
+        self.navigationItem.titleView = self.searchMoviesTableViewLayout.searchBar
         self.fetchMovies(page: 1)
-    }
-    
-    func setupSearchMoviesTableViewUI() {
-        self.searchMoviesTableView.separatorStyle = .none
-        self.searchMoviesTableView.translatesAutoresizingMaskIntoConstraints = false
-        self.searchMoviesTableView.dataSource = self.searchMoviesTableViewDataSource
-        self.searchMoviesTableView.delegate = self
-        self.searchMoviesTableView.register(SearchMovieTableViewCell.self, forCellReuseIdentifier: SearchMovieTableViewCell.identifier)
-        self.searchMoviesTableView.keyboardDismissMode = .onDrag
-        
-        self.view.addSubview(self.searchMoviesTableView)
-        
-        let guide = self.view.safeAreaLayoutGuide
-        
-        NSLayoutConstraint.activate([
-             self.searchMoviesTableView.topAnchor.constraint(equalTo: guide.topAnchor),
-             self.searchMoviesTableView.bottomAnchor.constraint(equalTo: guide.bottomAnchor),
-             self.searchMoviesTableView.leadingAnchor.constraint(equalTo: guide.leadingAnchor),
-             self.searchMoviesTableView.trailingAnchor.constraint(equalTo: guide.trailingAnchor)
-        ])
-    }
-    
-    func setupSearchBarUI() {
-        self.searchBar.translatesAutoresizingMaskIntoConstraints = false
-        self.searchBar.searchBarStyle = UISearchBar.Style.default
-        self.searchBar.sizeToFit()
-        self.searchBar.delegate = self
-        self.navigationItem.titleView = self.searchBar
     }
 
     func fetchMovies(page: Int) {
         self.searchMoviesTableViewDataSource.fetchMovies(page: page, completion: {
             self.searchMoviesTableViewDataSource.loadImages(completion: {
                 DispatchQueue.main.async {
-                    self.searchMoviesTableView.reloadData()
+                    self.searchMoviesTableViewLayout.searchMoviesTableView.reloadData()
                 }
             })
         })
     }
     
     @objc func searchMovies() {
-        guard let text = self.searchBar.text else { return }
+        guard let text = self.searchMoviesTableViewLayout.searchBar.text else { return }
         self.searchMoviesTableViewDataSource.searchMovies(text: text, completion: {
             self.searchMoviesTableViewDataSource.loadImages(completion: {
                 DispatchQueue.main.async {
-                    self.searchMoviesTableView.reloadData()
+                    self.searchMoviesTableViewLayout.searchMoviesTableView.reloadData()
                 }
             })
         })
@@ -103,6 +76,6 @@ extension SearchMoviesViewController: UISearchBarDelegate {
     }
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        self.searchBar.endEditing(true)
+        self.searchMoviesTableViewLayout.searchBar.endEditing(true)
     }
 }

@@ -10,13 +10,7 @@ import UIKit
 import RealmSwift
 
 class SavedMoviesViewController: UIViewController, InitialTransitionAnimatableContent {
-    var savedMoviesCollectionView: UICollectionView = {
-        let savedMoviesCollectionViewFlowLayout = UICollectionViewFlowLayout()
-        savedMoviesCollectionViewFlowLayout.scrollDirection = .vertical
-    
-        return UICollectionView(frame: .zero, collectionViewLayout: savedMoviesCollectionViewFlowLayout)
-    }()
-    
+    var savedMoviesCollectionViewLayout = SavedMoviesCollectionViewLayout()
     var savedMoviesCollectionViewDataSource = SavedMoviesCollectionViewDataSource()
     
     let interItemSpacing: CGFloat = 5.0
@@ -27,49 +21,26 @@ class SavedMoviesViewController: UIViewController, InitialTransitionAnimatableCo
     let transitioningContentDelegateInstance = TransitioningDelegate()
 
     override func viewDidLoad() {
-        self.view.backgroundColor = .white
-        self.setBarTitle()
-        self.setSavedMoviesCollectionView()
-        self.setConstraints()
         self.loadSavedMovies()
+        self.navigationItem.titleView = self.savedMoviesCollectionViewLayout.barTitle
+        self.savedMoviesCollectionViewLayout.savedMoviesCollectionView.dataSource = self.savedMoviesCollectionViewDataSource
+        self.savedMoviesCollectionViewLayout.savedMoviesCollectionView.delegate = self
     }
     
-    func setBarTitle() {
-        let barTitle: UILabel = UILabel(frame: CGRect(x: 0, y: 0, width: 50, height: 40))
-        barTitle.font = UIFont(name: "Helvetica-Bold", size: 16)
-        barTitle.text = "My List"
-        self.navigationItem.titleView = barTitle
-    }
-    
-    func setSavedMoviesCollectionView() {
-        self.savedMoviesCollectionView.backgroundColor = .white
-        self.savedMoviesCollectionView.dataSource = self.savedMoviesCollectionViewDataSource
-        self.savedMoviesCollectionView.delegate = self
-        self.savedMoviesCollectionView.register(CategoryCollectionViewCell.self, forCellWithReuseIdentifier: CategoryCollectionViewCell.identifier)
-        self.savedMoviesCollectionView.translatesAutoresizingMaskIntoConstraints = false
-    }
-    
-    func setConstraints() {
-        self.view.addSubview(self.savedMoviesCollectionView)
-        
-        NSLayoutConstraint.activate([
-            self.savedMoviesCollectionView.topAnchor.constraint(equalTo: self.view.topAnchor),
-            self.savedMoviesCollectionView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor),
-            self.savedMoviesCollectionView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
-            self.savedMoviesCollectionView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor)
-        ])
+    override func loadView() {
+        self.view = self.savedMoviesCollectionViewLayout
     }
     
     func loadSavedMovies() {
         self.savedMoviesCollectionViewDataSource.loadSavedMovies {changes in
             switch changes {
             case .initial:
-                self.savedMoviesCollectionView.reloadData()
+                self.savedMoviesCollectionViewLayout.savedMoviesCollectionView.reloadData()
             case .update(_, deletions: let deletions, insertions: let insertions, modifications: let modifications):
-                self.savedMoviesCollectionView.performBatchUpdates({
-                    self.savedMoviesCollectionView.deleteItems(at: deletions.map({IndexPath(row: $0, section: 0)}))
-                    self.savedMoviesCollectionView.insertItems(at: insertions.map({IndexPath(row: $0, section: 0)}))
-                    self.savedMoviesCollectionView.reloadItems(at: modifications.map({ IndexPath(row: $0, section: 0) }))
+                self.savedMoviesCollectionViewLayout.savedMoviesCollectionView.performBatchUpdates({
+                    self.savedMoviesCollectionViewLayout.savedMoviesCollectionView.deleteItems(at: deletions.map({IndexPath(row: $0, section: 0)}))
+                    self.savedMoviesCollectionViewLayout.savedMoviesCollectionView.insertItems(at: insertions.map({IndexPath(row: $0, section: 0)}))
+                    self.savedMoviesCollectionViewLayout.savedMoviesCollectionView.reloadItems(at: modifications.map({ IndexPath(row: $0, section: 0) }))
                 }, completion: nil)
             case .error(let err):
                 print(err)

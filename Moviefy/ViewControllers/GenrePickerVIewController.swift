@@ -13,85 +13,10 @@ protocol GenrePickerViewControllerDelegate: AnyObject {
 }
 
 class GenrePickerViewController: UIViewController {
-    let maxDimmedAlpha: CGFloat = 0.6
-    let defaultHeight: CGFloat = 300
-    var currentContainerHeight: CGFloat = 300
-    let dismissibleHeight: CGFloat = 200
+    let genreChipsCollectionViewLayout = GenreChipsCollectionViewLayout()
     var genres = [String]()
     var selectedGenres: [String] = []
     weak var delegate: GenrePickerViewControllerDelegate?
-    
-    lazy var containerView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .white
-        view.layer.cornerRadius = 16
-        view.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMinXMinYCorner]
-        view .clipsToBounds = true
-        return view
-    }()
-    
-    lazy var dimmedView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .black
-        view.alpha = self.maxDimmedAlpha
-        return view
-    }()
-    
-    lazy var genrePickerView: UIPickerView = {
-        let genrePickerView = UIPickerView()
-        genrePickerView.delegate = self
-        genrePickerView.dataSource = self
-        return genrePickerView
-    }()
-    
-    lazy var barView: UIView = {
-        let barView = UIView()
-        barView.backgroundColor = .lightGray
-        
-        let doneButton = UIButton()
-        doneButton.setTitle("Done", for: .normal)
-        doneButton.setTitleColor(.systemBlue, for: .normal)
-        doneButton.translatesAutoresizingMaskIntoConstraints = false
-        doneButton.addTarget(self, action: #selector(self.doneButtonTap), for: .touchUpInside)
-        if self.selectedGenres.count == self.genres.count {
-            doneButton.isUserInteractionEnabled = false
-            doneButton.setTitleColor(.systemGray, for: .normal)
-        }
-        
-        let closeButton = UIButton()
-        closeButton.setTitle("Close", for: .normal)
-        closeButton.setTitleColor(.systemBlue, for: .normal)
-        closeButton.translatesAutoresizingMaskIntoConstraints = false
-        closeButton.addTarget(self, action: #selector(self.closeButtonTap), for: .touchUpInside)
-        
-        let titleLabel = UILabel()
-        titleLabel.text = "Genres"
-        titleLabel.font = UIFont(name: "Helvetica", size: 18)
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.sizeToFit()
-        
-        barView.addSubview(doneButton)
-        barView.addSubview(closeButton)
-        barView.addSubview(titleLabel)
-        
-        NSLayoutConstraint.activate([
-            closeButton.leadingAnchor.constraint(equalTo: barView.leadingAnchor, constant: 10),
-            closeButton.topAnchor.constraint(equalTo: barView.topAnchor),
-            closeButton.bottomAnchor.constraint(equalTo: barView.bottomAnchor),
-            
-            doneButton.trailingAnchor.constraint(equalTo: barView.trailingAnchor, constant: -10),
-            doneButton.topAnchor.constraint(equalTo: barView.topAnchor),
-            doneButton.bottomAnchor.constraint(equalTo: barView.bottomAnchor),
-            
-            titleLabel.centerXAnchor.constraint(equalTo: barView.centerXAnchor),
-            titleLabel.centerYAnchor.constraint(equalTo: barView.centerYAnchor)
-        ])
-        
-        return barView
-    }()
-    
-    var containerViewHeightConstraint: NSLayoutConstraint?
-    var containerViewBottomConstraint: NSLayoutConstraint?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -99,18 +24,34 @@ class GenrePickerViewController: UIViewController {
             self.genres = Array(genres.values)
         }
         
-        self.view.backgroundColor = .clear
-        self.setupConstraints()
+        self.genreChipsCollectionViewLayout.genrePickerView.delegate = self
+        self.genreChipsCollectionViewLayout.genrePickerView.dataSource = self
+        
+        let gestureTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(animateDismissView))
+        self.genreChipsCollectionViewLayout.dimmedView.addGestureRecognizer(gestureTapRecognizer)
+        
+        self.genreChipsCollectionViewLayout.doneButton.addTarget(self, action: #selector(self.doneButtonTap), for: .touchUpInside)
+        if self.selectedGenres.count == self.genres.count {
+            self.genreChipsCollectionViewLayout.doneButton.isUserInteractionEnabled = false
+            self.genreChipsCollectionViewLayout.doneButton.setTitleColor(.systemGray, for: .normal)
+        }
+        
+        self.genreChipsCollectionViewLayout.closeButton.addTarget(self, action: #selector(self.closeButtonTap), for: .touchUpInside)
+        
         self.setupPanGesture()
         
         for i in (0...self.genres.count) {
             if selectedGenres.contains(self.genres[i]) {
                 continue
             } else {
-                self.genrePickerView.selectRow(i, inComponent: 0, animated: false)
+                self.genreChipsCollectionViewLayout.genrePickerView.selectRow(i, inComponent: 0, animated: false)
                 break
             }
         }
+    }
+    
+    override func loadView() {
+        self.view = self.genreChipsCollectionViewLayout
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -118,73 +59,29 @@ class GenrePickerViewController: UIViewController {
         self.animateShowDimmedView()
     }
     
-    func setupConstraints() {
-        self.view.addSubview(self.dimmedView)
-        self.view.addSubview(self.containerView)
-        self.dimmedView.translatesAutoresizingMaskIntoConstraints = false
-        self.containerView.translatesAutoresizingMaskIntoConstraints = false
-        let gestureTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(animateDismissView))
-        self.dimmedView.addGestureRecognizer(gestureTapRecognizer)
-        
-        self.containerView.addSubview(self.genrePickerView)
-        self.containerView.addSubview(self.barView)
-        self.genrePickerView.translatesAutoresizingMaskIntoConstraints = false
-        self.barView.translatesAutoresizingMaskIntoConstraints = false
-        
-        NSLayoutConstraint.activate([
-            self.dimmedView.topAnchor.constraint(equalTo: self.view.topAnchor),
-            self.dimmedView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor),
-            self.dimmedView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
-            self.dimmedView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor),
-            
-            self.containerView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
-            self.containerView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor)
-        ])
-        
-        self.containerViewHeightConstraint = self.containerView.heightAnchor.constraint(equalToConstant: self.defaultHeight)
-        self.containerViewBottomConstraint = self.containerView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: self.defaultHeight)
-        
-        self.containerViewHeightConstraint?.isActive = true
-        self.containerViewBottomConstraint?.isActive = true
-        
-        NSLayoutConstraint.activate([
-            self.barView.topAnchor.constraint(equalTo: self.containerView.topAnchor),
-            self.barView.leadingAnchor.constraint(equalTo: self.containerView.leadingAnchor),
-            self.barView.trailingAnchor.constraint(equalTo: self.containerView.trailingAnchor),
-            self.barView.heightAnchor.constraint(equalToConstant: 40)
-        ])
-        
-        NSLayoutConstraint.activate([
-            self.genrePickerView.topAnchor.constraint(equalTo: self.barView.bottomAnchor),
-            self.genrePickerView.bottomAnchor.constraint(equalTo: self.containerView.bottomAnchor),
-            self.genrePickerView.leadingAnchor.constraint(equalTo: self.containerView.leadingAnchor),
-            self.genrePickerView.trailingAnchor.constraint(equalTo: self.containerView.trailingAnchor)
-        ])
-    }
-    
     func animateShowContainerView() {
         UIView.animate(withDuration: 0.3) {
-            self.containerViewBottomConstraint?.constant = 0
+            self.genreChipsCollectionViewLayout.containerViewBottomConstraint?.constant = 0
             self.view.layoutIfNeeded()
         }
     }
     
     func animateShowDimmedView() {
-        self.dimmedView.alpha = 0
+        self.genreChipsCollectionViewLayout.dimmedView.alpha = 0
         UIView.animate(withDuration: 0.4) {
-            self.dimmedView.alpha = self.maxDimmedAlpha
+            self.genreChipsCollectionViewLayout.dimmedView.alpha = self.genreChipsCollectionViewLayout.maxDimmedAlpha
         }
     }
     
     @objc func animateDismissView() {
         UIView.animate(withDuration: 0.3) {
-            self.containerViewBottomConstraint?.constant = self.defaultHeight
+            self.genreChipsCollectionViewLayout.containerViewBottomConstraint?.constant = self.genreChipsCollectionViewLayout.defaultHeight
             self.view.layoutIfNeeded()
         }
         
-        self.dimmedView.alpha = maxDimmedAlpha
+        self.genreChipsCollectionViewLayout.dimmedView.alpha = self.genreChipsCollectionViewLayout.maxDimmedAlpha
         UIView.animate(withDuration: 0.4) {
-            self.dimmedView.alpha = 0
+            self.genreChipsCollectionViewLayout.dimmedView.alpha = 0
         } completion: { _ in
             self.dismiss(animated: false, completion: nil)
         }
@@ -196,7 +93,7 @@ class GenrePickerViewController: UIViewController {
     }
     
     @objc func doneButtonTap() {
-        let chosenGenre = self.genres[self.genrePickerView.selectedRow(inComponent: 0)]
+        let chosenGenre = self.genres[self.genreChipsCollectionViewLayout.genrePickerView.selectedRow(inComponent: 0)]
         self.delegate?.getSelectedGenre(genre: chosenGenre)
         self.animateDismissView()
     }
@@ -210,19 +107,19 @@ class GenrePickerViewController: UIViewController {
     
     @objc func handlePanAction(gesture: UIPanGestureRecognizer) {
         let translation = gesture.translation(in: self.view)
-        let newHeight = self.currentContainerHeight - translation.y
+        let newHeight = self.genreChipsCollectionViewLayout.currentContainerHeight - translation.y
         
         switch gesture.state {
         case .changed:
-            if newHeight < self.defaultHeight {
-                self.containerViewHeightConstraint?.constant = newHeight
+            if newHeight < self.genreChipsCollectionViewLayout.defaultHeight {
+                self.genreChipsCollectionViewLayout.containerViewHeightConstraint?.constant = newHeight
                 self.view.layoutIfNeeded()
             }
         case .ended:
-            if newHeight < self.dismissibleHeight {
+            if newHeight < self.genreChipsCollectionViewLayout.dismissibleHeight {
                 self.animateDismissView()
-            } else if newHeight < defaultHeight {
-                self.animateContainerHeight(height: defaultHeight)
+            } else if newHeight < self.genreChipsCollectionViewLayout.defaultHeight {
+                self.animateContainerHeight(height: self.genreChipsCollectionViewLayout.defaultHeight)
             }
         default:
             break
@@ -231,10 +128,10 @@ class GenrePickerViewController: UIViewController {
     
     func animateContainerHeight(height: CGFloat) {
         UIView.animate(withDuration: 0.4) {
-            self.containerViewHeightConstraint?.constant = height
+            self.genreChipsCollectionViewLayout.containerViewHeightConstraint?.constant = height
             self.view.layoutIfNeeded()
         }
-        self.currentContainerHeight = height
+        self.genreChipsCollectionViewLayout.currentContainerHeight = height
     }
 }
 
