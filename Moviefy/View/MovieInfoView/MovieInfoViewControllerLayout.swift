@@ -22,6 +22,7 @@ class MovieInfoViewControllerLayout: UIView {
     var movieOverviewLabel = UILabel()
     var containerView = UIView()
     var topPartView = UIView()
+    let leadingOffset: CGFloat = 10.0
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -188,26 +189,26 @@ class MovieInfoViewControllerLayout: UIView {
             self.topPartView.widthAnchor.constraint(equalTo: self.containerView.widthAnchor),
             self.topPartView.heightAnchor.constraint(equalTo: self.movieImageView.heightAnchor),
             
-            self.movieTitle.leadingAnchor.constraint(equalTo: self.containerView.leadingAnchor, constant: 10),
+            self.movieTitle.leadingAnchor.constraint(equalTo: self.containerView.leadingAnchor, constant: self.leadingOffset),
             self.movieTitle.topAnchor.constraint(equalTo: self.topPartView.bottomAnchor, constant: 15),
-            self.movieTitle.trailingAnchor.constraint(equalTo: self.containerView.trailingAnchor, constant: -10),
+            self.movieTitle.trailingAnchor.constraint(equalTo: self.containerView.trailingAnchor, constant: -self.leadingOffset),
             
-            self.movieGenres.leadingAnchor.constraint(equalTo: self.containerView.leadingAnchor, constant: 10),
+            self.movieGenres.leadingAnchor.constraint(equalTo: self.containerView.leadingAnchor, constant: self.leadingOffset),
             self.movieGenres.topAnchor.constraint(equalTo: self.movieTitle.bottomAnchor, constant: 5),
-            self.movieGenres.trailingAnchor.constraint(equalTo: self.containerView.trailingAnchor, constant: -10),
+            self.movieGenres.trailingAnchor.constraint(equalTo: self.containerView.trailingAnchor, constant: -self.leadingOffset),
             
-            self.movieDateReleased.leadingAnchor.constraint(equalTo: self.containerView.leadingAnchor, constant: 10),
+            self.movieDateReleased.leadingAnchor.constraint(equalTo: self.containerView.leadingAnchor, constant: self.leadingOffset),
             self.movieDateReleased.topAnchor.constraint(equalTo: self.movieGenres.bottomAnchor, constant: 5),
-            self.movieDateReleased.trailingAnchor.constraint(equalTo: self.containerView.trailingAnchor, constant: -10),
+            self.movieDateReleased.trailingAnchor.constraint(equalTo: self.containerView.trailingAnchor, constant: -self.leadingOffset),
             
-            self.movieOverviewLabel.leadingAnchor.constraint(equalTo: self.containerView.leadingAnchor, constant: 10),
+            self.movieOverviewLabel.leadingAnchor.constraint(equalTo: self.containerView.leadingAnchor, constant: self.leadingOffset),
             self.movieOverviewLabel.topAnchor.constraint(equalTo: self.movieDateReleased.bottomAnchor, constant: 15),
-            self.movieOverviewLabel.trailingAnchor.constraint(equalTo: self.containerView.trailingAnchor, constant: -10),
+            self.movieOverviewLabel.trailingAnchor.constraint(equalTo: self.containerView.trailingAnchor, constant: -self.leadingOffset),
             
-            self.movieOverview.leadingAnchor.constraint(equalTo: self.containerView.leadingAnchor, constant: 10),
+            self.movieOverview.leadingAnchor.constraint(equalTo: self.containerView.leadingAnchor, constant: self.leadingOffset),
             self.movieOverview.topAnchor.constraint(equalTo: self.movieOverviewLabel.bottomAnchor, constant: 5),
             self.movieOverview.bottomAnchor.constraint(equalTo: self.containerView.bottomAnchor, constant: -20),
-            self.movieOverview.trailingAnchor.constraint(equalTo: self.containerView.trailingAnchor, constant: -10)
+            self.movieOverview.trailingAnchor.constraint(equalTo: self.containerView.trailingAnchor, constant: -self.leadingOffset)
         ])
 
         self.movieInfoScrollView.addSubview(self.containerView)

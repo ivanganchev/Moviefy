@@ -14,24 +14,24 @@ protocol GenrePickerViewControllerDelegate: AnyObject {
 
 class GenrePickerViewController: UIViewController {
     let genreChipsCollectionViewLayout = GenreChipsCollectionViewLayout()
-    var genres = [String]()
+    let genrePickerViewControllerDataSource = GenrePickerViewControllerDataSource()
     var selectedGenres: [String] = []
     weak var delegate: GenrePickerViewControllerDelegate?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         if let genres = MoviesService.genres {
-            self.genres = Array(genres.values)
+            self.genrePickerViewControllerDataSource.genres = Array(genres.values)
         }
         
         self.genreChipsCollectionViewLayout.genrePickerView.delegate = self
-        self.genreChipsCollectionViewLayout.genrePickerView.dataSource = self
+        self.genreChipsCollectionViewLayout.genrePickerView.dataSource = self.genrePickerViewControllerDataSource
         
         let gestureTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(animateDismissView))
         self.genreChipsCollectionViewLayout.dimmedView.addGestureRecognizer(gestureTapRecognizer)
         
         self.genreChipsCollectionViewLayout.doneButton.addTarget(self, action: #selector(self.doneButtonTap), for: .touchUpInside)
-        if self.selectedGenres.count == self.genres.count {
+        if self.selectedGenres.count == self.genrePickerViewControllerDataSource.genres.count {
             self.genreChipsCollectionViewLayout.doneButton.isUserInteractionEnabled = false
             self.genreChipsCollectionViewLayout.doneButton.setTitleColor(.systemGray, for: .normal)
         }
@@ -40,8 +40,8 @@ class GenrePickerViewController: UIViewController {
         
         self.setupPanGesture()
         
-        for i in (0...self.genres.count) {
-            if selectedGenres.contains(self.genres[i]) {
+        for i in (0...self.genrePickerViewControllerDataSource.genres.count) {
+            if selectedGenres.contains(self.genrePickerViewControllerDataSource.genres[i]) {
                 continue
             } else {
                 self.genreChipsCollectionViewLayout.genrePickerView.selectRow(i, inComponent: 0, animated: false)
@@ -93,7 +93,7 @@ class GenrePickerViewController: UIViewController {
     }
     
     @objc func doneButtonTap() {
-        let chosenGenre = self.genres[self.genreChipsCollectionViewLayout.genrePickerView.selectedRow(inComponent: 0)]
+        let chosenGenre = self.genrePickerViewControllerDataSource.genres[self.genreChipsCollectionViewLayout.genrePickerView.selectedRow(inComponent: 0)]
         self.delegate?.getSelectedGenre(genre: chosenGenre)
         self.animateDismissView()
     }
@@ -135,29 +135,23 @@ class GenrePickerViewController: UIViewController {
     }
 }
 
-extension GenrePickerViewController: UIPickerViewDelegate, UIPickerViewDataSource {
-    func numberOfComponents(in pickerView: UIPickerView) -> Int {
-       return 1
-    }
-    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        return self.genres.count
-    }
+extension GenrePickerViewController: UIPickerViewDelegate {
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        let row = self.genres[row]
+        let row = self.genrePickerViewControllerDataSource.genres[row]
         return row
     }
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         var index = 0
-        
+        let genres = self.genrePickerViewControllerDataSource.genres
         let firstHalf: [Int] = Array(0..<row).reversed()
-        let secondHalf: [Int] = Array((row + 1)...self.genres.count)
+        let secondHalf: [Int] = Array((row + 1)...genres.count)
         
-        if self.selectedGenres.contains(self.genres[row]) {
+        if self.selectedGenres.contains(genres[row]) {
             for(firstHalfIndex, secondHalfIndex) in zip(firstHalf, secondHalf) {
-                if !(self.selectedGenres.contains(self.genres[firstHalfIndex])) {
+                if !(self.selectedGenres.contains(genres[firstHalfIndex])) {
                     index = firstHalfIndex
                     break
-                } else if !(self.selectedGenres.contains(self.genres[secondHalfIndex])) {
+                } else if !(self.selectedGenres.contains(genres[secondHalfIndex])) {
                     index = secondHalfIndex
                     break
                 }
@@ -166,14 +160,14 @@ extension GenrePickerViewController: UIPickerViewDelegate, UIPickerViewDataSourc
             if index == 0 {
                 if firstHalf.count < secondHalf.count {
                     for i in (secondHalf[firstHalf.count]...secondHalf.count) {
-                        if !(self.selectedGenres.contains(self.genres[i])) {
+                        if !(self.selectedGenres.contains(genres[i])) {
                             index = i
                             break
                         }
                     }
                 } else {
                     for i in (0...firstHalf[secondHalf.count]).reversed() {
-                        if !(self.selectedGenres.contains(self.genres[i])) {
+                        if !(self.selectedGenres.contains(genres[i])) {
                             index = i
                             break
                         }
@@ -189,12 +183,14 @@ extension GenrePickerViewController: UIPickerViewDelegate, UIPickerViewDataSourc
     
     func pickerView(_ pickerView: UIPickerView, attributedTitleForRow row: Int, forComponent component: Int) -> NSAttributedString? {
         var color: UIColor
-        if selectedGenres.contains(self.genres[row]) {
+        let genres = self.genrePickerViewControllerDataSource.genres
+        
+        if selectedGenres.contains(genres[row]) {
             color = UIColor.lightGray
         } else {
             color = UIColor.black
         }
         
-        return NSAttributedString(string: self.genres[row], attributes: [NSAttributedString.Key.foregroundColor: color])
+        return NSAttributedString(string: genres[row], attributes: [NSAttributedString.Key.foregroundColor: color])
     }
 }
