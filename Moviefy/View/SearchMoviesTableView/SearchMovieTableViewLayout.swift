@@ -26,8 +26,6 @@ class SearchMovieTableViewLayout: UIView {
     func setupSearchMoviesTableViewUI() {
         self.searchMoviesTableView.separatorStyle = .none
         self.searchMoviesTableView.translatesAutoresizingMaskIntoConstraints = false
-//        self.searchMoviesTableView.dataSource = self.searchMoviesTableViewDataSource
-//        self.searchMoviesTableView.delegate = self
         self.searchMoviesTableView.register(SearchMovieTableViewCell.self, forCellReuseIdentifier: SearchMovieTableViewCell.identifier)
         self.searchMoviesTableView.keyboardDismissMode = .onDrag
         

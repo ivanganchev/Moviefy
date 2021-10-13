@@ -8,16 +8,16 @@
 import Foundation
 import UIKit
 
-protocol MoviesTableViewCellDelegate: AnyObject {
+protocol MoviesTableViewCellDelegate {
     func getClickedCollectionViewCell(cell: MoviesCollectionViewCell?, movie: Movie)
 }
-class MoviesTableViewCell: UITableViewCell {
+class MoviesTableViewCell : UITableViewCell {
     
     static let identifier = "MoviesTableViewCell"
     var moviesCollectionViewDataSource: MoviesCollectionViewDataSource?
     var moviesCollectionView: UICollectionView?
     var moviesCollectionViewLayout: UICollectionViewFlowLayout?
-    weak var delegate: MoviesTableViewCellDelegate?
+    var delegate: MoviesTableViewCellDelegate?
     
     var movieCategoryPath: String = "" {
         didSet {
@@ -42,15 +42,12 @@ class MoviesTableViewCell: UITableViewCell {
         self.moviesCollectionView!.dataSource = self.moviesCollectionViewDataSource
         self.moviesCollectionView?.delegate = self
         self.moviesCollectionView!.register(MoviesCollectionViewCell.self, forCellWithReuseIdentifier: MoviesCollectionViewCell.identifier)
-        
         self.contentView.addSubview(moviesCollectionView!)
-
-        NSLayoutConstraint.activate([
-            self.moviesCollectionView!.topAnchor.constraint(equalTo: self.topAnchor),
-            self.moviesCollectionView!.bottomAnchor.constraint(equalTo: self.bottomAnchor),
-            self.moviesCollectionView!.leadingAnchor.constraint(equalTo: self.leadingAnchor),
-            self.moviesCollectionView!.trailingAnchor.constraint(equalTo: self.trailingAnchor)
-        ])
+        
+        self.moviesCollectionView?.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
+        self.moviesCollectionView?.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
+        self.moviesCollectionView?.leadingAnchor.constraint(equalTo: self.leadingAnchor).isActive = true
+        self.moviesCollectionView?.trailingAnchor.constraint(equalTo: self.trailingAnchor).isActive = true
     }
     
     required init?(coder: NSCoder) {
@@ -64,7 +61,7 @@ class MoviesTableViewCell: UITableViewCell {
         super.layoutSubviews()
     }
     
-    private func setLayout() -> UICollectionViewFlowLayout {
+    private func setLayout() -> UICollectionViewFlowLayout{
         let size = ThumbnailImageProperties.getSize()
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
