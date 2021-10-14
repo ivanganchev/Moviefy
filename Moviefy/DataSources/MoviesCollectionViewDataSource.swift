@@ -11,6 +11,7 @@ import UIKit
 class MoviesCollectionViewDataSource: NSObject, UICollectionViewDataSource {
     
     var movies: [Movie] = []
+    let cache = NSCache<NSNumber, UIImage>()
     
      func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return self.movies.count
@@ -20,24 +21,6 @@ class MoviesCollectionViewDataSource: NSObject, UICollectionViewDataSource {
         
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MoviesCollectionViewCell.identifier, for: indexPath) as? MoviesCollectionViewCell else {
             return MoviesCollectionViewCell()
-        }
-        
-        cell.image = nil
-        let model = self.movies[indexPath.row]
-        
-        if model.movieResponse.posterPath != nil {
-            if let imageData = model.imageData {
-                cell.image = UIImage(data: imageData)
-            } else {
-                self.loadImage(movie: model) {
-                    DispatchQueue.main.async {
-                        cell.image = UIImage(data: self.movies[indexPath.row].imageData!)
-                    }
-                }
-            }
-        } else {
-            let defaultImage = UIImage(named: "not_loaded_image.jpg")
-            cell.image = defaultImage
         }
         
         return cell
@@ -65,27 +48,36 @@ extension MoviesCollectionViewDataSource {
     }
     
     func loadImages(completion: @escaping () -> Void) {
+        var currentMovieIndex = 0
         self.movies.forEach { (movie) in
             if let path = movie.movieResponse.posterPath {
                 MoviesService().fetchMovieImage(imageUrl: path, completion: {result in
                     switch result {
                     case .success(let data):
                         movie.imageData = data
+                        self.cache.setObject(UIImage(data: data)!, forKey: NSNumber(value: currentMovieIndex))
+                        currentMovieIndex += 1
                     case .failure(let err):
                         print(err)
                     }
                 })
+            } else {
+                self.cache.setObject(UIImage(named: "not_loaded_image.jpg")!, forKey: NSNumber(value: currentMovieIndex))
             }
         }
         completion()
     }
     
-    func loadImage(movie: Movie, completion: @escaping () -> Void) {
+    func loadImage(index: NSNumber, completion: ((UIImage) -> Void)? = nil) {
+        let movie = self.movies[index.intValue]
         if let path = movie.movieResponse.posterPath {
             MoviesService().fetchMovieImage(imageUrl: path, completion: {result in
                 switch result {
                 case .success(let data):
                     movie.imageData = data
+                    let loadedImage = UIImage(data: data)!
+                    self.cache.setObject(loadedImage, forKey: index)
+                    completion!(loadedImage)
                 case .failure(let err):
                     print(err)
                 }

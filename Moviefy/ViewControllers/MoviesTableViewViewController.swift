@@ -27,6 +27,7 @@ class MoviesTableViewViewController: UIViewController, InitialTransitionAnimatab
         self.moviesTableViewViewControllerLayout.moviesTableView.refreshControl?.addTarget(self, action: #selector(pullToRefresh), for: .valueChanged)
         self.moviesTableViewDelegateInstance.delegate = self
         MoviesService.loadMoviesGenreList()
+        self.moviesTableViewViewControllerLayout.moviesTableView.reloadData()
     }
     
     override func viewWillAppear(_ animated: Bool) {

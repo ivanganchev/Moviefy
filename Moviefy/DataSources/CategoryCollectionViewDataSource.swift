@@ -14,6 +14,7 @@ class CategoryCollectionViewDataSource: NSObject {
     var movieCategoryPath: String?
     var loadedImages = [Data]()
     var currentPage = 1
+    let cache = NSCache<NSNumber, UIImage>()
     
     let activityIndicatorView = UIActivityIndicatorView(style: .medium)
     
@@ -35,27 +36,36 @@ class CategoryCollectionViewDataSource: NSObject {
        }
     
     func loadImages(completion: (() -> Void)? = nil) {
+        var currentMovieIndex = 0
         self.filteredMovies.forEach { (movie) in
             if let path = movie.movieResponse.posterPath {
                 MoviesService().fetchMovieImage(imageUrl: path, completion: {result in
                     switch result {
                     case .success(let data):
                         movie.imageData = data
+                        self.cache.setObject(UIImage(data: data)!, forKey: NSNumber(value: currentMovieIndex))
+                        currentMovieIndex += 1
                     case .failure(let err):
                         print(err)
                     }
                 })
+            } else {
+                self.cache.setObject(UIImage(named: "not_loaded_image.jpg")!, forKey: NSNumber(value: currentMovieIndex))
             }
         }
         completion?()
     }
     
-    func loadImage(movie: Movie, completion: (() -> Void)? = nil) {
+    func loadImage(index: NSNumber, completion: ((UIImage) -> Void)? = nil) {
+        let movie = self.filteredMovies[index.intValue]
         if let path = movie.movieResponse.posterPath {
             MoviesService().fetchMovieImage(imageUrl: path, completion: {result in
                 switch result {
                 case .success(let data):
                     movie.imageData = data
+                    let loadedImage = UIImage(data: data)!
+                    self.cache.setObject(loadedImage, forKey: index)
+                    completion!(loadedImage)
                 case .failure(let err):
                     print(err)
                 }
@@ -117,31 +127,13 @@ extension CategoryCollectionViewDataSource: UICollectionViewDataSource, UICollec
             return CategoryCollectionViewCell()
         }
         
-        cell.image = nil
-        let model = self.filteredMovies[indexPath.row]
-        
-        if model.movieResponse.posterPath != nil {
-            if let imageData = model.imageData {
-                cell.image = UIImage(data: imageData)
-            } else {
-                self.loadImage(movie: model) {
-                    DispatchQueue.main.async {
-                        cell.image = UIImage(data: self.movies[indexPath.row].imageData!)
-                    }
-                }
-            }
-        } else {
-            let defaultImage = UIImage(named: "not_loaded_image.jpg")
-            cell.image = defaultImage
-        }
-
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
         indexPaths.forEach { (indexPath) in
             if filteredMovies[indexPath.row].imageData == nil {
-                loadImage(movie: movies[indexPath.row], completion: {})
+                loadImage(index: NSNumber(value: indexPath.row), completion: {_ in })
             }
         }
     }

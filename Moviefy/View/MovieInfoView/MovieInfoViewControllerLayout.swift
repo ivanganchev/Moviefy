@@ -245,8 +245,7 @@ class MovieInfoViewControllerLayout: UIView {
     func setMovieImage(movie: Movie) {
         if let imageData = movie.imageData {
             self.movieImageView.image = UIImage(data: imageData)
+            self.movieImageView.heightAnchor.constraint(equalTo: self.movieImageView.widthAnchor, multiplier: self.movieImageView.image!.size.height / self.movieImageView.image!.size.width, constant: 0).isActive = true
         }
-        
-        self.movieImageView.heightAnchor.constraint(equalTo: self.movieImageView.widthAnchor, multiplier: self.movieImageView.image!.size.height / self.movieImageView.image!.size.width, constant: 0).isActive = true
     }
 }

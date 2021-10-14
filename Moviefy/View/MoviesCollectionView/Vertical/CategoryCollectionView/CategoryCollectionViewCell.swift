@@ -31,6 +31,11 @@ class CategoryCollectionViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        self.imageView.image = nil
+    }
+    
     override func layoutSubviews() {
         let width = self.bounds.width
         let height = width * (750 / 500)

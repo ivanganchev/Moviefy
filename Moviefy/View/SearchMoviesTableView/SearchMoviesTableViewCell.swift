@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-class SearchMovieTableViewCell: UITableViewCell {
+class SearchMoviesTableViewCell: UITableViewCell {
     static let identifier = "SearchMoviesTableViewCell"
     
     let movieImage = UIImageView()
@@ -69,7 +69,9 @@ class SearchMovieTableViewCell: UITableViewCell {
         self.containerView.addArrangedSubview(self.movieGenres)
         self.contentView.addSubview(self.movieImage)
         self.contentView.addSubview(self.containerView)
-        
+    }
+
+    override func layoutSubviews() {
         NSLayoutConstraint.activate([
             self.movieImage.leadingAnchor.constraint(equalTo: self.leadingAnchor),
             self.movieImage.heightAnchor.constraint(equalTo: self.heightAnchor),
@@ -79,8 +81,13 @@ class SearchMovieTableViewCell: UITableViewCell {
             self.containerView.centerYAnchor.constraint(equalTo: self.centerYAnchor)
         ])
     }
-
+    
     required init(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        self.movieImage.image = nil
     }
 }

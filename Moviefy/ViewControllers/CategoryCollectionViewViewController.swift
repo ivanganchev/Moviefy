@@ -119,6 +119,21 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
         let isHidden = GenreChipsCollectionViewDataSource.genres.isEmpty
         self.categoryCollectionViewLayout.genreChipsView.hideChipsCollectioNView(isHidden: isHidden)
     }
+    
+    func loadImageView(cell: UICollectionViewCell, index: NSNumber) {
+        guard let cell = cell as? CategoryCollectionViewCell else { return }
+        cell.prepareForReuse()
+        
+        if let cachedImage = self.categoryCollectionViewDataSource.cache.object(forKey: index) {
+            cell.image = cachedImage
+        } else {
+            self.categoryCollectionViewDataSource.loadImage(index: index) { image in
+                DispatchQueue.main.async {
+                    cell.image = image
+                }
+            }
+        }
+    }
 }
 
 extension CategoryCollectionViewViewController: UICollectionViewDelegateFlowLayout {
@@ -148,6 +163,8 @@ extension CategoryCollectionViewViewController: UICollectionViewDelegateFlowLayo
     }
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        self.loadImageView(cell: cell, index: NSNumber(value: indexPath.row))
+        
         if indexPath.row == (self.categoryCollectionViewDataSource.filteredMovies.count - 1) {
             self.categoryCollectionViewDataSource.activityIndicatorView.startAnimating()
             self.fetchFilteredMovies(currentCellIndex: indexPath.row) {

@@ -34,4 +34,9 @@ class MoviesCollectionViewCell: UICollectionViewCell {
             self.imageView.frame = CGRect(origin: .zero, size: ThumbnailImageProperties.getSize())
         }
     }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        self.imageView.image = nil
+    }
 }
