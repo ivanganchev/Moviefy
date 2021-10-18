@@ -37,13 +37,18 @@ class SearchMoviesViewController: UIViewController, InitialTransitionAnimatableC
     
     @objc func searchMovies() {
         guard let text = self.searchMoviesTableViewLayout.searchBar.text else { return }
-        self.searchMoviesTableViewDataSource.searchMovies(text: text, completion: {
-            self.searchMoviesTableViewDataSource.loadImages(completion: {
-                DispatchQueue.main.async {
-                    self.searchMoviesTableViewLayout.searchMoviesTableView.reloadData()
-                }
+        
+        if text != "" {
+            self.searchMoviesTableViewDataSource.searchMovies(text: text, completion: {
+                self.searchMoviesTableViewDataSource.loadImages(completion: {
+                    DispatchQueue.main.async {
+                        self.searchMoviesTableViewLayout.searchMoviesTableView.reloadData()
+                    }
+                })
             })
-        })
+        } else {
+            fetchMovies(page: 1)
+        }
     }
     
     func presentMovieInfoViewController(with movie: Movie?) {

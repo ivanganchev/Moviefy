@@ -10,6 +10,7 @@ import UIKit
 
 protocol GenrePickerViewControllerDelegate: AnyObject {
     func getSelectedGenre(genre: String)
+    func viewDismissed()
 }
 
 class GenrePickerViewController: UIViewController {
@@ -83,6 +84,7 @@ class GenrePickerViewController: UIViewController {
         UIView.animate(withDuration: 0.4) {
             self.genreChipsCollectionViewLayout.dimmedView.alpha = 0
         } completion: { _ in
+            self.delegate?.viewDismissed()
             self.dismiss(animated: false, completion: nil)
         }
     }

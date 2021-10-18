@@ -97,8 +97,6 @@ extension SavedMoviesViewController: GenreChipsViewDelegate {
 
 extension SavedMoviesViewController: GenrePickerViewControllerDelegate {
     func getSelectedGenre(genre: String) {
-        self.tabBarController?.tabBar.isHidden = false
-        
         guard genre != "" else {
             return
         }
@@ -107,6 +105,10 @@ extension SavedMoviesViewController: GenrePickerViewControllerDelegate {
         self.saveMoviesCollectionViewLayout.genreChipsView.genreChipsCollectionView.reloadData()
         self.savedMoviesCollectionViewDataSource.filterMovies(genres: self.genreChipsCollectionViewDataSource.genres)
         self.saveMoviesCollectionViewLayout.categoryCollectionView.reloadData()
+    }
+    
+    func viewDismissed() {
+        self.tabBarController?.tabBar.isHidden = false
     }
 }
 

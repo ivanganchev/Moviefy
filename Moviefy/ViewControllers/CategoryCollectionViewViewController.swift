@@ -205,8 +205,6 @@ extension CategoryCollectionViewViewController: GenreChipsViewDelegate {
 
 extension CategoryCollectionViewViewController: GenrePickerViewControllerDelegate {
     func getSelectedGenre(genre: String) {
-        self.tabBarController?.tabBar.isHidden = false
-        
         guard genre != "" else {
             return
         }
@@ -229,5 +227,9 @@ extension CategoryCollectionViewViewController: GenrePickerViewControllerDelegat
                 }
             }
         }
+    }
+    
+    func viewDismissed() {
+        self.tabBarController?.tabBar.isHidden = false
     }
 }
