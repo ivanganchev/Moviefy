@@ -8,6 +8,7 @@
 import Foundation
 
 struct MovieResponse: Codable {
+    let id: Int?
     let originalTitle: String?
     let title: String?
     let posterPath: String?
@@ -19,6 +20,7 @@ struct MovieResponse: Codable {
     let genreIds: [Int]?
     
     enum CodingKeys: String, CodingKey {
+        case id	
         case originalTitle = "original_title"
         case title = "title"
         case posterPath = "poster_path"

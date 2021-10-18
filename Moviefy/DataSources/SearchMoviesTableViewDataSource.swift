@@ -11,7 +11,7 @@ import UIKit
 class SearchMoviesTableViewDataSource: NSObject, UITableViewDataSource {
     var movies: [Movie] = []
     let genres = MoviesService.genres
-    let cache = NSCache<NSNumber, UIImage>()
+    let cache = NSCache<NSString, UIImage>()
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.movies.count
@@ -73,40 +73,49 @@ extension SearchMoviesTableViewDataSource {
     }
     
     func loadImages(completion: @escaping () -> Void) {
-        var currentMovieIndex = 0
         self.movies.forEach { (movie) in
-            if let path = movie.movieResponse.posterPath {
-                MoviesService().fetchMovieImage(imageUrl: path, completion: {result in
-                    switch result {
-                    case .success(let data):
-                        movie.imageData = data
-                        self.cache.setObject(UIImage(data: data)!, forKey: NSNumber(value: currentMovieIndex))
-                        currentMovieIndex += 1
-                    case .failure(let err):
-                        print(err)
-                    }
-                })
-            } else {
-                
+            guard let posterPath = movie.movieResponse.posterPath else {
+                return
             }
-        }
-        completion()
-    }
-    
-    func loadImage(index: NSNumber, completion: ((UIImage) -> Void)? = nil) {
-        let movie = self.movies[index.intValue]
-        if let path = movie.movieResponse.posterPath {
-            MoviesService().fetchMovieImage(imageUrl: path, completion: {result in
+            
+            let path = NSString(string: posterPath)
+            
+            MoviesService().fetchMovieImage(imageUrl: path as String, completion: {result in
                 switch result {
                 case .success(let data):
                     movie.imageData = data
-                    let loadedImage = UIImage(data: data)!
-                    self.cache.setObject(loadedImage, forKey: index)
-                    completion!(loadedImage)
+                    self.cache.setObject(UIImage(data: data)!, forKey: path)
                 case .failure(let err):
                     print(err)
                 }
             })
         }
+        completion()
+    }
+    
+    func loadImage(index: Int, completion: ((UIImage) -> Void)? = nil) {
+        guard index >= 0 && index < self.movies.count else {
+            return
+        }
+        
+        let movie = self.movies[index]
+        
+        guard let posterPath = movie.movieResponse.posterPath else {
+            return
+        }
+        
+        let path = NSString(string: posterPath)
+        
+        MoviesService().fetchMovieImage(imageUrl: path as String, completion: {result in
+            switch result {
+            case .success(let data):
+                movie.imageData = data
+                let loadedImage = UIImage(data: data)!
+                self.cache.setObject(loadedImage, forKey: path)
+                completion!(loadedImage)
+            case .failure(let err):
+                print(err)
+            }
+        })
     }
 }

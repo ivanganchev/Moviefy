@@ -54,11 +54,17 @@ class SearchMoviesViewController: UIViewController, InitialTransitionAnimatableC
         present(movieInfoViewController, animated: true)
     }
     
-    func loadImageView(cell: UITableViewCell, index: NSNumber) {
+    func loadImageView(cell: UITableViewCell, index: Int) {
         guard let cell = cell as? SearchMoviesTableViewCell else { return }
-        cell.prepareForReuse()
+
+        let movie = self.searchMoviesTableViewDataSource.movies[index]
         
-        if let cachedImage = self.searchMoviesTableViewDataSource.cache.object(forKey: index) {
+        guard let path = movie.movieResponse.posterPath else {
+            cell.image = UIImage(named: "not_loaded_image.jpg")
+            return
+        }
+        
+        if let cachedImage = self.searchMoviesTableViewDataSource.cache.object(forKey: NSString(string: path)) {
             cell.image = cachedImage
         } else {
             self.searchMoviesTableViewDataSource.loadImage(index: index) { image in
@@ -84,7 +90,7 @@ extension SearchMoviesViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        self.loadImageView(cell: cell, index: NSNumber(value: indexPath.row))
+        self.loadImageView(cell: cell, index: indexPath.row)
     }
 }
 

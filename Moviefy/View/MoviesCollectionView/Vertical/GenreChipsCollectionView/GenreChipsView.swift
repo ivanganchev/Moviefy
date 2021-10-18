@@ -108,7 +108,9 @@ extension GenreChipsView: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let text: UILabel = UILabel()
         text.font = UIFont(name: "Helvetica", size: 20)
-        text.text = GenreChipsCollectionViewDataSource.genres[indexPath.row]
+        if let dataSource = self.genreChipsCollectionView.dataSource as? GenreChipsCollectionViewDataSource {
+            text.text = dataSource.genres[indexPath.row]
+        }
         return CGSize(width: Int(text.intrinsicContentSize.width) + self.buttonWidth + self.chipViewsSpacing * 3, height: 50)
     }
 }

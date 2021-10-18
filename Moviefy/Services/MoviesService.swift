@@ -35,9 +35,9 @@ class MoviesService {
                 return
             }
             do {
-                let obj: MoviesResponse = try JSONDecoder().decode(MoviesResponse.self, from: data)
-                completion(.success(obj))
-                
+                var responseObj: MoviesResponse = try JSONDecoder().decode(MoviesResponse.self, from: data)
+                responseObj.movies = responseObj.movies.map {$0.filter({$0.id != nil})}
+                completion(.success(responseObj))
             } catch let err {
                 completion(.failure(err))
                 print(err)

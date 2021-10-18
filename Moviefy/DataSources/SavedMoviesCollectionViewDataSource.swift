@@ -10,11 +10,13 @@ import UIKit
 import RealmSwift
 
 class SavedMoviesCollectionViewDataSource: NSObject, UICollectionViewDataSource {
-    var savedMovies: [MovieEntity] = []
+    var savedMovies = [MovieEntity]()
+    var savedFilteredMovies = [MovieEntity]()
+    
     var token: NotificationToken?
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self.savedMovies.count
+        return self.savedFilteredMovies.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -24,7 +26,7 @@ class SavedMoviesCollectionViewDataSource: NSObject, UICollectionViewDataSource 
         
         cell.image = nil
         
-        let model = savedMovies[indexPath.row]
+        let model = savedFilteredMovies[indexPath.row]
         
         if let imageData = model.imageData {
             cell.image = UIImage(data: imageData)
@@ -38,16 +40,56 @@ class SavedMoviesCollectionViewDataSource: NSObject, UICollectionViewDataSource 
 }
 
 extension SavedMoviesCollectionViewDataSource {
-    func loadSavedMovies(completion: @escaping (RealmCollectionChange<Results<MovieEntity>>) -> Void) {
+    func registerNotificationToken(completion: @escaping (RealmCollectionChange<Results<MovieEntity>>) -> Void) {
+        self.token?.invalidate()
         let realm = try? Realm()
         guard let results = realm?.objects(MovieEntity.self) else {
-            return 
+            return
         }
-        self.savedMovies = Array(results)
-        self.token?.invalidate()
         // values capturing
         self.token = results.observe {(changes: RealmCollectionChange) in
             completion(changes)
         }
+    }
+    
+    func loadSavedMovies() {
+        let realm = try? Realm()
+        guard let results = realm?.objects(MovieEntity.self) else {
+            return
+        }
+        self.savedMovies = Array(results)
+        self.savedFilteredMovies = Array(results)
+    }
+    
+    func filterMovies(genres: [String]) {
+        guard !genres.isEmpty else {
+            self.savedFilteredMovies = self.savedMovies
+            return
+        }
+        let realm = try? Realm()
+        guard let movies = realm?.objects(MovieEntity.self) else { return }
+        var newFilteredMovies: [MovieEntity] = Array(movies) 
+        let allGenres = MoviesService.genres
+        
+        genres.forEach { genre in
+            var tempArr: [MovieEntity] = []
+            newFilteredMovies.forEach { movie in
+                let id = allGenres?.first(where: {$0.value == genre})?.key
+                if movie.genreIds.contains(id!) {
+                    tempArr.append(movie)
+                }
+            }
+            newFilteredMovies = tempArr
+        }
+        self.savedMovies = newFilteredMovies
+        
+//        var genreIds: [Int] = []
+//        for genre in genres {
+//            guard let id = allGenres?.first(where: {$0.value == genre})?.key else {
+//                continue
+//            }
+//            genreIds.append(id)
+//        }
+//        let filteredMovies = realm?.objects(MovieEntity.self).filter("console IN %@", genreIds)
     }
 }

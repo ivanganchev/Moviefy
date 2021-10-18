@@ -31,7 +31,6 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
         
         self.categoryCollectionViewDataSource.movieCategoryPath = self.movieCategoryPath?.rawValue
         self.categoryCollectionViewLayout.categoryCollectionView.dataSource = self.categoryCollectionViewDataSource
-        self.categoryCollectionViewLayout.categoryCollectionView.prefetchDataSource = self.categoryCollectionViewDataSource
         self.categoryCollectionViewLayout.categoryCollectionView.delegate = self
         
         self.categoryCollectionViewLayout.categoryCollectionView.refreshControl = UIRefreshControl()
@@ -66,7 +65,7 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
     }
     
     @objc func pullToRefresh() {
-        self.categoryCollectionViewDataSource.refreshMovies(completion: {
+        self.categoryCollectionViewDataSource.refreshMovies(genres: self.genreChipsCollectionViewDataSource.genres, completion: {
             self.categoryCollectionViewDataSource.loadImages(completion: {
                 DispatchQueue.main.async {
                     self.categoryCollectionViewLayout.categoryCollectionView.reloadData()
@@ -78,7 +77,7 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
         
     func fetchFilteredMovies(currentCellIndex: Int, completion: @escaping () -> Void) {
         self.categoryCollectionViewDataSource.fetchMovies {
-            self.categoryCollectionViewDataSource.filterMovies()
+            self.categoryCollectionViewDataSource.filterMovies(genres: self.genreChipsCollectionViewDataSource.genres)
             let moviesOnScreen = self.categoryCollectionViewDataSource.filteredMovies.count
             if moviesOnScreen - currentCellIndex > 1 {
                 self.categoryCollectionViewDataSource.loadImages()
@@ -111,20 +110,26 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
     func deleteGenreChip() {
         self.setGenreChipsViewUILayout()
         self.categoryCollectionViewLayout.genreChipsView.genreChipsCollectionView.reloadData()
-        self.categoryCollectionViewDataSource.filterMovies()
+        self.categoryCollectionViewDataSource.filterMovies(genres: self.genreChipsCollectionViewDataSource.genres)
         self.categoryCollectionViewLayout.categoryCollectionView.reloadData()
     }
     
     func setGenreChipsViewUILayout() {
-        let isHidden = GenreChipsCollectionViewDataSource.genres.isEmpty
+        let isHidden = self.genreChipsCollectionViewDataSource.genres.isEmpty
         self.categoryCollectionViewLayout.genreChipsView.hideChipsCollectioNView(isHidden: isHidden)
     }
     
-    func loadImageView(cell: UICollectionViewCell, index: NSNumber) {
+    func loadImageView(cell: UICollectionViewCell, index: Int) {
         guard let cell = cell as? CategoryCollectionViewCell else { return }
-        cell.prepareForReuse()
+
+        let movie = self.categoryCollectionViewDataSource.filteredMovies[index]
         
-        if let cachedImage = self.categoryCollectionViewDataSource.cache.object(forKey: index) {
+        guard let path = movie.movieResponse.posterPath else {
+            cell.image = UIImage(named: "not_loaded_image.jpg")
+            return
+        }
+        
+        if let cachedImage = self.categoryCollectionViewDataSource.cache.object(forKey: NSString(string: path)) {
             cell.image = cachedImage
         } else {
             self.categoryCollectionViewDataSource.loadImage(index: index) { image in
@@ -163,7 +168,7 @@ extension CategoryCollectionViewViewController: UICollectionViewDelegateFlowLayo
     }
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        self.loadImageView(cell: cell, index: NSNumber(value: indexPath.row))
+        self.loadImageView(cell: cell, index: indexPath.row)
         
         if indexPath.row == (self.categoryCollectionViewDataSource.filteredMovies.count - 1) {
             self.categoryCollectionViewDataSource.activityIndicatorView.startAnimating()
@@ -188,7 +193,8 @@ extension CategoryCollectionViewViewController: UICollectionViewDelegateFlowLayo
 extension CategoryCollectionViewViewController: GenreChipsViewDelegate {
     func presentGenrePickerViewController() {
         self.tabBarController?.tabBar.isHidden = true
-        let selectedGenres = GenreChipsCollectionViewDataSource.genres
+        
+        let selectedGenres = self.genreChipsCollectionViewDataSource.genres
         let genrePickerViewController = GenrePickerViewController()
         genrePickerViewController.selectedGenres = selectedGenres
         genrePickerViewController.delegate = self
@@ -204,10 +210,10 @@ extension CategoryCollectionViewViewController: GenrePickerViewControllerDelegat
         guard genre != "" else {
             return
         }
-        GenreChipsCollectionViewDataSource.genres.append(genre)
+        self.genreChipsCollectionViewDataSource.genres.append(genre)
         self.setGenreChipsViewUILayout()
         self.categoryCollectionViewLayout.genreChipsView.genreChipsCollectionView.reloadData()
-        self.categoryCollectionViewDataSource.filterMovies()
+        self.categoryCollectionViewDataSource.filterMovies(genres: self.genreChipsCollectionViewDataSource.genres)
         let filteredMovies = self.categoryCollectionViewDataSource.filteredMovies
         let filteredMoviesCount = filteredMovies.count
         if filteredMoviesCount > 0 {

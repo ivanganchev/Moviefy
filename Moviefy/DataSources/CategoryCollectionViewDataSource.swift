@@ -12,9 +12,8 @@ class CategoryCollectionViewDataSource: NSObject {
     var movies = [Movie]()
     var filteredMovies = [Movie]()
     var movieCategoryPath: String?
-    var loadedImages = [Data]()
     var currentPage = 1
-    let cache = NSCache<NSNumber, UIImage>()
+    let cache = NSCache<NSString, UIImage>()
     
     let activityIndicatorView = UIActivityIndicatorView(style: .medium)
     
@@ -33,52 +32,61 @@ class CategoryCollectionViewDataSource: NSObject {
                    print(err)
                }
            })
-       }
-    
-    func loadImages(completion: (() -> Void)? = nil) {
-        var currentMovieIndex = 0
-        self.filteredMovies.forEach { (movie) in
-            if let path = movie.movieResponse.posterPath {
-                MoviesService().fetchMovieImage(imageUrl: path, completion: {result in
-                    switch result {
-                    case .success(let data):
-                        movie.imageData = data
-                        self.cache.setObject(UIImage(data: data)!, forKey: NSNumber(value: currentMovieIndex))
-                        currentMovieIndex += 1
-                    case .failure(let err):
-                        print(err)
-                    }
-                })
-            } else {
-                self.cache.setObject(UIImage(named: "not_loaded_image.jpg")!, forKey: NSNumber(value: currentMovieIndex))
-            }
-        }
-        completion?()
     }
     
-    func loadImage(index: NSNumber, completion: ((UIImage) -> Void)? = nil) {
-        let movie = self.filteredMovies[index.intValue]
-        if let path = movie.movieResponse.posterPath {
-            MoviesService().fetchMovieImage(imageUrl: path, completion: {result in
+    func loadImages(completion: (() -> Void)? = nil) {
+        self.filteredMovies.forEach { (movie) in
+            guard let posterPath = movie.movieResponse.posterPath else {
+                return
+            }
+            
+            let path = NSString(string: posterPath)
+            
+            MoviesService().fetchMovieImage(imageUrl: path as String, completion: {result in
                 switch result {
                 case .success(let data):
                     movie.imageData = data
-                    let loadedImage = UIImage(data: data)!
-                    self.cache.setObject(loadedImage, forKey: index)
-                    completion!(loadedImage)
+                    self.cache.setObject(UIImage(data: data)!, forKey: path)
                 case .failure(let err):
                     print(err)
                 }
             })
         }
+        completion?()
     }
     
-    func filterMovies() {
-        guard !GenreChipsCollectionViewDataSource.genres.isEmpty else {
+    func loadImage(index: Int, completion: ((UIImage) -> Void)? = nil) {
+        guard index >= 0 && index < self.filteredMovies.count else {
+            return
+        }
+        
+        let movie: Movie = self.filteredMovies[index]
+        
+        guard let posterPath = movie.movieResponse.posterPath else {
+            return
+        }
+        
+        let path = NSString(string: posterPath)
+        
+        MoviesService().fetchMovieImage(imageUrl: path as String, completion: {result in
+            switch result {
+            case .success(let data):
+                movie.imageData = data
+                let loadedImage = UIImage(data: data)!
+                self.cache.setObject(loadedImage, forKey: path)
+                completion!(loadedImage)
+            case .failure(let err):
+                print(err)
+            }
+        })
+    }
+    
+    func filterMovies(genres: [String]) {
+        guard !genres.isEmpty else {
             self.filteredMovies = self.movies
             return
         }
-        let selectedGenres = GenreChipsCollectionViewDataSource.genres
+        let selectedGenres = genres
         let allGenres = MoviesService.genres
         var newFilteredMovies: [Movie] = movies
         
@@ -96,28 +104,18 @@ class CategoryCollectionViewDataSource: NSObject {
         self.filteredMovies = newFilteredMovies
     }
     
-    func refreshMovies(completion: @escaping () -> Void) {
+    func refreshMovies(genres: [String], completion: @escaping () -> Void) {
         self.movies = []
         self.filteredMovies = []
         self.currentPage = 1
         self.fetchMovies {
-            self.filterMovies()
+            self.filterMovies(genres: genres)
             completion()
         }
    }
-    
-    func getMovieAtIndexPath(_ indexPath: IndexPath) -> Movie {
-        return self.filteredMovies[indexPath.row]
-    }
-    
-    func getLoadedImage() -> Movie? {
-        return self.filteredMovies.first(where: { movie in
-            movie.imageData != nil
-        })
-    }
 }
 
-extension CategoryCollectionViewDataSource: UICollectionViewDataSource, UICollectionViewDataSourcePrefetching {
+extension CategoryCollectionViewDataSource: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return self.filteredMovies.count
     }
@@ -128,14 +126,6 @@ extension CategoryCollectionViewDataSource: UICollectionViewDataSource, UICollec
         }
         
         return cell
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
-        indexPaths.forEach { (indexPath) in
-            if filteredMovies[indexPath.row].imageData == nil {
-                loadImage(index: NSNumber(value: indexPath.row), completion: {_ in })
-            }
-        }
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {

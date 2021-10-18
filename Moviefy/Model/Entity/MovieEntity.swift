@@ -9,7 +9,7 @@ import Foundation
 import RealmSwift
 
 class MovieEntity: Object {
-    @Persisted(primaryKey: true) var id = NSUUID().uuidString
+    @Persisted(primaryKey: true) var id: Int?
     @Persisted var originalTitle: String?
     @Persisted var title: String?
     @Persisted var posterPath: String?
@@ -19,11 +19,12 @@ class MovieEntity: Object {
     @Persisted var releaseDate: String?
     @Persisted var runtime: String?
     @Persisted var imageData: Data?
-    let genreIds = RealmSwift.List<Int>()
+    @Persisted var genreIds = RealmSwift.List<Int>()
     
     convenience init(movie: Movie?) {
         self.init()
         
+        self.id = movie?.movieResponse.id
         self.originalTitle = movie?.movieResponse.originalTitle
         self.title = movie?.movieResponse.title
         self.posterPath = movie?.movieResponse.posterPath

@@ -59,11 +59,18 @@ class MoviesTableViewCell: UITableViewCell {
         super.layoutSubviews()
     }
     
-    func loadImageView(cell: UICollectionViewCell, index: NSNumber) {
+    func loadImageView(cell: UICollectionViewCell, index: Int) {
         guard let cell = cell as? MoviesCollectionViewCell else { return }
-        cell.prepareForReuse()
+        cell.prepareForReuse()  
         
-        if let cachedImage = self.moviesCollectionViewDataSource.cache.object(forKey: index) {
+        let movie = self.moviesCollectionViewDataSource.movies[index]
+        
+        guard let path = movie.movieResponse.posterPath else {
+            cell.image = UIImage(named: "not_loaded_image.jpg")
+            return
+        }
+        
+        if let cachedImage = self.moviesCollectionViewDataSource.cache.object(forKey: NSString(string: path)) {
             cell.image = cachedImage
         } else {
             self.moviesCollectionViewDataSource.loadImage(index: index) { image in
@@ -73,7 +80,6 @@ class MoviesTableViewCell: UITableViewCell {
             }
         }
     }
-
 }
 
 extension MoviesTableViewCell: UICollectionViewDelegate {
@@ -84,6 +90,6 @@ extension MoviesTableViewCell: UICollectionViewDelegate {
     }
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        self.loadImageView(cell: cell, index: NSNumber(value: indexPath.row))
+        self.loadImageView(cell: cell, index: indexPath.row)
     }
 }

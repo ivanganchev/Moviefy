@@ -98,7 +98,6 @@ class MovieInfoViewControllerLayout: UIView {
         self.heartButton.contentVerticalAlignment = .fill
         self.heartButton.tintColor = .white
         self.heartButton.translatesAutoresizingMaskIntoConstraints = false
-        self.heartButton.addTarget(self, action: #selector(MovieInfoViewController.heartButtonTap), for: .touchUpInside)
         self.heartButton.isUserInteractionEnabled = true
     }
     
@@ -232,10 +231,10 @@ class MovieInfoViewControllerLayout: UIView {
         ])
     }
     
-    func setHeart(movie: Movie) {
-        let imageName = movie.id != nil ? "suit.heart.fill" : "heart"
+    func setHeart(isFilled: Bool) {
+        let imageName = isFilled == true ? "suit.heart.fill" : "heart"
         self.heartButton.setImage(UIImage(systemName: imageName), for: .normal)
-        self.heartButton.tintColor = movie.id != nil ? .red : .white
+        self.heartButton.tintColor = isFilled == true ? .red : .white
     }
     
     func setGenres(genres: String) {

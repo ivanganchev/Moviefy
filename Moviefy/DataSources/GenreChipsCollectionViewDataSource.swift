@@ -9,12 +9,12 @@ import Foundation
 import UIKit
 
 class GenreChipsCollectionViewDataSource: NSObject, UICollectionViewDataSource {
-    static var genres: [String] = []
+    var genres: [String] = []
     
     var deleteAction: (() -> Void)?
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return GenreChipsCollectionViewDataSource.genres.count
+        return self.genres.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -22,14 +22,14 @@ class GenreChipsCollectionViewDataSource: NSObject, UICollectionViewDataSource {
             return GenreChipsCollectionViewCell()
         }
         
-        cell.genre = GenreChipsCollectionViewDataSource.genres[indexPath.row]
+        cell.genre = self.genres[indexPath.row]
         cell.removeButton.tag = indexPath.row
         cell.removeButton.addTarget(self, action: #selector(self.deleteGenre(sender:)), for: .touchUpInside)
         return cell
     }
     
     @objc func deleteGenre(sender: UIButton) {
-        GenreChipsCollectionViewDataSource.genres.remove(at: sender.tag)
+        self.genres.remove(at: sender.tag)
         deleteAction?()
     }
 }
