@@ -12,7 +12,7 @@ class CategoryCollectionViewDataSource: NSObject {
     var movies = [Movie]()
     var filteredMovies = [Movie]()
     var movieCategoryPath: String?
-    var currentPage = 1
+    var currentPage = 7
     let cache = NSCache<NSString, UIImage>()
     
     let activityIndicatorView = UIActivityIndicatorView(style: .medium)
@@ -88,7 +88,7 @@ class CategoryCollectionViewDataSource: NSObject {
         }
         let selectedGenres = genres
         let allGenres = MoviesService.genres
-        var newFilteredMovies: [Movie] = movies
+        var newFilteredMovies: [Movie] = self.movies
         
         selectedGenres.forEach({ genre in
             var tempArr: [Movie] = []
@@ -124,6 +124,8 @@ extension CategoryCollectionViewDataSource: UICollectionViewDataSource {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CategoryCollectionViewCell.identifier, for: indexPath) as? CategoryCollectionViewCell else {
             return CategoryCollectionViewCell()
         }
+        cell.tag = indexPath.row
+        self.loadImageView(cell: cell, index: indexPath.row)
         
         return cell
     }
@@ -136,5 +138,28 @@ extension CategoryCollectionViewDataSource: UICollectionViewDataSource {
             return footer
         }
         return UICollectionReusableView()
+    }
+    
+    func loadImageView(cell: UICollectionViewCell, index: Int) {
+        guard let cell = cell as? CategoryCollectionViewCell else { return }
+
+        let movie = self.filteredMovies[index]
+        
+        guard let path = movie.movieResponse.posterPath else {
+            cell.image = UIImage(named: "not_loaded_image.jpg")
+            return
+        }
+        
+        if let cachedImage = self.cache.object(forKey: NSString(string: path)) {
+            cell.imageView.image = cachedImage
+        } else {
+            self.loadImage(index: index) { image in
+                DispatchQueue.main.async {
+                    if cell.tag == index {
+                        cell.imageView.image = image
+                    }
+                }
+            }
+        }
     }
 }

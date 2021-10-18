@@ -130,10 +130,12 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
         }
         
         if let cachedImage = self.categoryCollectionViewDataSource.cache.object(forKey: NSString(string: path)) {
+            cell.imageView.image = nil
             cell.image = cachedImage
         } else {
             self.categoryCollectionViewDataSource.loadImage(index: index) { image in
                 DispatchQueue.main.async {
+                    cell.imageView.image = nil
                     cell.image = image
                 }
             }
@@ -168,7 +170,7 @@ extension CategoryCollectionViewViewController: UICollectionViewDelegateFlowLayo
     }
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        self.loadImageView(cell: cell, index: indexPath.row)
+        
         
         if indexPath.row == (self.categoryCollectionViewDataSource.filteredMovies.count - 1) {
             self.categoryCollectionViewDataSource.activityIndicatorView.startAnimating()
