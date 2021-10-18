@@ -137,7 +137,7 @@ extension SavedMoviesViewController: UICollectionViewDelegateFlowLayout {
         let selectedCell = collectionView.cellForItem(at: indexPath) as? CategoryCollectionViewCell
         self.selectedCellImageView = selectedCell?.imageView
         self.selectedCellImageViewSnapshot = selectedCellImageView?.snapshotView(afterScreenUpdates: true)
-        let savedMovie = self.savedMoviesCollectionViewDataSource.savedMovies[indexPath.row]
+        let savedMovie = self.savedMoviesCollectionViewDataSource.savedFilteredMovies[indexPath.row]
         self.presentMovieInfoViewController(with: Movie(movieEntity: savedMovie, imageData: savedMovie.imageData!))
     }
 }

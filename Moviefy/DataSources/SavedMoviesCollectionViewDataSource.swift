@@ -81,7 +81,7 @@ extension SavedMoviesCollectionViewDataSource {
             }
             newFilteredMovies = tempArr
         }
-        self.savedMovies = newFilteredMovies
+        self.savedFilteredMovies = newFilteredMovies
         
 //        var genreIds: [Int] = []
 //        for genre in genres {
@@ -90,6 +90,9 @@ extension SavedMoviesCollectionViewDataSource {
 //            }
 //            genreIds.append(id)
 //        }
-//        let filteredMovies = realm?.objects(MovieEntity.self).filter("console IN %@", genreIds)
+//        guard let filteredMovies = realm?.objects(MovieEntity.self).filter("genreIds IN %@", genreIds) else {
+//            return
+//        }
+//        self.savedFilteredMovies = Array(filteredMovies)
     }
 }
