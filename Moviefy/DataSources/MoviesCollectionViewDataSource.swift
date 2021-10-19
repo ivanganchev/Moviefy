@@ -23,6 +23,9 @@ class MoviesCollectionViewDataSource: NSObject, UICollectionViewDataSource {
             return MoviesCollectionViewCell()
         }
         
+        cell.tag = indexPath.row
+        self.loadImageView(cell: cell, index: indexPath.row)
+        
         return cell
     }
     
@@ -92,5 +95,31 @@ extension MoviesCollectionViewDataSource {
                 print(err)
             }
         })
+    }
+}
+
+extension MoviesCollectionViewDataSource {
+    func loadImageView(cell: UICollectionViewCell, index: Int) {
+        guard let cell = cell as? MoviesCollectionViewCell else { return }
+        cell.prepareForReuse()
+        
+        let movie = self.movies[index]
+        
+        guard let path = movie.movieResponse.posterPath else {
+            cell.image = UIImage(named: "not_loaded_image.jpg")
+            return
+        }
+        
+        if let cachedImage = self.cache.object(forKey: NSString(string: path)) {
+            cell.image = cachedImage
+        } else {
+            self.loadImage(index: index) { image in
+                DispatchQueue.main.async {
+                    if cell.tag == index {
+                        cell.imageView.image = image
+                    }
+                }
+            }
+        }
     }
 }

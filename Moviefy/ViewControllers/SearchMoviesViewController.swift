@@ -58,27 +58,6 @@ class SearchMoviesViewController: UIViewController, InitialTransitionAnimatableC
         movieInfoViewController.transitioningDelegate = self.transitioningContentDelegateInstance
         present(movieInfoViewController, animated: true)
     }
-    
-    func loadImageView(cell: UITableViewCell, index: Int) {
-        guard let cell = cell as? SearchMoviesTableViewCell else { return }
-
-        let movie = self.searchMoviesTableViewDataSource.movies[index]
-        
-        guard let path = movie.movieResponse.posterPath else {
-            cell.image = UIImage(named: "not_loaded_image.jpg")
-            return
-        }
-        
-        if let cachedImage = self.searchMoviesTableViewDataSource.cache.object(forKey: NSString(string: path)) {
-            cell.image = cachedImage
-        } else {
-            self.searchMoviesTableViewDataSource.loadImage(index: index) { image in
-                DispatchQueue.main.async {
-                    cell.image = image
-                }
-            }
-        }
-    }
 }
 
 extension SearchMoviesViewController: UITableViewDelegate {
@@ -92,10 +71,6 @@ extension SearchMoviesViewController: UITableViewDelegate {
         self.selectedCellImageView = selectedCell?.movieImage
         self.selectedCellImageViewSnapshot = self.selectedCellImageView?.snapshotView(afterScreenUpdates: true)
         self.presentMovieInfoViewController(with: self.searchMoviesTableViewDataSource.movies[indexPath.row])
-    }
-    
-    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        self.loadImageView(cell: cell, index: indexPath.row)
     }
 }
 

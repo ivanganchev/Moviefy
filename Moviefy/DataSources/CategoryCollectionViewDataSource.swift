@@ -12,7 +12,7 @@ class CategoryCollectionViewDataSource: NSObject {
     var movies = [Movie]()
     var filteredMovies = [Movie]()
     var movieCategoryPath: String?
-    var currentPage = 7
+    var currentPage = 1
     let cache = NSCache<NSString, UIImage>()
     
     let activityIndicatorView = UIActivityIndicatorView(style: .medium)
@@ -139,7 +139,9 @@ extension CategoryCollectionViewDataSource: UICollectionViewDataSource {
         }
         return UICollectionReusableView()
     }
-    
+}
+
+extension CategoryCollectionViewDataSource {
     func loadImageView(cell: UICollectionViewCell, index: Int) {
         guard let cell = cell as? CategoryCollectionViewCell else { return }
 

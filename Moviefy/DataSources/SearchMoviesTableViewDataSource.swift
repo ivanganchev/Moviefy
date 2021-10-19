@@ -22,6 +22,9 @@ class SearchMoviesTableViewDataSource: NSObject, UITableViewDataSource {
             return SearchMoviesTableViewCell()
         }
         
+        cell.tag = indexPath.row
+        self.loadImageView(cell: cell, index: indexPath.row)
+        
         let model = self.movies[indexPath.row]
 
         cell.title = model.movieResponse.title
@@ -117,5 +120,30 @@ extension SearchMoviesTableViewDataSource {
                 print(err)
             }
         })
+    }
+}
+
+extension SearchMoviesTableViewDataSource {
+    func loadImageView(cell: UITableViewCell, index: Int) {
+        guard let cell = cell as? SearchMoviesTableViewCell else { return }
+
+        let movie = self.movies[index]
+        
+        guard let path = movie.movieResponse.posterPath else {
+            cell.movieImage.image = UIImage(named: "not_loaded_image.jpg")
+            return
+        }
+        
+        if let cachedImage = self.cache.object(forKey: NSString(string: path)) {
+            cell.movieImage.image = cachedImage
+        } else {
+            self.loadImage(index: index) { image in
+                DispatchQueue.main.async {
+                    if cell.tag == index {
+                        cell.movieImage.image = image
+                    }
+                }
+            }
+        }
     }
 }
