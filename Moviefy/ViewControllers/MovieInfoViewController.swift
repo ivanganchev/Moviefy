@@ -64,7 +64,7 @@ class MovieInfoViewController: UIViewController, PresentedTransitionAnimatableCo
                 })
             }
             self.movieInfoViewControllerLayout.setHeart(isFilled: self.isHeartFilled)
-        } catch(let err) {
+        } catch let err {
             print(err)
         }
     }

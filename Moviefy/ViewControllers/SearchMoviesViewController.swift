@@ -49,6 +49,7 @@ class SearchMoviesViewController: UIViewController, InitialTransitionAnimatableC
         } else {
             fetchMovies(page: 1)
         }
+        self.searchMoviesTableViewLayout.searchMoviesTableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
     }
     
     func presentMovieInfoViewController(with movie: Movie?) {

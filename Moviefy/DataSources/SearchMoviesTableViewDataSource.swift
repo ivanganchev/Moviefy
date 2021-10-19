@@ -22,6 +22,8 @@ class SearchMoviesTableViewDataSource: NSObject, UITableViewDataSource {
             return SearchMoviesTableViewCell()
         }
         
+        cell.selectionStyle = .none
+        
         cell.tag = indexPath.row
         self.loadImageView(cell: cell, index: indexPath.row)
         
