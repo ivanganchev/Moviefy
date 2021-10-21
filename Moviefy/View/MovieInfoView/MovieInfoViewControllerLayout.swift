@@ -23,6 +23,9 @@ class MovieInfoViewControllerLayout: UIView {
     var containerView = UIView()
     var topPartView = UIView()
     let leadingOffset: CGFloat = 10.0
+    let loadingIndicator = UIActivityIndicatorView(style: .large)
+    let optimalImageWidth: CGFloat = 500.0
+    let optimalImageHeight: CGFloat = 750.0
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -30,6 +33,7 @@ class MovieInfoViewControllerLayout: UIView {
         
         self.setMovieInfoScrollView()
         self.setMovieTitle()
+        self.setLoadingIndicator()
         self.setMovieImageView()
         self.setShadowView()
         self.setCloseButton()
@@ -61,8 +65,12 @@ class MovieInfoViewControllerLayout: UIView {
         self.movieTitle.translatesAutoresizingMaskIntoConstraints = false
     }
     
+    func setLoadingIndicator() {
+        self.loadingIndicator.hidesWhenStopped = true
+        self.loadingIndicator.translatesAutoresizingMaskIntoConstraints = false
+    }
+    
     func setMovieImageView() {
-
         self.movieImageView.contentMode = .scaleAspectFit
         self.movieImageView.clipsToBounds = true
         self.movieImageView.layer.cornerRadius = 20
@@ -148,16 +156,22 @@ class MovieInfoViewControllerLayout: UIView {
     func setConstraints() {
         let guide = self.safeAreaLayoutGuide
         
+        self.movieImageView.addSubview(self.loadingIndicator)
+        NSLayoutConstraint.activate([
+            self.loadingIndicator.centerXAnchor.constraint(equalTo: self.movieImageView.centerXAnchor),
+            self.loadingIndicator.centerYAnchor.constraint(equalTo: self.movieImageView.centerYAnchor)
+        ])
+
         self.shadowView.addSubview(self.closeButton)
         self.shadowView.addSubview(self.heartButton)
         
         NSLayoutConstraint.activate([
-            self.closeButton.centerYAnchor.constraint(equalTo: self.shadowView.centerYAnchor, constant: 10),
+            self.closeButton.centerYAnchor.constraint(equalTo: self.shadowView.centerYAnchor),
             self.closeButton.leadingAnchor.constraint(equalTo: self.shadowView.leadingAnchor, constant: 20),
             self.closeButton.widthAnchor.constraint(equalToConstant: 25),
             self.closeButton.heightAnchor.constraint(equalToConstant: 25),
             
-            self.heartButton.centerYAnchor.constraint(equalTo: self.shadowView.centerYAnchor, constant: 10),
+            self.heartButton.centerYAnchor.constraint(equalTo: self.shadowView.centerYAnchor),
             self.heartButton.trailingAnchor.constraint(equalTo: self.shadowView.trailingAnchor, constant: -20),
             self.heartButton.widthAnchor.constraint(equalToConstant: 30),
             self.heartButton.heightAnchor.constraint(equalToConstant: 30)
@@ -243,8 +257,16 @@ class MovieInfoViewControllerLayout: UIView {
     
     func setMovieImage(movie: Movie) {
         if let imageData = movie.imageData {
-            self.movieImageView.image = UIImage(data: imageData)
-            self.movieImageView.heightAnchor.constraint(equalTo: self.movieImageView.widthAnchor, multiplier: self.movieImageView.image!.size.height / self.movieImageView.image!.size.width, constant: 0).isActive = true
+            DispatchQueue.main.async {
+                self.movieImageView.image = UIImage(data: imageData)
+                self.movieImageView.heightAnchor.constraint(equalTo: self.movieImageView.widthAnchor, multiplier: self.movieImageView.image!.size.height / self.movieImageView.image!.size.width, constant: 0).isActive = true
+                self.loadingIndicator.stopAnimating()
+            }
+        } else {
+            let width = UIScreen.main.bounds.width
+            self.movieImageView.heightAnchor.constraint(equalToConstant: width * (self.optimalImageHeight / self.optimalImageWidth)).isActive = true
+            self.movieImageView.widthAnchor.constraint(equalToConstant: width).isActive = true
+            self.loadingIndicator.startAnimating()
         }
     }
 }

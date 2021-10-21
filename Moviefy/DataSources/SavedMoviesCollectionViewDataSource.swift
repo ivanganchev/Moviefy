@@ -68,31 +68,7 @@ extension SavedMoviesCollectionViewDataSource {
         }
         let realm = try? Realm()
         guard let movies = realm?.objects(MovieEntity.self) else { return }
-        var newFilteredMovies: [MovieEntity] = Array(movies) 
-        let allGenres = MoviesService.genres
-        
-        genres.forEach { genre in
-            var tempArr: [MovieEntity] = []
-            newFilteredMovies.forEach { movie in
-                let id = allGenres?.first(where: {$0.value == genre})?.key
-                if movie.genreIds.contains(id!) {
-                    tempArr.append(movie)
-                }
-            }
-            newFilteredMovies = tempArr
-        }
-        self.savedFilteredMovies = newFilteredMovies
-        
-//        var genreIds: [Int] = []
-//        for genre in genres {
-//            guard let id = allGenres?.first(where: {$0.value == genre})?.key else {
-//                continue
-//            }
-//            genreIds.append(id)
-//        }
-//        guard let filteredMovies = realm?.objects(MovieEntity.self).filter("genreIds IN %@", genreIds) else {
-//            return
-//        }
-//        self.savedFilteredMovies = Array(filteredMovies)
+
+        self.savedFilteredMovies = FilterHelper.filterByGenres(movies: Array(movies.map({Movie(movieEntity: $0, imageData: $0.imageData!)})), selectedGenres: genres, allGenres: MoviesService.genres).map({MovieEntity(movie: $0)})
     }
 }

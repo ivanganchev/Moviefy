@@ -7,7 +7,7 @@
 
 import Foundation
 
-class Movie {
+class Movie: Hashable {
     let movieResponse: MovieResponse
     var imageData: Data? = nil
     var id: Int?
@@ -23,5 +23,15 @@ class Movie {
         self.movieResponse = MovieResponse(id: movieEntity.id, originalTitle: movieEntity.originalTitle, title: movieEntity.title, posterPath:  movieEntity.posterPath, budget: movieEntity.budget, overview: movieEntity.overview, popularity: movieEntity.popularity, releaseDate: movieEntity.releaseDate, runtime: movieEntity.runtime, genreIds: Array(movieEntity.genreIds))
         self.imageData = imageData
         self.id = movieEntity.id
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(self.movieResponse.id)
+    }
+}
+
+extension Movie: Equatable {
+    static func == (lhs: Movie, rhs: Movie) -> Bool {
+        lhs.movieResponse.id == rhs.movieResponse.id
     }
 }

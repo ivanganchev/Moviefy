@@ -99,9 +99,11 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
         return paths
     }
     
-    func presentMovieInfoViewController(with movie: Movie) {
+    func presentMovieInfoViewController(with movie: Movie, index: Int) {
         let movieInfoViewController = MovieInfoViewController()
         movieInfoViewController.movie = movie
+        movieInfoViewController.movieIndexInList = index
+        movieInfoViewController.delegate = self
         movieInfoViewController.modalPresentationStyle = .fullScreen
         movieInfoViewController.transitioningDelegate = self.transitioningContentDelegateInstance
         present(movieInfoViewController, animated: true)
@@ -111,6 +113,7 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
         self.setGenreChipsViewUILayout()
         self.categoryCollectionViewLayout.genreChipsView.genreChipsCollectionView.reloadData()
         self.categoryCollectionViewDataSource.filterMovies(genres: self.genreChipsCollectionViewDataSource.genres)
+        self.categoryCollectionViewLayout.categoryCollectionView.setContentOffset(.zero, animated: false)
         self.categoryCollectionViewLayout.categoryCollectionView.reloadData()
     }
     
@@ -163,7 +166,7 @@ extension CategoryCollectionViewViewController: UICollectionViewDelegateFlowLayo
         let selectedCell = collectionView.cellForItem(at: indexPath) as? CategoryCollectionViewCell
         self.selectedCellImageView = selectedCell?.imageView
         self.selectedCellImageViewSnapshot = selectedCellImageView?.snapshotView(afterScreenUpdates: true)
-        self.presentMovieInfoViewController(with: self.categoryCollectionViewDataSource.filteredMovies[indexPath.row])
+        self.presentMovieInfoViewController(with: self.categoryCollectionViewDataSource.filteredMovies[indexPath.row], index: indexPath.row)
     }
 }
 
@@ -188,8 +191,10 @@ extension CategoryCollectionViewViewController: GenrePickerViewControllerDelegat
         self.genreChipsCollectionViewDataSource.genres.append(genre)
         self.setGenreChipsViewUILayout()
         self.categoryCollectionViewLayout.genreChipsView.genreChipsCollectionView.reloadData()
+        self.categoryCollectionViewLayout.categoryCollectionView.setContentOffset(.zero, animated: false)
         self.categoryCollectionViewDataSource.filterMovies(genres: self.genreChipsCollectionViewDataSource.genres)
         let filteredMovies = self.categoryCollectionViewDataSource.filteredMovies
+        self.categoryCollectionViewLayout.categoryCollectionView.reloadData()
         let filteredMoviesCount = filteredMovies.count
         if filteredMoviesCount > 0 {
             let paths = self.getIndexPathForPrefetchedMovies(currentCellIndex: filteredMoviesCount - 1)
@@ -208,5 +213,18 @@ extension CategoryCollectionViewViewController: GenrePickerViewControllerDelegat
     
     func viewDismissed() {
         self.tabBarController?.tabBar.isHidden = false
+    }
+}
+
+extension CategoryCollectionViewViewController: MovieInfoDelegate {
+    func getMovieImageData(movieIndexInList: Int, completion: @escaping (Result<Data, Error>) -> Void) {
+        let movie = self.categoryCollectionViewDataSource.filteredMovies[movieIndexInList]
+        if movie.imageData == nil {
+            self.categoryCollectionViewDataSource.loadImage(index: movieIndexInList, completion: {_ in 
+                completion(.success(self.categoryCollectionViewDataSource.filteredMovies[movieIndexInList].imageData!))
+            })
+        } else {
+            completion(.success(movie.imageData!))
+        }
     }
 }

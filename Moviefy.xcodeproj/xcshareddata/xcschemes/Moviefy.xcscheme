@@ -28,6 +28,26 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "8E9357D9271F11B5000EB3E5"
+               BuildableName = "GenrePickingTests.xctest"
+               BlueprintName = "GenrePickingTests"
+               ReferencedContainer = "container:Moviefy.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "8EAEFCB5272040030016F325"
+               BuildableName = "FilterMoviesTest.xctest"
+               BlueprintName = "FilterMoviesTest"
+               ReferencedContainer = "container:Moviefy.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

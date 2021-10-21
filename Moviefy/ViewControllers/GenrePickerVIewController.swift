@@ -41,14 +41,7 @@ class GenrePickerViewController: UIViewController {
         
         self.setupPanGesture()
         
-        for i in (0...self.genrePickerViewControllerDataSource.genres.count) {
-            if selectedGenres.contains(self.genrePickerViewControllerDataSource.genres[i]) {
-                continue
-            } else {
-                self.genreChipsCollectionViewLayout.genrePickerView.selectRow(i, inComponent: 0, animated: false)
-                break
-            }
-        }
+        self.selectRowAtBeginning()
     }
     
     override func loadView() {
@@ -58,6 +51,17 @@ class GenrePickerViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         self.animateShowContainerView()
         self.animateShowDimmedView()
+    }
+    
+    func selectRowAtBeginning() {
+        for i in (0...self.genrePickerViewControllerDataSource.genres.count) {
+            if selectedGenres.contains(self.genrePickerViewControllerDataSource.genres[i]) {
+                continue
+            } else {
+                self.genreChipsCollectionViewLayout.genrePickerView.selectRow(i, inComponent: 0, animated: false)
+                break
+            }
+        }
     }
     
     func animateShowContainerView() {
@@ -143,44 +147,8 @@ extension GenrePickerViewController: UIPickerViewDelegate {
         return row
     }
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        var index = 0
-        let genres = self.genrePickerViewControllerDataSource.genres
-        let firstHalf: [Int] = Array(0..<row).reversed()
-        let secondHalf: [Int] = Array((row + 1)...genres.count)
-        
-        if self.selectedGenres.contains(genres[row]) {
-            for(firstHalfIndex, secondHalfIndex) in zip(firstHalf, secondHalf) {
-                if !(self.selectedGenres.contains(genres[firstHalfIndex])) {
-                    index = firstHalfIndex
-                    break
-                } else if !(self.selectedGenres.contains(genres[secondHalfIndex])) {
-                    index = secondHalfIndex
-                    break
-                }
-            }
-            
-            if index == 0 {
-                if firstHalf.count < secondHalf.count {
-                    for i in (secondHalf[firstHalf.count]...secondHalf.count) {
-                        if !(self.selectedGenres.contains(genres[i])) {
-                            index = i
-                            break
-                        }
-                    }
-                } else {
-                    for i in (0...firstHalf[secondHalf.count]).reversed() {
-                        if !(self.selectedGenres.contains(genres[i])) {
-                            index = i
-                            break
-                        }
-                    }
-                }
-            }
-        } else {
-            index = row
-        }
-
-        pickerView.selectRow(index, inComponent: component, animated: true)
+        let index = GenrePickerHelper.getUnselectedGenre(rowNumber: row, allGenres: self.genrePickerViewControllerDataSource.genres, selectedGenres: self.selectedGenres)
+        pickerView.selectRow(index ?? 0, inComponent: component, animated: true)
     }
     
     func pickerView(_ pickerView: UIPickerView, attributedTitleForRow row: Int, forComponent component: Int) -> NSAttributedString? {

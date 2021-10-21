@@ -7,6 +7,10 @@
 import UIKit
 import RealmSwift
 
+protocol MovieInfoDelegate: AnyObject {
+    func getMovieImageData(movieIndexInList: Int, completion: @escaping (Result<Data, Error>) -> Void)
+}
+
 class MovieInfoViewController: UIViewController, PresentedTransitionAnimatableContent {
     var movieImageView: UIImageView {
         self.movieInfoViewControllerLayout.movieImageView
@@ -15,6 +19,8 @@ class MovieInfoViewController: UIViewController, PresentedTransitionAnimatableCo
     var movie: Movie?
     var genres: [String]?
     var isHeartFilled: Bool = false
+    var delegate: MovieInfoDelegate?
+    var movieIndexInList = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,6 +34,18 @@ class MovieInfoViewController: UIViewController, PresentedTransitionAnimatableCo
         self.isHeartFilled = realm?.object(ofType: MovieEntity.self, forPrimaryKey: self.movie?.movieResponse.id) != nil ? true : false
         self.movieInfoViewControllerLayout.setHeart(isFilled: self.isHeartFilled)
         self.movieInfoViewControllerLayout.heartButton.addTarget(self, action: #selector(MovieInfoViewController.heartButtonTap), for: .touchUpInside)
+        
+        if movie?.imageData == nil {
+            delegate?.getMovieImageData(movieIndexInList: self.movieIndexInList, completion: { result in
+                switch result {
+                case .success(let data):
+                    self.movie?.imageData = data
+                    self.movieInfoViewControllerLayout.setMovieImage(movie: self.movie!)
+                case .failure(let err):
+                    print(err)
+                }
+            })
+        }
         self.movieInfoViewControllerLayout.setMovieImage(movie: self.movie!)
     }
     

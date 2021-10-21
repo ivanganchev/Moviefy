@@ -58,6 +58,7 @@ extension SearchMoviesTableViewDataSource {
                 completion()
            case .failure(let err):
                 print(err)
+
            }
        })
     }

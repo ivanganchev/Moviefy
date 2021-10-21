@@ -11,6 +11,7 @@ import UIKit
 class CategoryCollectionViewDataSource: NSObject {
     var movies = [Movie]()
     var filteredMovies = [Movie]()
+    var uniqueMovies = Set<Movie>()
     var movieCategoryPath: String?
     var currentPage = 1
     let cache = NSCache<NSString, UIImage>()
@@ -21,13 +22,18 @@ class CategoryCollectionViewDataSource: NSObject {
         MoviesService().fetchMoviesByCategory(movieCategoryPath: self.movieCategoryPath!, page: self.currentPage, completion: { result in
                switch result {
                case .success(let moviesResponse):
-                let movies = moviesResponse.movies?.map { (movieResponse) -> Movie in
+                let movieObjects = moviesResponse.movies?.map { (movieResponse) -> Movie in
                     return Movie(movieResponse: movieResponse)
                 }
-                self.movies.append(contentsOf: movies ?? [])
-                self.filteredMovies = self.movies
+                movieObjects?.forEach({ movie in
+                    if !self.uniqueMovies.contains(movie) {
+                        self.uniqueMovies.insert(movie)
+                        self.movies.append(movie)
+                        self.filteredMovies.append(movie)
+                    }
+                })
                 self.currentPage += 1
-                completion()
+                completion()	
                case .failure(let err):
                    print(err)
                }
@@ -42,7 +48,7 @@ class CategoryCollectionViewDataSource: NSObject {
             
             let path = NSString(string: posterPath)
             
-            MoviesService().fetchMovieImage(imageUrl: path as String, completion: {result in
+            MoviesService().fetchMovieImage(imageUrl: path as String, completion: { result in
                 switch result {
                 case .success(let data):
                     movie.imageData = data
@@ -68,7 +74,7 @@ class CategoryCollectionViewDataSource: NSObject {
         
         let path = NSString(string: posterPath)
         
-        MoviesService().fetchMovieImage(imageUrl: path as String, completion: {result in
+        MoviesService().fetchMovieImage(imageUrl: path as String, completion: { result in
             switch result {
             case .success(let data):
                 movie.imageData = data
@@ -86,22 +92,9 @@ class CategoryCollectionViewDataSource: NSObject {
             self.filteredMovies = self.movies
             return
         }
-        let selectedGenres = genres
-        let allGenres = MoviesService.genres
-        var newFilteredMovies: [Movie] = self.movies
-        
-        selectedGenres.forEach({ genre in
-            var tempArr: [Movie] = []
-            newFilteredMovies.forEach { movie in
-                let id = allGenres?.first(where: {$0.value == genre})?.key
-                if movie.movieResponse.genreIds!.contains(id!) {
-                    tempArr.append(movie)
-                }
-            }
-            newFilteredMovies = tempArr
-        })
-        
-        self.filteredMovies = newFilteredMovies
+
+        self.filteredMovies = FilterHelper.filterByGenres(movies: self.movies, selectedGenres: genres, allGenres: MoviesService.genres)
+        print()
     }
     
     func refreshMovies(genres: [String], completion: @escaping () -> Void) {
