@@ -46,7 +46,6 @@ class SearchMoviesTableViewDataSource: NSObject, UITableViewDataSource {
 }
 
 extension SearchMoviesTableViewDataSource {
-    
     func fetchMovies(page: Int, completion: @escaping () -> Void) {
         MoviesService().fetchMoviesByCategory(movieCategoryPath: EndPoint.MovieCategoryEndPoint.topRated.rawValue, page: page, completion: { result in
            switch result {
@@ -58,7 +57,6 @@ extension SearchMoviesTableViewDataSource {
                 completion()
            case .failure(let err):
                 print(err)
-
            }
        })
     }

@@ -102,7 +102,6 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
     func presentMovieInfoViewController(with movie: Movie, index: Int) {
         let movieInfoViewController = MovieInfoViewController()
         movieInfoViewController.movie = movie
-        movieInfoViewController.movieIndexInList = index
         movieInfoViewController.delegate = self
         movieInfoViewController.modalPresentationStyle = .fullScreen
         movieInfoViewController.transitioningDelegate = self.transitioningContentDelegateInstance
@@ -126,10 +125,10 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
 extension CategoryCollectionViewViewController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let ratio = ThumbnailImageProperties.getRatio()
+        let ratio = ImageProperties.getThumbNailImageRatio()
         
         let width = (collectionView.bounds.width - self.interItemSpacing - self.interItemSpacing) * CGFloat(ratio)
-        let height = width * (750 / 500)
+        let height = width * (ImageProperties.imageHeight / ImageProperties.imageWidth)
         return CGSize(width: width, height: height)
     }
     
@@ -217,11 +216,11 @@ extension CategoryCollectionViewViewController: GenrePickerViewControllerDelegat
 }
 
 extension CategoryCollectionViewViewController: MovieInfoDelegate {
-    func getMovieImageData(movieIndexInList: Int, completion: @escaping (Result<Data, Error>) -> Void) {
-        let movie = self.categoryCollectionViewDataSource.filteredMovies[movieIndexInList]
+    func movieInfoViewController(movieInfoViewController: MovieInfoViewController, getMovieImageData movie: Movie, completion: @escaping (Result<Data, Error>) -> Void) {
         if movie.imageData == nil {
-            self.categoryCollectionViewDataSource.loadImage(index: movieIndexInList, completion: {_ in 
-                completion(.success(self.categoryCollectionViewDataSource.filteredMovies[movieIndexInList].imageData!))
+            let index = self.categoryCollectionViewDataSource.filteredMovies.firstIndex(where: {$0 === movie})
+            self.categoryCollectionViewDataSource.loadImage(index: index!, completion: {_ in
+                completion(.success(self.categoryCollectionViewDataSource.filteredMovies[index!].imageData!))
             })
         } else {
             completion(.success(movie.imageData!))

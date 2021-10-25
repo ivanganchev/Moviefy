@@ -8,7 +8,7 @@ import UIKit
 import RealmSwift
 
 protocol MovieInfoDelegate: AnyObject {
-    func getMovieImageData(movieIndexInList: Int, completion: @escaping (Result<Data, Error>) -> Void)
+    func movieInfoViewController(movieInfoViewController: MovieInfoViewController, getMovieImageData movie: Movie, completion: @escaping (Result<Data, Error>) -> Void)
 }
 
 class MovieInfoViewController: UIViewController, PresentedTransitionAnimatableContent {
@@ -19,8 +19,7 @@ class MovieInfoViewController: UIViewController, PresentedTransitionAnimatableCo
     var movie: Movie?
     var genres: [String]?
     var isHeartFilled: Bool = false
-    var delegate: MovieInfoDelegate?
-    var movieIndexInList = 0
+    weak var delegate: MovieInfoDelegate?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -36,7 +35,7 @@ class MovieInfoViewController: UIViewController, PresentedTransitionAnimatableCo
         self.movieInfoViewControllerLayout.heartButton.addTarget(self, action: #selector(MovieInfoViewController.heartButtonTap), for: .touchUpInside)
         
         if movie?.imageData == nil {
-            delegate?.getMovieImageData(movieIndexInList: self.movieIndexInList, completion: { result in
+            delegate?.movieInfoViewController(movieInfoViewController: self, getMovieImageData: self.movie!, completion: { result in
                 switch result {
                 case .success(let data):
                     self.movie?.imageData = data
@@ -71,7 +70,6 @@ class MovieInfoViewController: UIViewController, PresentedTransitionAnimatableCo
             if let movieEntity = realm.object(ofType: MovieEntity.self, forPrimaryKey: self.movie?.movieResponse.id) {
                 try? realm.write({
                     realm.delete(movieEntity)
-                    try? realm.commitWrite()
                     self.isHeartFilled = false
                 })
             } else {

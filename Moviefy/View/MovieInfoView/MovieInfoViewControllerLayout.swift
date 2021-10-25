@@ -24,8 +24,6 @@ class MovieInfoViewControllerLayout: UIView {
     var topPartView = UIView()
     let leadingOffset: CGFloat = 10.0
     let loadingIndicator = UIActivityIndicatorView(style: .large)
-    let optimalImageWidth: CGFloat = 500.0
-    let optimalImageHeight: CGFloat = 750.0
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -264,7 +262,7 @@ class MovieInfoViewControllerLayout: UIView {
             }
         } else {
             let width = UIScreen.main.bounds.width
-            self.movieImageView.heightAnchor.constraint(equalToConstant: width * (self.optimalImageHeight / self.optimalImageWidth)).isActive = true
+            self.movieImageView.heightAnchor.constraint(equalToConstant: width * (ImageProperties.imageHeight / ImageProperties.imageWidth)).isActive = true
             self.movieImageView.widthAnchor.constraint(equalToConstant: width).isActive = true
             self.loadingIndicator.startAnimating()
         }

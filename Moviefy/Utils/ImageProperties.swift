@@ -8,15 +8,18 @@
 import Foundation
 import UIKit
 
-class ThumbnailImageProperties {
-    static func getSize() -> CGSize {
-        let width = UIScreen.main.bounds.width * CGFloat(self.getRatio())
-        let height = width * (750 / 500)
+class ImageProperties {
+    static let imageWidth: CGFloat = 500.0
+    static let imageHeight: CGFloat = 750.0
+    
+    static func getThumbnailImageSize() -> CGSize {
+        let width = UIScreen.main.bounds.width * CGFloat(self.getThumbNailImageRatio())
+        let height = width * (imageHeight / imageWidth)
         
         return CGSize(width: width, height: height)
     }
     
-    static func getRatio() -> Double {
+    static func getThumbNailImageRatio() -> Double {
         var ratio: Double
         let size = UIScreen.main.bounds.size
         

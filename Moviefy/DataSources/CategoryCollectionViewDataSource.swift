@@ -137,9 +137,14 @@ extension CategoryCollectionViewDataSource: UICollectionViewDataSource {
 extension CategoryCollectionViewDataSource {
     func loadImageView(cell: UICollectionViewCell, index: Int) {
         guard let cell = cell as? CategoryCollectionViewCell else { return }
-
-        let movie = self.filteredMovies[index]
         
+        let movie: Movie
+        if self.filteredMovies.count > index {
+           movie = self.filteredMovies[index]
+        } else {
+            return
+        }
+    
         guard let path = movie.movieResponse.posterPath else {
             cell.image = UIImage(named: "not_loaded_image.jpg")
             return

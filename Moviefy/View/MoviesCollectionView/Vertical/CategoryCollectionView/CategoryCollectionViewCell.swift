@@ -38,7 +38,7 @@ class CategoryCollectionViewCell: UICollectionViewCell {
     
     override func layoutSubviews() {
         let width = self.bounds.width
-        let height = width * (750 / 500)
+        let height = width * (ImageProperties.imageHeight / ImageProperties.imageWidth)
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
         layout.itemSize = CGSize(width: width, height: height)

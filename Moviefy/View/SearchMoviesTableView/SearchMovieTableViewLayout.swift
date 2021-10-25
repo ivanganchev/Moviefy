@@ -10,26 +10,44 @@ import UIKit
 
 class SearchMovieTableViewLayout: UIView {
     var searchBar: UISearchBar = UISearchBar()
-    var searchMoviesTableView: UITableView = UITableView(frame: .zero, style: .plain)
+    var searchMoviesTableView = UITableView(frame: .zero, style: .plain)
+    var recentSearchesTableView = UITableView(frame: .zero, style: .plain)
 
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.backgroundColor = .white
         self.setupSearchBarUI()
-        self.setupSearchMoviesTableViewUI()
+        self.setupSearchMoviesTableView()
+        self.setupRecentSearchesTableView()
+        self.setConstraints()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func setupSearchMoviesTableViewUI() {
+    func setupSearchMoviesTableView() {
         self.searchMoviesTableView.separatorStyle = .none
         self.searchMoviesTableView.translatesAutoresizingMaskIntoConstraints = false
         self.searchMoviesTableView.register(SearchMoviesTableViewCell.self, forCellReuseIdentifier: SearchMoviesTableViewCell.identifier)
         self.searchMoviesTableView.keyboardDismissMode = .onDrag
-        
+    }
+    
+    func setupRecentSearchesTableView() {
+        self.recentSearchesTableView.translatesAutoresizingMaskIntoConstraints = false
+        self.recentSearchesTableView.register(RecentSearchSuggestionsTableViewCell.self, forCellReuseIdentifier: RecentSearchSuggestionsTableViewCell.identifier)
+        self.recentSearchesTableView.isHidden = true
+    }
+    
+    func setupSearchBarUI() {
+        self.searchBar.translatesAutoresizingMaskIntoConstraints = false
+        self.searchBar.searchBarStyle = UISearchBar.Style.default
+        self.searchBar.sizeToFit()
+    }
+
+    func setConstraints() {
         self.addSubview(self.searchMoviesTableView)
+        self.addSubview(self.recentSearchesTableView)
         
         let guide = self.safeAreaLayoutGuide
         
@@ -37,15 +55,12 @@ class SearchMovieTableViewLayout: UIView {
              self.searchMoviesTableView.topAnchor.constraint(equalTo: guide.topAnchor),
              self.searchMoviesTableView.bottomAnchor.constraint(equalTo: guide.bottomAnchor),
              self.searchMoviesTableView.leadingAnchor.constraint(equalTo: guide.leadingAnchor),
-             self.searchMoviesTableView.trailingAnchor.constraint(equalTo: guide.trailingAnchor)
+             self.searchMoviesTableView.trailingAnchor.constraint(equalTo: guide.trailingAnchor),
+            
+             self.recentSearchesTableView.topAnchor.constraint(equalTo: guide.topAnchor),
+             self.recentSearchesTableView.bottomAnchor.constraint(equalTo: guide.bottomAnchor),
+             self.recentSearchesTableView.leadingAnchor.constraint(equalTo: guide.leadingAnchor),
+             self.recentSearchesTableView.trailingAnchor.constraint(equalTo: guide.trailingAnchor)
         ])
-    }
-    
-    func setupSearchBarUI() {
-        self.searchBar.translatesAutoresizingMaskIntoConstraints = false
-        self.searchBar.searchBarStyle = UISearchBar.Style.default
-        self.searchBar.sizeToFit()
-//        self.searchBar.delegate = self
-//        self.navigationItem.titleView = self.searchBar
     }
 }

@@ -20,7 +20,7 @@ class MoviesTableViewDelegate: NSObject, UITableViewDelegate, MoviesTableViewCel
     var path: EndPoint.MovieCategoryEndPoint?
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        let size = ThumbnailImageProperties.getSize()
+        let size = ImageProperties.getThumbnailImageSize()
         return size.height
     }
     

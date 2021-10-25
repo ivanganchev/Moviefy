@@ -33,7 +33,7 @@ class SavedMoviesCollectionViewCell: UICollectionViewCell {
     override func layoutSubviews() {
         
         DispatchQueue.main.async {
-            self.imageView.frame = CGRect(origin: .zero, size: ThumbnailImageProperties.getSize())
+            self.imageView.frame = CGRect(origin: .zero, size: ImageProperties.getThumbnailImageSize())
         }
     }
 }

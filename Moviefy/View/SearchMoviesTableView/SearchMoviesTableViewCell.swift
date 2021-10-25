@@ -72,19 +72,16 @@ class SearchMoviesTableViewCell: UITableViewCell {
 
     override func layoutSubviews() {
         super.layoutSubviews()
-        let size = ThumbnailImageProperties.getSize()
+        let size = ImageProperties.getThumbnailImageSize()
         NSLayoutConstraint.activate([
             self.movieImage.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor),
-//            self.movieImage.topAnchor.constraint(equalTo: self.contentView.topAnchor),
-//            self.movieImage.bottomAnchor.constraint(equalTo: self.contentView.bottomAnchor),
-            self.movieImage.heightAnchor.constraint(equalToConstant: size.height - 3),
-            self.movieImage.widthAnchor.constraint(equalToConstant: size.height * (500/750)),
+            self.movieImage.widthAnchor.constraint(equalToConstant: size.height * (ImageProperties.imageWidth / ImageProperties.imageHeight)),
+            self.movieImage.topAnchor.constraint(equalTo: self.topAnchor, constant: 5),
+            self.movieImage.bottomAnchor.constraint(equalTo: self.bottomAnchor),
             self.containerView.leadingAnchor.constraint(equalTo: self.movieImage.trailingAnchor, constant: 15),
             self.containerView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
             self.containerView.centerYAnchor.constraint(equalTo: self.centerYAnchor)
         ])
-        
-        contentView.frame = contentView.frame.inset(by: UIEdgeInsets(top: 5, left: 0, bottom: 0, right: 0))
     }
     
     required init(coder aDecoder: NSCoder) {

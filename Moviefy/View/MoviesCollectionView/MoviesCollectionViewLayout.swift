@@ -34,7 +34,7 @@ class MoviesCollectionViewLayout: UIView {
     }
     
     static func setLayout() -> UICollectionViewFlowLayout {
-        let size = ThumbnailImageProperties.getSize()
+        let size = ImageProperties.getThumbnailImageSize()
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
         layout.itemSize = CGSize(width: size.width, height: size.height)

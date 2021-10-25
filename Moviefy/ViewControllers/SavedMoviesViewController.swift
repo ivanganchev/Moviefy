@@ -45,7 +45,7 @@ class SavedMoviesViewController: UIViewController, InitialTransitionAnimatableCo
     
     func loadSavedMovies() {
         self.savedMoviesCollectionViewDataSource.loadSavedMovies()
-        self.savedMoviesCollectionViewDataSource.registerNotificationToken {changes in
+        self.savedMoviesCollectionViewDataSource.registerNotificationToken { changes in
             switch changes {
             case .initial:
                 self.saveMoviesCollectionViewLayout.categoryCollectionView.reloadData()
@@ -54,7 +54,7 @@ class SavedMoviesViewController: UIViewController, InitialTransitionAnimatableCo
                 self.saveMoviesCollectionViewLayout.categoryCollectionView.performBatchUpdates({
                     self.saveMoviesCollectionViewLayout.categoryCollectionView.deleteItems(at: deletions.map({IndexPath(row: $0, section: 0)}))
                     self.saveMoviesCollectionViewLayout.categoryCollectionView.insertItems(at: insertions.map({IndexPath(row: $0, section: 0)}))
-                    self.saveMoviesCollectionViewLayout.categoryCollectionView.reloadItems(at: modifications.map({ IndexPath(row: $0, section: 0) }))
+                    self.saveMoviesCollectionViewLayout.categoryCollectionView.reloadItems(at: modifications.map({ IndexPath(row: $0, section: 0)}))
                 }, completion: nil)
             case .error(let err):
                 print(err)
@@ -114,10 +114,10 @@ extension SavedMoviesViewController: GenrePickerViewControllerDelegate {
 
 extension SavedMoviesViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let ratio = ThumbnailImageProperties.getRatio()
+        let ratio = ImageProperties.getThumbNailImageRatio()
         
         let width = (collectionView.bounds.width - self.interItemSpacing - self.interItemSpacing) * CGFloat(ratio)
-        let height = width * (750 / 500)
+        let height = width * (ImageProperties.imageHeight / ImageProperties.imageWidth)
         return CGSize(width: width, height: height)
     }
     
