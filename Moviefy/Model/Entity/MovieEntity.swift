@@ -9,7 +9,7 @@ import Foundation
 import RealmSwift
 
 class MovieEntity: Object {
-    @Persisted(primaryKey: true) var id: Int?
+    @Persisted(primaryKey: true) var id: String?
     @Persisted var originalTitle: String?
     @Persisted var title: String?
     @Persisted var posterPath: String?
@@ -24,7 +24,7 @@ class MovieEntity: Object {
     convenience init(movie: Movie?) {
         self.init()
         
-        self.id = movie?.movieResponse.id
+        self.id = movie?.movieResponse.id?.description
         self.originalTitle = movie?.movieResponse.originalTitle
         self.title = movie?.movieResponse.title
         self.posterPath = movie?.movieResponse.posterPath

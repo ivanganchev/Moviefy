@@ -29,8 +29,10 @@ class MovieInfoViewController: UIViewController, PresentedTransitionAnimatableCo
         self.movieInfoViewControllerLayout.movieOverview.text = self.movie?.movieResponse.overview
         self.movieInfoViewControllerLayout.movieDateReleased.text = self.movie?.movieResponse.releaseDate
         self.movieInfoViewControllerLayout.setGenres(genres: self.getMovieGenres())
-        let realm = try? Realm()
-        self.isHeartFilled = realm?.object(ofType: MovieEntity.self, forPrimaryKey: self.movie?.movieResponse.id) != nil ? true : false
+        guard let primaryKey = self.movie?.movieResponse.id else {
+            return
+        }
+        self.isHeartFilled = RealmWriteTransactionHelper.getRealmObject(primaryKey: String(primaryKey), entityType: MovieEntity.self) != nil ? true : false
         self.movieInfoViewControllerLayout.setHeart(isFilled: self.isHeartFilled)
         self.movieInfoViewControllerLayout.heartButton.addTarget(self, action: #selector(MovieInfoViewController.heartButtonTap), for: .touchUpInside)
         
@@ -63,26 +65,20 @@ class MovieInfoViewController: UIViewController, PresentedTransitionAnimatableCo
         guard let movie = self.movie else {
             return
         }
-        
-        do {
-            let realm = try Realm()
-
-            if let movieEntity = realm.object(ofType: MovieEntity.self, forPrimaryKey: self.movie?.movieResponse.id) {
-                try? realm.write({
-                    realm.delete(movieEntity)
-                })
-                self.isHeartFilled = false
-            } else {
-                let movieEntity = MovieEntity(movie: movie)
-                try? realm.write({
-                    realm.add(movieEntity, update: .all)
-                })
-                self.isHeartFilled = true
-            }
-            self.movieInfoViewControllerLayout.setHeart(isFilled: self.isHeartFilled)
-        } catch let err {
-            print(err)
+    
+        guard let primaryKey = self.movie?.movieResponse.id else {
+            return
         }
+        
+        if let movieEntity = RealmWriteTransactionHelper.getRealmObject(primaryKey: String(primaryKey), entityType: MovieEntity.self) {
+            RealmWriteTransactionHelper.realmDelete(entity: movieEntity)
+            self.isHeartFilled = false
+        } else {
+            let movieEntity = MovieEntity(movie: movie)
+            RealmWriteTransactionHelper.realmAdd(entity: movieEntity)
+            self.isHeartFilled = true
+        }
+        self.movieInfoViewControllerLayout.setHeart(isFilled: self.isHeartFilled)
     }
     
     func getMovieGenres() -> String {
