@@ -40,7 +40,9 @@ class RecentSearchSuggestionsDataSource: NSObject {
     
     func saveSearchText(text: String) {
         let suggestion = SuggestionEntity(suggestion: text)
-        RealmWriteTransactionHelper.realmAdd(entity: suggestion)
+        if RealmWriteTransactionHelper.filterRealmObject(filter: text, entityType: SuggestionEntity.self) == nil {
+            RealmWriteTransactionHelper.realmAdd(entity: suggestion)
+        }
     }
     
     func deleteSearchText(index: Int) {
