@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 
 protocol GenreChipsViewDelegate: AnyObject {
-    func presentGenrePickerViewController()
+    func presentGenrePickerViewController(genreChipsView: GenreChipsView)
 }
 
 class GenreChipsView: UIView {
@@ -94,7 +94,7 @@ class GenreChipsView: UIView {
     }
     
     @objc func addGenre() {
-        self.delegate?.presentGenrePickerViewController()
+        self.delegate?.presentGenrePickerViewController(genreChipsView: self)
     }
     
     func hideChipsCollectioNView(isHidden: Bool) {

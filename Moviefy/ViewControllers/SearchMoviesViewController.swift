@@ -27,6 +27,7 @@ class SearchMoviesViewController: UIViewController, InitialTransitionAnimatableC
         self.searchMoviesTableViewLayout.searchMoviesTableView.dataSource = self.searchMoviesTableViewDataSource
         self.searchMoviesTableViewLayout.searchMoviesTableView.delegate = self
         self.searchMoviesTableViewLayout.recentSearchesTableView.delegate = self.recentSearchSuggestionsTableViewDelegateInstance
+        self.recentSearchSuggestionsTableViewDelegateInstance.getSelectedSuggestionIndex = self.searchBySelectedSuggestionIndex
         self.searchMoviesTableViewLayout.searchBar.delegate = self
         self.navigationItem.titleView = self.searchMoviesTableViewLayout.searchBar
         self.searchBarBackButton = UIBarButtonItem(image: UIImage(systemName: "arrow.left"), style: .done, target: self, action: #selector(hideSuggestionsTableView))
@@ -49,25 +50,34 @@ class SearchMoviesViewController: UIViewController, InitialTransitionAnimatableC
     @objc func searchMovies(text: String) {
         if text != "" {
             self.searchMoviesTableViewDataSource.searchMovies(text: text, completion: {
-                self.searchMoviesTableViewDataSource.loadImages(completion: {
+                if self.searchMoviesTableViewDataSource.movies.count > 0 {
+                    self.searchMoviesTableViewDataSource.loadImages(completion: {
+                        DispatchQueue.main.async {
+                            self.searchMoviesTableViewLayout.setSearchMoviesTableViewBackground(isEmpty: false)
+                            self.searchMoviesTableViewLayout.searchMoviesTableView.reloadData()
+                            self.searchMoviesTableViewLayout.searchMoviesTableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
+                        }
+                    })
+                } else {
                     DispatchQueue.main.async {
                         self.searchMoviesTableViewLayout.searchMoviesTableView.reloadData()
+                        self.searchMoviesTableViewLayout.setSearchMoviesTableViewBackground(isEmpty: true)
                     }
-                })
+                }
             })
         } else {
             fetchMovies(page: 1)
         }
-        self.searchMoviesTableViewLayout.searchMoviesTableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
     }
     
     func loadSavedSuggestions() {
+        self.recentSearchSuggestionsDataSource.loadSavedSuggestions()
         self.recentSearchSuggestionsDataSource.registerNotificatonToken { changes in
             switch changes {
             case .initial:
                 self.searchMoviesTableViewLayout.recentSearchesTableView.reloadData()
             case .update(_, deletions: let deletions, insertions: let insertions, modifications: let modifications):
-                self.recentSearchSuggestionsDataSource.loadSavedSuggestions()
+                self.loadSavedSuggestions()
                 self.searchMoviesTableViewLayout.recentSearchesTableView.performBatchUpdates({
                     self.searchMoviesTableViewLayout.recentSearchesTableView.deleteRows(at: deletions.map({IndexPath(row: $0, section: 0)}), with: .automatic)
                     self.searchMoviesTableViewLayout.recentSearchesTableView.insertRows(at: insertions.map({IndexPath(row: $0, section: 0)}), with: .automatic)
@@ -101,6 +111,15 @@ class SearchMoviesViewController: UIViewController, InitialTransitionAnimatableC
         self.searchMoviesTableViewLayout.searchMoviesTableView.isHidden = false
         self.searchMoviesTableViewLayout.searchBar.endEditing(false)
     }
+    
+    func searchBySelectedSuggestionIndex(_ index: Int) {
+        guard let suggestion = self.recentSearchSuggestionsDataSource.suggestions[index].suggestion else {
+            return
+        }
+        self.searchMoviesTableViewLayout.searchBar.text = suggestion
+        self.searchMovies(text: suggestion)
+        self.hideSuggestionsTableView()
+    }
 }
 
 extension SearchMoviesViewController: UITableViewDelegate {
@@ -118,14 +137,9 @@ extension SearchMoviesViewController: UITableViewDelegate {
 }
 
 extension SearchMoviesViewController: UISearchBarDelegate {
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-//        NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(self.searchMovies), object: nil)
-//        self.perform(#selector(self.searchMovies), with: nil, afterDelay: 0.75)
-    }
-    
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         guard let text = self.searchMoviesTableViewLayout.searchBar.text else { return }
-            self.searchMovies(text: text)
+        self.searchMovies(text: text)
         self.hideSuggestionsTableView()
         self.searchMoviesTableViewLayout.searchBar.endEditing(true)
         self.recentSearchSuggestionsDataSource.saveSearchText(text: text)

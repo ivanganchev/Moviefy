@@ -9,11 +9,13 @@ import Foundation
 import RealmSwift
 
 class SuggestionEntity: Object {
+    @Persisted(primaryKey: true) var id: String?
     @Persisted var suggestion: String?
     
     convenience init(suggestion: String) {
         self.init()
         
+        self.id = UUID().uuidString
         self.suggestion = suggestion
     }
 }

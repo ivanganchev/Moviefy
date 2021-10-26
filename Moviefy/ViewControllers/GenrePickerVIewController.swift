@@ -9,8 +9,8 @@ import Foundation
 import UIKit
 
 protocol GenrePickerViewControllerDelegate: AnyObject {
-    func getSelectedGenre(genre: String)
-    func viewDismissed()
+    func genrePickerViewController(genrePickerViewController: GenrePickerViewController, genre: String)
+    func viewDismissed(genrePickerViewController: GenrePickerViewController)
 }
 
 class GenrePickerViewController: UIViewController {
@@ -88,19 +88,19 @@ class GenrePickerViewController: UIViewController {
         UIView.animate(withDuration: 0.4) {
             self.genreChipsCollectionViewLayout.dimmedView.alpha = 0
         } completion: { _ in
-            self.delegate?.viewDismissed()
+            self.delegate?.viewDismissed(genrePickerViewController: self)
             self.dismiss(animated: false, completion: nil)
         }
     }
     
     @objc func closeButtonTap() {
-        self.delegate?.getSelectedGenre(genre: "")
+        self.delegate?.genrePickerViewController(genrePickerViewController: self, genre: "")
         self.animateDismissView()
     }
     
     @objc func doneButtonTap() {
         let chosenGenre = self.genrePickerViewControllerDataSource.genres[self.genreChipsCollectionViewLayout.genrePickerView.selectedRow(inComponent: 0)]
-        self.delegate?.getSelectedGenre(genre: chosenGenre)
+        self.delegate?.genrePickerViewController(genrePickerViewController: self, genre: chosenGenre)
         self.animateDismissView()
     }
     

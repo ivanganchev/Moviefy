@@ -12,6 +12,7 @@ class SearchMovieTableViewLayout: UIView {
     var searchBar: UISearchBar = UISearchBar()
     var searchMoviesTableView = UITableView(frame: .zero, style: .plain)
     var recentSearchesTableView = UITableView(frame: .zero, style: .plain)
+    var emptyTableViewText = UILabel(frame: .zero)
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -20,6 +21,7 @@ class SearchMovieTableViewLayout: UIView {
         self.setupSearchMoviesTableView()
         self.setupRecentSearchesTableView()
         self.setConstraints()
+        self.setEmptyTableViewText()
     }
     
     required init?(coder: NSCoder) {
@@ -44,6 +46,14 @@ class SearchMovieTableViewLayout: UIView {
         self.searchBar.searchBarStyle = UISearchBar.Style.default
         self.searchBar.sizeToFit()
     }
+    
+    func setEmptyTableViewText() {
+        self.emptyTableViewText.translatesAutoresizingMaskIntoConstraints = false
+        self.emptyTableViewText.text = "No movies found"
+        self.emptyTableViewText.font = UIFont(name: "Helvetica", size: 16)
+        self.emptyTableViewText.textAlignment = .center
+        self.emptyTableViewText.sizeToFit()
+    }
 
     func setConstraints() {
         self.addSubview(self.searchMoviesTableView)
@@ -62,5 +72,9 @@ class SearchMovieTableViewLayout: UIView {
              self.recentSearchesTableView.leadingAnchor.constraint(equalTo: guide.leadingAnchor),
              self.recentSearchesTableView.trailingAnchor.constraint(equalTo: guide.trailingAnchor)
         ])
+    }
+    
+    func setSearchMoviesTableViewBackground(isEmpty: Bool) {
+        isEmpty == true ? (self.searchMoviesTableView.backgroundView = self.emptyTableViewText ) : (self.searchMoviesTableView.backgroundView = nil )
     }
 }

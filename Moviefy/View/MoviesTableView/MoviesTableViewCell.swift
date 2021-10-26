@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 
 protocol MoviesTableViewCellDelegate: AnyObject {
-    func getClickedCollectionViewCell(cell: MoviesCollectionViewCell?, movie: Movie)
+    func moviesTableViewCell(moviesTableViewCell: MoviesTableViewCell, cell: MoviesCollectionViewCell, movie: Movie)
 }
 
 class MoviesTableViewCell: UITableViewCell {
@@ -62,8 +62,10 @@ class MoviesTableViewCell: UITableViewCell {
 
 extension MoviesTableViewCell: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let selectedCell = collectionView.cellForItem(at: indexPath) as? MoviesCollectionViewCell
+        guard let selectedCell = collectionView.cellForItem(at: indexPath) as? MoviesCollectionViewCell else {
+            return
+        }
         let movie = self.moviesCollectionViewDataSource.movies[indexPath.row]
-        self.delegate?.getClickedCollectionViewCell(cell: selectedCell, movie: movie)
+        self.delegate?.moviesTableViewCell(moviesTableViewCell: self, cell: selectedCell, movie: movie)
     }
 }

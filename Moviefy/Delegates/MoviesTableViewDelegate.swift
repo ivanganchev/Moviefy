@@ -41,7 +41,7 @@ class MoviesTableViewDelegate: NSObject, UITableViewDelegate, MoviesTableViewCel
         delegate?.switchView(path: self.movieCategoryCases[sender.tag], categoryType: self.moviesSections[sender.tag])
     }
     
-    func getClickedCollectionViewCell(cell: MoviesCollectionViewCell?, movie: Movie) {
+    func moviesTableViewCell(moviesTableViewCell: MoviesTableViewCell, cell: MoviesCollectionViewCell, movie: Movie) {
         self.delegate?.setClickedCollectionViewCell(cell: cell, movie: movie)
     }
     

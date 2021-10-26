@@ -38,7 +38,7 @@ class RecentSearchSuggestionsDataSource: NSObject {
     func saveSearchText(text: String) {
         do {
             let realm = try Realm()
-            
+
             let suggestion = SuggestionEntity(suggestion: text)
             try realm.write({
                 realm.add(suggestion)
@@ -48,15 +48,15 @@ class RecentSearchSuggestionsDataSource: NSObject {
         }
     }
     
-    @objc func deleteSearchText(sender: UIButton) {
-        guard let text = self.suggestions[sender.tag].suggestion else {
+    func deleteSearchText(index: Int) {
+        guard index < self.suggestions.count, let id = self.suggestions[index].id else {
             return
         }
         
         do {
             let realm = try Realm()
             
-            if let suggestionEntity = realm.objects(SuggestionEntity.self).filter("suggestion == %@", text).first {
+            if let suggestionEntity = realm.object(ofType: SuggestionEntity.self, forPrimaryKey: id) {
                 try realm.write({
                     realm.delete(suggestionEntity)
                 })
@@ -78,9 +78,9 @@ extension RecentSearchSuggestionsDataSource: UITableViewDataSource {
         }
         
         cell.textSuggestion.text = suggestions[indexPath.row].suggestion
-        cell.closeButton.tag = indexPath.row
-        cell.closeButton.addTarget(self, action: #selector(self.deleteSearchText(sender:)), for: .touchUpInside)
-        
+        cell.deleteButton.deleteAction = { _ in
+            self.deleteSearchText(index: indexPath.row)
+        }
         return cell
     }
 

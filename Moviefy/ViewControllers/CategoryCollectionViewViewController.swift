@@ -169,8 +169,8 @@ extension CategoryCollectionViewViewController: UICollectionViewDelegateFlowLayo
     }
 }
 
-extension CategoryCollectionViewViewController: GenreChipsViewDelegate {
-    func presentGenrePickerViewController() {
+extension CategoryCollectionViewViewController: GenreChipsViewDelegate {    
+    func presentGenrePickerViewController(genreChipsView: GenreChipsView) {
         self.tabBarController?.tabBar.isHidden = true
         
         let selectedGenres = self.genreChipsCollectionViewDataSource.genres
@@ -183,7 +183,7 @@ extension CategoryCollectionViewViewController: GenreChipsViewDelegate {
 }
 
 extension CategoryCollectionViewViewController: GenrePickerViewControllerDelegate {
-    func getSelectedGenre(genre: String) {
+    func genrePickerViewController(genrePickerViewController: GenrePickerViewController, genre: String) {
         guard genre != "" else {
             return
         }
@@ -210,7 +210,7 @@ extension CategoryCollectionViewViewController: GenrePickerViewControllerDelegat
         }
     }
     
-    func viewDismissed() {
+    func viewDismissed(genrePickerViewController: GenrePickerViewController) {
         self.tabBarController?.tabBar.isHidden = false
     }
 }

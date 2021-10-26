@@ -84,7 +84,7 @@ class SavedMoviesViewController: UIViewController, InitialTransitionAnimatableCo
 }
 
 extension SavedMoviesViewController: GenreChipsViewDelegate {
-    func presentGenrePickerViewController() {
+    func presentGenrePickerViewController(genreChipsView: GenreChipsView) {
         self.tabBarController?.tabBar.isHidden = true
         let selectedGenres = self.genreChipsCollectionViewDataSource.genres
         let genrePickerViewController = GenrePickerViewController()
@@ -96,7 +96,7 @@ extension SavedMoviesViewController: GenreChipsViewDelegate {
 }
 
 extension SavedMoviesViewController: GenrePickerViewControllerDelegate {
-    func getSelectedGenre(genre: String) {
+    func genrePickerViewController(genrePickerViewController: GenrePickerViewController, genre: String) {
         guard genre != "" else {
             return
         }
@@ -107,7 +107,7 @@ extension SavedMoviesViewController: GenrePickerViewControllerDelegate {
         self.saveMoviesCollectionViewLayout.categoryCollectionView.reloadData()
     }
     
-    func viewDismissed() {
+    func viewDismissed(genrePickerViewController: GenrePickerViewController) {
         self.tabBarController?.tabBar.isHidden = false
     }
 }

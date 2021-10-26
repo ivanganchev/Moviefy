@@ -19,8 +19,8 @@ class RecentSearchSuggestionsTableViewCell: UITableViewCell {
         return text
     }()
     
-    let closeButton: UIButton = {
-        let closeButton = UIButton(type: .custom)
+    let deleteButton: RecentSearchSuggestionCloseButton = {
+        let closeButton = RecentSearchSuggestionCloseButton(type: .custom)
         closeButton.setImage(UIImage(systemName: "xmark"), for: .normal)
         closeButton.imageView?.contentMode = .scaleAspectFit
         closeButton.contentHorizontalAlignment = .fill
@@ -36,16 +36,16 @@ class RecentSearchSuggestionsTableViewCell: UITableViewCell {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
         self.contentView.addSubview(self.textSuggestion)
-        self.contentView.addSubview(self.closeButton)
+        self.contentView.addSubview(self.deleteButton)
         
         NSLayoutConstraint.activate([
             self.textSuggestion.topAnchor.constraint(equalTo: self.topAnchor),
             self.textSuggestion.bottomAnchor.constraint(equalTo: self.bottomAnchor),
             self.textSuggestion.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 10),
             
-            self.closeButton.topAnchor.constraint(equalTo: self.topAnchor),
-            self.closeButton.bottomAnchor.constraint(equalTo: self.bottomAnchor),
-            self.closeButton.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -10)
+            self.deleteButton.topAnchor.constraint(equalTo: self.topAnchor),
+            self.deleteButton.bottomAnchor.constraint(equalTo: self.bottomAnchor),
+            self.deleteButton.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -10)
         ])
     }
     

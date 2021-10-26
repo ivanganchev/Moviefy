@@ -70,14 +70,14 @@ class MovieInfoViewController: UIViewController, PresentedTransitionAnimatableCo
             if let movieEntity = realm.object(ofType: MovieEntity.self, forPrimaryKey: self.movie?.movieResponse.id) {
                 try? realm.write({
                     realm.delete(movieEntity)
-                    self.isHeartFilled = false
                 })
+                self.isHeartFilled = false
             } else {
                 let movieEntity = MovieEntity(movie: movie)
                 try? realm.write({
                     realm.add(movieEntity, update: .all)
-                    self.isHeartFilled = true
                 })
+                self.isHeartFilled = true
             }
             self.movieInfoViewControllerLayout.setHeart(isFilled: self.isHeartFilled)
         } catch let err {
