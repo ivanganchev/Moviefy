@@ -51,12 +51,13 @@ class SearchMovieView: UIView {
         self.emptyTableViewText.text = "No movies found"
         self.emptyTableViewText.font = UIFont(name: "Helvetica", size: 16)
         self.emptyTableViewText.textAlignment = .center
-        self.emptyTableViewText.sizeToFit()
+        self.emptyTableViewText.isHidden = true
     }
 
     func setConstraints() {
         self.addSubview(self.searchMoviesTableView)
         self.addSubview(self.recentSearchesTableView)
+        self.addSubview(self.emptyTableViewText)
         
         let guide = self.safeAreaLayoutGuide
         
@@ -69,11 +70,22 @@ class SearchMovieView: UIView {
              self.recentSearchesTableView.topAnchor.constraint(equalTo: guide.topAnchor),
              self.recentSearchesTableView.bottomAnchor.constraint(equalTo: guide.bottomAnchor),
              self.recentSearchesTableView.leadingAnchor.constraint(equalTo: guide.leadingAnchor),
-             self.recentSearchesTableView.trailingAnchor.constraint(equalTo: guide.trailingAnchor)
+             self.recentSearchesTableView.trailingAnchor.constraint(equalTo: guide.trailingAnchor),
+            
+             self.emptyTableViewText.topAnchor.constraint(equalTo: guide.topAnchor),
+             self.emptyTableViewText.bottomAnchor.constraint(equalTo: guide.bottomAnchor),
+             self.emptyTableViewText.leadingAnchor.constraint(equalTo: guide.leadingAnchor),
+             self.emptyTableViewText.trailingAnchor.constraint(equalTo: guide.trailingAnchor)
         ])
     }
     
-    func setSearchMoviesTableViewBackground(isEmpty: Bool) {
-        isEmpty == true ? (self.searchMoviesTableView.backgroundView = self.emptyTableViewText ) : (self.searchMoviesTableView.backgroundView = nil )
+    func setSearchMoviesTableViewBackground(isEmpty: Bool) {        
+        self.searchMoviesTableView.isHidden = isEmpty
+        self.emptyTableViewText.isHidden = !isEmpty
+    }
+    
+    func setSearchMoviesLayout(isSuggesting: Bool) {
+        self.recentSearchesTableView.isHidden = !isSuggesting
+        self.searchMoviesTableView.isHidden = isSuggesting
     }
 }

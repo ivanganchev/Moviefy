@@ -98,16 +98,15 @@ class SearchMoviesViewController: UIViewController, InitialTransitionAnimatableC
     
     @objc func showSuggestionsTableView() {
         self.navigationItem.setLeftBarButton(self.searchBarBackButton, animated: true)
-        self.searchMoviesView.recentSearchesTableView.isHidden = false
-        self.searchMoviesView.searchMoviesTableView.isHidden = true
+        self.searchMoviesView.setSearchMoviesLayout(isSuggesting: true)
         self.recentSearchSuggestionsDataSource.loadSavedSuggestions()
         self.searchMoviesView.recentSearchesTableView.reloadData()
     }
     
     @objc func hideSuggestionsTableView() {
         self.navigationItem.setLeftBarButton(nil, animated: true)
-        self.searchMoviesView.recentSearchesTableView.isHidden = true
-        self.searchMoviesView.searchMoviesTableView.isHidden = false
+        self.searchMoviesView.setSearchMoviesLayout(isSuggesting: false)
+        self.searchMoviesView.setSearchMoviesTableViewBackground(isEmpty: self.shouldShowEmptyTableTextMessage())
         self.searchMoviesView.searchBar.endEditing(false)
     }
     
@@ -118,6 +117,10 @@ class SearchMoviesViewController: UIViewController, InitialTransitionAnimatableC
         self.searchMoviesView.searchBar.text = suggestion
         self.searchMovies(text: suggestion)
         self.hideSuggestionsTableView()
+    }
+    
+    func shouldShowEmptyTableTextMessage() -> Bool {
+        return self.searchMoviesTableViewDataSource.getMovies().isEmpty
     }
 }
 
@@ -145,6 +148,7 @@ extension SearchMoviesViewController: UISearchBarDelegate {
     }
     
     func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
+        self.searchMoviesView.emptyTableViewText.isHidden = true
         self.showSuggestionsTableView()
         return true
     }
