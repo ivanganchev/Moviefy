@@ -4,11 +4,9 @@
 //
 //  Created by A-Team Intern on 5.10.21.
 //
-
-import Foundation
 import UIKit
 
-class IndicatorFooter: UICollectionReusableView {
+class FooterIndicator: UICollectionReusableView {
     static let identifier = "IndicatorFooter"
     
     var indicator = UIActivityIndicatorView()

@@ -8,7 +8,7 @@
 import Foundation
 
 struct GenresResponse: Codable {
-    let genres: [Genre]
+    let genres: [GenreResponse]
         
     enum CodingKeys: String, CodingKey {
         case genres 

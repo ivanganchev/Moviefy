@@ -5,12 +5,11 @@
 //  Created by A-Team Intern on 1.10.21.
 //
 
-import Foundation
 import UIKit
 import RealmSwift
 
 class SavedMoviesViewController: UIViewController, InitialTransitionAnimatableContent {
-    var saveMoviesCollectionViewLayout = CategoryCollectionViewLayout()
+    var saveMoviesCollectionView = CategoryCollectionView()
     var savedMoviesCollectionViewDataSource = SavedMoviesCollectionViewDataSource()
     var genreChipsCollectionViewDataSource = GenreChipsCollectionViewDataSource()
 
@@ -24,23 +23,23 @@ class SavedMoviesViewController: UIViewController, InitialTransitionAnimatableCo
     override func viewDidLoad() {
         self.loadSavedMovies()
         
-        self.saveMoviesCollectionViewLayout.barTitle.text = "My List"
-        self.navigationItem.titleView = self.saveMoviesCollectionViewLayout.barTitle
+        self.saveMoviesCollectionView.barTitle.text = "My List"
+        self.navigationItem.titleView = self.saveMoviesCollectionView.barTitle
         
-        self.saveMoviesCollectionViewLayout.categoryCollectionView.dataSource = self.savedMoviesCollectionViewDataSource
-        self.saveMoviesCollectionViewLayout.categoryCollectionView.delegate = self
+        self.saveMoviesCollectionView.categoryCollectionView.dataSource = self.savedMoviesCollectionViewDataSource
+        self.saveMoviesCollectionView.categoryCollectionView.delegate = self
         
         self.genreChipsCollectionViewDataSource.deleteAction = self.deleteGenreChip
         
-        self.saveMoviesCollectionViewLayout.genreChipsView.genreChipsCollectionView.dataSource = self.genreChipsCollectionViewDataSource
-        self.saveMoviesCollectionViewLayout.genreChipsView.delegate = self
+        self.saveMoviesCollectionView.genreChipsView.genreChipsCollectionView.dataSource = self.genreChipsCollectionViewDataSource
+        self.saveMoviesCollectionView.genreChipsView.delegate = self
         
         self.setGenreChipsViewUILayout()
         self.loadSavedMovies()
     }
     
     override func loadView() {
-        self.view = self.saveMoviesCollectionViewLayout
+        self.view = self.saveMoviesCollectionView
     }
     
     func loadSavedMovies() {
@@ -48,13 +47,13 @@ class SavedMoviesViewController: UIViewController, InitialTransitionAnimatableCo
         self.savedMoviesCollectionViewDataSource.registerNotificationToken { changes in
             switch changes {
             case .initial:
-                self.saveMoviesCollectionViewLayout.categoryCollectionView.reloadData()
+                self.saveMoviesCollectionView.categoryCollectionView.reloadData()
             case .update(_, deletions: let deletions, insertions: let insertions, modifications: let modifications):
                 self.loadSavedMovies()
-                self.saveMoviesCollectionViewLayout.categoryCollectionView.performBatchUpdates({
-                    self.saveMoviesCollectionViewLayout.categoryCollectionView.deleteItems(at: deletions.map({IndexPath(row: $0, section: 0)}))
-                    self.saveMoviesCollectionViewLayout.categoryCollectionView.insertItems(at: insertions.map({IndexPath(row: $0, section: 0)}))
-                    self.saveMoviesCollectionViewLayout.categoryCollectionView.reloadItems(at: modifications.map({ IndexPath(row: $0, section: 0)}))
+                self.saveMoviesCollectionView.categoryCollectionView.performBatchUpdates({
+                    self.saveMoviesCollectionView.categoryCollectionView.deleteItems(at: deletions.map({IndexPath(row: $0, section: 0)}))
+                    self.saveMoviesCollectionView.categoryCollectionView.insertItems(at: insertions.map({IndexPath(row: $0, section: 0)}))
+                    self.saveMoviesCollectionView.categoryCollectionView.reloadItems(at: modifications.map({ IndexPath(row: $0, section: 0)}))
                 }, completion: nil)
             case .error(let err):
                 print(err)
@@ -72,21 +71,21 @@ class SavedMoviesViewController: UIViewController, InitialTransitionAnimatableCo
     
     func deleteGenreChip() {
         self.setGenreChipsViewUILayout()
-        self.saveMoviesCollectionViewLayout.genreChipsView.genreChipsCollectionView.reloadData()
-        self.savedMoviesCollectionViewDataSource.filterMovies(genres: self.genreChipsCollectionViewDataSource.genres)
-        self.saveMoviesCollectionViewLayout.categoryCollectionView.reloadData()
+        self.saveMoviesCollectionView.genreChipsView.genreChipsCollectionView.reloadData()
+        self.savedMoviesCollectionViewDataSource.filterMovies(genres: self.genreChipsCollectionViewDataSource.getAllSelectedGenres())
+        self.saveMoviesCollectionView.categoryCollectionView.reloadData()
     }
     
     func setGenreChipsViewUILayout() {
-        let isHidden = self.genreChipsCollectionViewDataSource.genres.isEmpty
-        self.saveMoviesCollectionViewLayout.genreChipsView.hideChipsCollectioNView(isHidden: isHidden)
+        let isHidden = self.genreChipsCollectionViewDataSource.getAllSelectedGenres().isEmpty
+        self.saveMoviesCollectionView.genreChipsView.hideChipsCollectioNView(isHidden: isHidden)
     }
 }
 
 extension SavedMoviesViewController: GenreChipsViewDelegate {
-    func presentGenrePickerViewController(genreChipsView: GenreChipsView) {
+    func didSelectAddGenre(genreChipsView: GenreChipsView) {
         self.tabBarController?.tabBar.isHidden = true
-        let selectedGenres = self.genreChipsCollectionViewDataSource.genres
+        let selectedGenres = self.genreChipsCollectionViewDataSource.getAllSelectedGenres()
         let genrePickerViewController = GenrePickerViewController()
         genrePickerViewController.selectedGenres = selectedGenres
         genrePickerViewController.delegate = self
@@ -100,11 +99,11 @@ extension SavedMoviesViewController: GenrePickerViewControllerDelegate {
         guard genre != "" else {
             return
         }
-        self.genreChipsCollectionViewDataSource.genres.append(genre)
+        self.genreChipsCollectionViewDataSource.addSelectedGenre(genre: genre)
         self.setGenreChipsViewUILayout()
-        self.saveMoviesCollectionViewLayout.genreChipsView.genreChipsCollectionView.reloadData()
-        self.savedMoviesCollectionViewDataSource.filterMovies(genres: self.genreChipsCollectionViewDataSource.genres)
-        self.saveMoviesCollectionViewLayout.categoryCollectionView.reloadData()
+        self.saveMoviesCollectionView.genreChipsView.genreChipsCollectionView.reloadData()
+        self.savedMoviesCollectionViewDataSource.filterMovies(genres: self.genreChipsCollectionViewDataSource.getAllSelectedGenres())
+        self.saveMoviesCollectionView.categoryCollectionView.reloadData()
     }
     
     func viewDismissed(genrePickerViewController: GenrePickerViewController) {
@@ -137,7 +136,9 @@ extension SavedMoviesViewController: UICollectionViewDelegateFlowLayout {
         let selectedCell = collectionView.cellForItem(at: indexPath) as? CategoryCollectionViewCell
         self.selectedCellImageView = selectedCell?.imageView
         self.selectedCellImageViewSnapshot = selectedCellImageView?.snapshotView(afterScreenUpdates: true)
-        let savedMovie = self.savedMoviesCollectionViewDataSource.savedFilteredMovies[indexPath.row]
-        self.presentMovieInfoViewController(with: Movie(movieEntity: savedMovie, imageData: savedMovie.imageData!))
+        guard let savedMovie = self.savedMoviesCollectionViewDataSource.getSavedFilteredMovieAt(index: indexPath.row) else {
+            return
+        }
+        self.presentMovieInfoViewController(with: Movie(movieEntity: savedMovie, imageData: savedMovie.getImageDataForSavedMovie()!))
     }
 }

@@ -10,13 +10,28 @@ import Foundation
 class Movie: Hashable {
     let movieResponse: MovieResponse
     var imageData: Data? = nil
+    lazy var genres: [String]? = movieResponse.genreIds?.compactMap { id -> String in
+        let allGenres = MoviesService.genres
+        return (allGenres?[id])!
+    }
     
     init(movieResponse: MovieResponse) {
         self.movieResponse = movieResponse
     }
     
     init(movieEntity: MovieEntity, imageData: Data) {
-        self.movieResponse = MovieResponse(id: Int(movieEntity.id!), originalTitle: movieEntity.originalTitle, title: movieEntity.title, posterPath: movieEntity.posterPath, budget: movieEntity.budget, overview: movieEntity.overview, popularity: movieEntity.popularity, releaseDate: movieEntity.releaseDate, runtime: movieEntity.runtime, genreIds: Array(movieEntity.genreIds))
+        self.movieResponse = MovieResponse(
+            id: Int(movieEntity.id!),
+            originalTitle: movieEntity.originalTitle,
+            title: movieEntity.title,
+            posterPath: movieEntity.posterPath,
+            budget: movieEntity.budget,
+            overview: movieEntity.overview,
+            popularity: movieEntity.popularity,
+            releaseDate: movieEntity.releaseDate,
+            runtime: movieEntity.runtime,
+            genreIds: Array(movieEntity.genreIds)
+        )
         self.imageData = imageData
     }
     

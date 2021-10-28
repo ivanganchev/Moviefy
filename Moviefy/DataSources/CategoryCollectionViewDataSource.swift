@@ -5,15 +5,13 @@
 //  Created by A-Team Intern on 3.09.21.
 //
 
-import Foundation
 import UIKit
 
 class CategoryCollectionViewDataSource: NSObject {
-    var movies = [Movie]()
-    var filteredMovies = [Movie]()
-    var uniqueMovies = Set<Movie>()
+    private var movies = [Movie]()
+    private var filteredMovies = [Movie]()
     var movieCategoryPath: String?
-    var currentPage = 1
+    private var currentPage = 1
     let cache = NSCache<NSString, UIImage>()
     
     let activityIndicatorView = UIActivityIndicatorView(style: .medium)
@@ -26,8 +24,7 @@ class CategoryCollectionViewDataSource: NSObject {
                     return Movie(movieResponse: movieResponse)
                 }
                 movieObjects?.forEach({ movie in
-                    if !self.uniqueMovies.contains(movie) {
-                        self.uniqueMovies.insert(movie)
+                    if !self.movies.contains(movie) {
                         self.movies.append(movie)
                         self.filteredMovies.append(movie)
                     }
@@ -93,7 +90,7 @@ class CategoryCollectionViewDataSource: NSObject {
             return
         }
 
-        self.filteredMovies = FilterHelper.filterByGenres(movies: self.movies, selectedGenres: genres, allGenres: MoviesService.genres)
+        self.filteredMovies = FilterHelper.getMoviesByGenres(movies: self.movies, selectedGenres: genres, allGenres: MoviesService.genres)
         print()
     }
     
@@ -125,7 +122,7 @@ extension CategoryCollectionViewDataSource: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         if kind == UICollectionView.elementKindSectionFooter {
-            let footer = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: IndicatorFooter.identifier, for: indexPath)
+            let footer = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: FooterIndicator.identifier, for: indexPath)
             footer.addSubview(self.activityIndicatorView)
             self.activityIndicatorView.frame = CGRect(origin: .zero, size: CGSize(width: collectionView.bounds.width, height: 50))
             return footer
@@ -146,7 +143,7 @@ extension CategoryCollectionViewDataSource {
         }
     
         guard let path = movie.movieResponse.posterPath else {
-            cell.image = UIImage(named: "not_loaded_image.jpg")
+            cell.imageView.image = UIImage(named: "not_loaded_image.jpg")
             return
         }
         
@@ -161,5 +158,21 @@ extension CategoryCollectionViewDataSource {
                 }
             }
         }
+    }
+    
+    func getMovieAt(index: Int) -> Movie {
+        return self.movies[index]
+    }
+    
+    func getFilteredMovieAt(index: Int) -> Movie {
+        return self.filteredMovies[index]
+    }
+    
+    func getMovies() -> [Movie] {
+        return self.movies
+    }
+    
+    func getFilteredMovies() -> [Movie] {
+        return self.filteredMovies
     }
 }

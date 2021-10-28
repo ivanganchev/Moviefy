@@ -6,10 +6,9 @@
 //
 
 import UIKit
-import Foundation
 
 class MoviesTableViewViewController: UIViewController, InitialTransitionAnimatableContent {
-    var moviesTableViewViewControllerLayout = MoviesTableViewViewControllerLayout()
+    var moviesTableView = MoviesTableView()
     var moviesTableViewDataSource = MoviesTableViewDataSource()
     var moviesTableViewDelegateInstance = MoviesTableViewDelegate()
     var transitioningContentDelegateInstance = TransitioningDelegate()
@@ -20,14 +19,14 @@ class MoviesTableViewViewController: UIViewController, InitialTransitionAnimatab
     override func viewDidLoad() {
         super.viewDidLoad()
         self.navigationController?.navigationBar.isHidden = true
-        self.view = self.moviesTableViewViewControllerLayout
+        self.view = self.moviesTableView
         
-        self.moviesTableViewViewControllerLayout.moviesTableView.dataSource = self.moviesTableViewDataSource
-        self.moviesTableViewViewControllerLayout.moviesTableView.delegate = self.moviesTableViewDelegateInstance
-        self.moviesTableViewViewControllerLayout.moviesTableView.refreshControl?.addTarget(self, action: #selector(pullToRefresh), for: .valueChanged)
+        self.moviesTableView.moviesTableView.dataSource = self.moviesTableViewDataSource
+        self.moviesTableView.moviesTableView.delegate = self.moviesTableViewDelegateInstance
+        self.moviesTableView.moviesTableView.refreshControl?.addTarget(self, action: #selector(pullToRefresh), for: .valueChanged)
         self.moviesTableViewDelegateInstance.delegate = self
         MoviesService.loadMoviesGenreList()
-        self.moviesTableViewViewControllerLayout.moviesTableView.reloadData()
+        self.moviesTableView.moviesTableView.reloadData()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -35,8 +34,8 @@ class MoviesTableViewViewController: UIViewController, InitialTransitionAnimatab
     }
     
     @objc func pullToRefresh() {
-        self.moviesTableViewViewControllerLayout.moviesTableView.reloadData()
-        self.moviesTableViewViewControllerLayout.moviesTableView.refreshControl?.endRefreshing()
+        self.moviesTableView.moviesTableView.reloadData()
+        self.moviesTableView.moviesTableView.refreshControl?.endRefreshing()
     }
     
     func presentMovieInfoViewController(with movie: Movie) {

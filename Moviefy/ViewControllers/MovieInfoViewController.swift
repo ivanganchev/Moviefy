@@ -13,9 +13,9 @@ protocol MovieInfoDelegate: AnyObject {
 
 class MovieInfoViewController: UIViewController, PresentedTransitionAnimatableContent {
     var movieImageView: UIImageView {
-        self.movieInfoViewControllerLayout.movieImageView
+        self.movieInfoView.movieImageView
     }
-    var movieInfoViewControllerLayout = MovieInfoViewControllerLayout(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height))
+    var movieInfoView = MovieInfoView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height))
     var movie: Movie?
     var genres: [String]?
     var isHeartFilled: Bool = false
@@ -24,37 +24,37 @@ class MovieInfoViewController: UIViewController, PresentedTransitionAnimatableCo
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.movieInfoViewControllerLayout.closeButton.addTarget(self, action: #selector(MovieInfoViewController.closeButtonTap), for: .touchUpInside)
-        self.movieInfoViewControllerLayout.movieTitle.text = self.movie?.movieResponse.title
-        self.movieInfoViewControllerLayout.movieOverview.text = self.movie?.movieResponse.overview
-        self.movieInfoViewControllerLayout.movieDateReleased.text = self.movie?.movieResponse.releaseDate
-        self.movieInfoViewControllerLayout.setGenres(genres: self.getMovieGenres())
+        self.movieInfoView.closeButton.addTarget(self, action: #selector(MovieInfoViewController.closeButtonTap), for: .touchUpInside)
+        self.movieInfoView.movieTitle.text = self.movie?.movieResponse.title
+        self.movieInfoView.movieOverview.text = self.movie?.movieResponse.overview
+        self.movieInfoView.movieDateReleased.text = self.movie?.movieResponse.releaseDate
+        self.movieInfoView.setGenres(genres: self.getMovieGenresAsString())
         guard let primaryKey = self.movie?.movieResponse.id else {
             return
         }
         self.isHeartFilled = RealmWriteTransactionHelper.getRealmObject(primaryKey: String(primaryKey), entityType: MovieEntity.self) != nil ? true : false
-        self.movieInfoViewControllerLayout.setHeart(isFilled: self.isHeartFilled)
-        self.movieInfoViewControllerLayout.heartButton.addTarget(self, action: #selector(MovieInfoViewController.heartButtonTap), for: .touchUpInside)
+        self.movieInfoView.setHeart(isFilled: self.isHeartFilled)
+        self.movieInfoView.heartButton.addTarget(self, action: #selector(MovieInfoViewController.heartButtonTap), for: .touchUpInside)
         
         if movie?.imageData == nil {
             delegate?.movieInfoViewController(movieInfoViewController: self, getMovieImageData: self.movie!, completion: { result in
                 switch result {
                 case .success(let data):
                     self.movie?.imageData = data
-                    self.movieInfoViewControllerLayout.setMovieImage(movie: self.movie!)
+                    self.movieInfoView.setMovieImage(movie: self.movie!)
                 case .failure(let err):
                     print(err)
                 }
             })
         }
-        self.movieInfoViewControllerLayout.setMovieImage(movie: self.movie!)
+        self.movieInfoView.setMovieImage(movie: self.movie!)
     }
     
     override func loadView() {
-        self.view = self.movieInfoViewControllerLayout
+        self.view = self.movieInfoView
     }
     override func viewDidLayoutSubviews() {
-        self.movieInfoViewControllerLayout.gradient.frame = CGRect(origin: .zero, size: CGSize(width: self.movieInfoViewControllerLayout.topPartView.bounds.width, height: 100))
+        self.movieInfoView.gradient.frame = CGRect(origin: .zero, size: CGSize(width: self.movieInfoView.topPartView.bounds.width, height: 100))
     }
     
     @objc func closeButtonTap() {
@@ -78,17 +78,13 @@ class MovieInfoViewController: UIViewController, PresentedTransitionAnimatableCo
             RealmWriteTransactionHelper.realmAdd(entity: movieEntity)
             self.isHeartFilled = true
         }
-        self.movieInfoViewControllerLayout.setHeart(isFilled: self.isHeartFilled)
+        self.movieInfoView.setHeart(isFilled: self.isHeartFilled)
     }
     
-    func getMovieGenres() -> String {
-        let genres = MoviesService.genres
-        
-        let arrayOfGenres: [String] = self.movie?.movieResponse.genreIds?.compactMap({ id in
-            return genres?[id]
-        }) ?? []
-        
-        let joined = arrayOfGenres.joined(separator: ", ")
+    func getMovieGenresAsString() -> String {
+        guard let joined = self.movie?.genres?.joined(separator: ", ") else {
+            return ""
+        }
         
         return joined
     }

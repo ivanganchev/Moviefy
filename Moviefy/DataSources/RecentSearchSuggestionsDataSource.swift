@@ -5,34 +5,31 @@
 //  Created by A-Team Intern on 21.10.21.
 //
 
-import Foundation
 import UIKit
 import RealmSwift
 
 class RecentSearchSuggestionsDataSource: NSObject {
-    var suggestions = [SuggestionEntity]()
-    var token: NotificationToken?
+    private var suggestions = [SuggestionEntity]()
+    private var token: NotificationToken?
     
     var deleteSearchTextButtonTap: (() -> Void)?
     
     func loadSavedSuggestions() {
-        do {
-            let realm = try Realm()
-            let results = realm.objects(SuggestionEntity.self)
-            
-            self.suggestions = Array(results)
-        } catch let err {
-            print(err)
-        }
-    }
-    
-    func registerNotificatonToken(completion: @escaping (RealmCollectionChange<Results<SuggestionEntity>>) -> Void) {
-        self.token?.invalidate()
         let realm = try? Realm()
         guard let results = realm?.objects(SuggestionEntity.self) else {
             return
         }
         
+        self.suggestions = Array(results)
+    }
+    
+    func registerNotificatonToken(completion: @escaping (RealmCollectionChange<Results<SuggestionEntity>>) -> Void) {
+        self.token?.invalidate()
+        guard let realm = try? Realm() else {
+            return
+        }
+        
+        let results = realm.objects(SuggestionEntity.self)
         self.token = results.observe {(changes: RealmCollectionChange) in
             completion(changes)
         }
@@ -40,19 +37,21 @@ class RecentSearchSuggestionsDataSource: NSObject {
     
     func saveSearchText(text: String) {
         let suggestion = SuggestionEntity(suggestion: text)
-        if RealmWriteTransactionHelper.filterRealmObject(filter: text, entityType: SuggestionEntity.self) == nil {
-            RealmWriteTransactionHelper.realmAdd(entity: suggestion)
+        guard RealmWriteTransactionHelper.filterRealmObject(entityType: SuggestionEntity.self, predicate: NSPredicate(format: "suggestion == %@", text)) == nil else {
+           return
         }
+        RealmWriteTransactionHelper.realmAdd(entity: suggestion)
     }
     
-    func deleteSearchText(index: Int) {
+    func deleteSearchTextAt(index: Int) {
         guard index < self.suggestions.count, let id = self.suggestions[index].id else {
             return
         }
         
-        if let suggestionEntity = RealmWriteTransactionHelper.getRealmObject(primaryKey: id, entityType: SuggestionEntity.self) {
-            RealmWriteTransactionHelper.realmDelete(entity: suggestionEntity)
+        guard let suggestionEntity = RealmWriteTransactionHelper.getRealmObject(primaryKey: id, entityType: SuggestionEntity.self) else {
+            return
         }
+        RealmWriteTransactionHelper.realmDelete(entity: suggestionEntity)
     }
 }
 
@@ -67,13 +66,22 @@ extension RecentSearchSuggestionsDataSource: UITableViewDataSource {
         }
         
         cell.textSuggestion.text = suggestions[indexPath.row].suggestion
-        cell.deleteButton.deleteAction = { _ in
-            self.deleteSearchText(index: indexPath.row)
+        cell.deleteButton.clickAction = { _ in
+            self.deleteSearchTextAt(index: indexPath.row)
         }
         return cell
     }
 
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
+    }
+}
+
+extension RecentSearchSuggestionsDataSource {
+    func getSuggestionAt(index: Int) -> SuggestionEntity? {
+        if index < self.suggestions.count {
+            return self.suggestions[index]
+        }
+        return nil
     }
 }

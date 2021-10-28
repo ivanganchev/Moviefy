@@ -5,11 +5,10 @@
 //  Created by A-Team Intern on 13.10.21.
 //
 
-import Foundation
 import UIKit
 
 class GenrePickerViewControllerDataSource: NSObject, UIPickerViewDataSource {
-    var genres = [String]()
+    private var genres = [String]()
     
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
        return 1
@@ -17,5 +16,22 @@ class GenrePickerViewControllerDataSource: NSObject, UIPickerViewDataSource {
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
         return self.genres.count
+    }
+}
+
+extension GenrePickerViewControllerDataSource {
+    func getGenres() -> [String] {
+        return self.genres
+    }
+    
+    func getGenreAt(index: Int) -> String? {
+        if index < self.genres.count {
+            return self.genres[index]
+        }
+        return nil
+    }
+    
+    func setGenres(genres: [String]) {
+        self.genres = genres
     }
 }

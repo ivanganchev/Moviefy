@@ -5,10 +5,9 @@
 //  Created by A-Team Intern on 12.10.21.
 //
 
-import Foundation
 import UIKit
 
-class SearchMovieTableViewLayout: UIView {
+class SearchMovieView: UIView {
     var searchBar: UISearchBar = UISearchBar()
     var searchMoviesTableView = UITableView(frame: .zero, style: .plain)
     var recentSearchesTableView = UITableView(frame: .zero, style: .plain)

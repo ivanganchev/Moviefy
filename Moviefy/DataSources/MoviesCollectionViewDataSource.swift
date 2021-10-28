@@ -5,36 +5,12 @@
 //  Created by A-Team Intern on 30.08.21.
 //
 
-import Foundation
 import UIKit
 
-class MoviesCollectionViewDataSource: NSObject, UICollectionViewDataSource {
-    
-    var movies: [Movie] = []
+class MoviesCollectionViewDataSource: NSObject {
+    private var movies = [Movie]()
     let cache = NSCache<NSString, UIImage>()
     
-     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self.movies.count
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MoviesCollectionViewCell.identifier, for: indexPath) as? MoviesCollectionViewCell else {
-            return MoviesCollectionViewCell()
-        }
-        
-        cell.tag = indexPath.row
-        self.loadImageView(cell: cell, index: indexPath.row)
-        
-        return cell
-    }
-    
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 1
-    }
-}
-
-extension MoviesCollectionViewDataSource {
     func fetchMovies(movieCategoryPath: String, completion: @escaping () -> Void) {
         MoviesService().fetchMoviesByCategory(movieCategoryPath: movieCategoryPath, page: 1, completion: { result in
            switch result {
@@ -71,13 +47,7 @@ extension MoviesCollectionViewDataSource {
         completion()
     }
     
-    func loadImage(index: Int, completion: ((UIImage) -> Void)? = nil) {
-        guard index >= 0 && index < self.movies.count else {
-            return
-        }
-        
-        let movie: Movie = self.movies[index]
-        
+    func loadImage(movie: Movie, completion: ((UIImage) -> Void)? = nil) {
         guard let posterPath = movie.movieResponse.posterPath else {
             return
         }
@@ -98,22 +68,40 @@ extension MoviesCollectionViewDataSource {
     }
 }
 
-extension MoviesCollectionViewDataSource {
-    func loadImageView(cell: UICollectionViewCell, index: Int) {
-        guard let cell = cell as? MoviesCollectionViewCell else { return }
-        cell.prepareForReuse()
+extension MoviesCollectionViewDataSource: UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return self.movies.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MoviesCollectionViewCell.identifier, for: indexPath) as? MoviesCollectionViewCell else {
+            return MoviesCollectionViewCell()
+        }
         
+        cell.tag = indexPath.row
+        self.loadImageView(cell: cell, index: indexPath.row)
+        
+        return cell
+    }
+    
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return 1
+    }
+}
+
+extension MoviesCollectionViewDataSource {
+    func loadImageView(cell: MoviesCollectionViewCell, index: Int) {
         let movie = self.movies[index]
         
         guard let path = movie.movieResponse.posterPath else {
-            cell.image = UIImage(named: "not_loaded_image.jpg")
+            cell.imageView.image = UIImage(named: "not_loaded_image.jpg")
             return
         }
         
         if let cachedImage = self.cache.object(forKey: NSString(string: path)) {
-            cell.image = cachedImage
+            cell.imageView.image = cachedImage
         } else {
-            self.loadImage(index: index) { image in
+            self.loadImage(movie: movie) { image in
                 DispatchQueue.main.async {
                     if cell.tag == index {
                         cell.imageView.image = image
@@ -121,5 +109,14 @@ extension MoviesCollectionViewDataSource {
                 }
             }
         }
+    }
+}
+
+extension MoviesCollectionViewDataSource {
+    func getMovieAt(index: Int) -> Movie? {
+        if index < self.movies.count {
+            return self.movies[index]
+        }
+        return nil
     }
 }

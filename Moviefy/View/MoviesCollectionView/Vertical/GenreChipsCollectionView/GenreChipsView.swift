@@ -5,11 +5,10 @@
 //  Created by A-Team Intern on 23.09.21.
 //
 
-import Foundation
 import UIKit
 
 protocol GenreChipsViewDelegate: AnyObject {
-    func presentGenrePickerViewController(genreChipsView: GenreChipsView)
+    func didSelectAddGenre(genreChipsView: GenreChipsView)
 }
 
 class GenreChipsView: UIView {
@@ -94,7 +93,7 @@ class GenreChipsView: UIView {
     }
     
     @objc func addGenre() {
-        self.delegate?.presentGenrePickerViewController(genreChipsView: self)
+        self.delegate?.didSelectAddGenre(genreChipsView: self)
     }
     
     func hideChipsCollectioNView(isHidden: Bool) {
@@ -109,7 +108,7 @@ extension GenreChipsView: UICollectionViewDelegateFlowLayout {
         let text: UILabel = UILabel()
         text.font = UIFont(name: "Helvetica", size: 20)
         if let dataSource = self.genreChipsCollectionView.dataSource as? GenreChipsCollectionViewDataSource {
-            text.text = dataSource.genres[indexPath.row]
+            text.text = dataSource.getGenreAt(index: indexPath.row)
         }
         return CGSize(width: Int(text.intrinsicContentSize.width) + self.buttonWidth + self.chipViewsSpacing * 3, height: 50)
     }

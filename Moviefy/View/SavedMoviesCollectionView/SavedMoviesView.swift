@@ -5,10 +5,9 @@
 //  Created by A-Team Intern on 12.10.21.
 //
 
-import Foundation
 import UIKit
 
-class SavedMoviesCollectionViewLayout: UIView {
+class SavedMoviesView: UIView {
     let savedMoviesCollectionView: UICollectionView = {
         let savedMoviesCollectionViewFlowLayout = UICollectionViewFlowLayout()
         savedMoviesCollectionViewFlowLayout.scrollDirection = .vertical
@@ -16,7 +15,7 @@ class SavedMoviesCollectionViewLayout: UIView {
         return UICollectionView(frame: .zero, collectionViewLayout: savedMoviesCollectionViewFlowLayout)
     }()
     
-    let barTitle: UILabel = UILabel(frame: CGRect(x: 0, y: 0, width: 50, height: 40))
+    let barTitle: UILabel = UILabel(frame: .zero)
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -34,6 +33,7 @@ class SavedMoviesCollectionViewLayout: UIView {
     func setBarTitle() {
         self.barTitle.font = UIFont(name: "Helvetica-Bold", size: 16)
         self.barTitle.text = "My List"
+        self.barTitle.translatesAutoresizingMaskIntoConstraints = false
     }
     
     func setSavedMoviesCollectionView() {
@@ -50,7 +50,10 @@ class SavedMoviesCollectionViewLayout: UIView {
             self.savedMoviesCollectionView.topAnchor.constraint(equalTo: self.topAnchor),
             self.savedMoviesCollectionView.bottomAnchor.constraint(equalTo: self.bottomAnchor),
             self.savedMoviesCollectionView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
-            self.savedMoviesCollectionView.trailingAnchor.constraint(equalTo: self.trailingAnchor)
+            self.savedMoviesCollectionView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
+            
+            self.barTitle.widthAnchor.constraint(equalToConstant: 50),
+            self.barTitle.heightAnchor.constraint(equalToConstant: 40)
         ])
     }
 }

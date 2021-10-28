@@ -5,10 +5,9 @@
 //  Created by A-Team Intern on 12.10.21.
 //
 
-import Foundation
 import UIKit
 
-class CategoryCollectionViewLayout: UIView {
+class CategoryCollectionView: UIView {
     let categoryCollectionView: UICollectionView = {
         let categoryCollectionViewLayout = UICollectionViewFlowLayout()
         categoryCollectionViewLayout.scrollDirection = .vertical
@@ -41,7 +40,7 @@ class CategoryCollectionViewLayout: UIView {
         self.categoryCollectionView.backgroundColor = .white
         self.categoryCollectionView.translatesAutoresizingMaskIntoConstraints = false
         self.categoryCollectionView.register(CategoryCollectionViewCell.self, forCellWithReuseIdentifier: CategoryCollectionViewCell.identifier)
-        self.categoryCollectionView.register(IndicatorFooter.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: IndicatorFooter.identifier)
+        self.categoryCollectionView.register(FooterIndicator.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: FooterIndicator.identifier)
         
         self.addSubview(self.categoryCollectionView)
     }

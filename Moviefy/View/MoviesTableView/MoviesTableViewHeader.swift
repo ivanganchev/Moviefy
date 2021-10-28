@@ -5,7 +5,6 @@
 //  Created by A-Team Intern on 8.10.21.
 //
 
-import Foundation
 import UIKit
 
 class MoviesTableViewHeader: UIView {

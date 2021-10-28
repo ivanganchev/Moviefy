@@ -5,21 +5,12 @@
 //  Created by A-Team Intern on 17.09.21.
 //
 
-import Foundation
 import UIKit
 
 class SearchMoviesTableViewCell: UITableViewCell {
     static let identifier = "SearchMoviesTableViewCell"
     
-    let movieImage = UIImageView()
-    
-    var image: UIImage? {
-        didSet {
-            DispatchQueue.main.async {
-                self.movieImage.image = self.image
-            }
-        }
-    }
+    let movieImageView = UIImageView()
 
     let movieTitle: UILabel = {
         let movieTitle = UILabel()
@@ -28,28 +19,12 @@ class SearchMoviesTableViewCell: UITableViewCell {
         return movieTitle
     }()
     
-    var title: String? {
-        didSet {
-            DispatchQueue.main.async {
-                self.movieTitle.text = self.title
-            }
-        }
-    }
-    
     let movieGenres: UILabel = {
         let movieGenres = UILabel()
         movieGenres.font = UIFont(name: "Helvetica", size: 12)
         movieGenres.tintColor = .lightGray
         return movieGenres
     }()
-    
-    var genres: String? {
-        didSet {
-            DispatchQueue.main.async {
-                self.movieGenres.text = self.genres
-            }
-        }
-    }
     
     let containerView: UIStackView = {
         let view = UIStackView()
@@ -61,12 +36,12 @@ class SearchMoviesTableViewCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
-        self.movieImage.translatesAutoresizingMaskIntoConstraints = false
+        self.movieImageView.translatesAutoresizingMaskIntoConstraints = false
         self.containerView.translatesAutoresizingMaskIntoConstraints = false
         
         self.containerView.addArrangedSubview(self.movieTitle)
         self.containerView.addArrangedSubview(self.movieGenres)
-        self.contentView.addSubview(self.movieImage)
+        self.contentView.addSubview(self.movieImageView)
         self.contentView.addSubview(self.containerView)
     }
 
@@ -74,11 +49,11 @@ class SearchMoviesTableViewCell: UITableViewCell {
         super.layoutSubviews()
         let size = ImageProperties.getThumbnailImageSize()
         NSLayoutConstraint.activate([
-            self.movieImage.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor),
-            self.movieImage.widthAnchor.constraint(equalToConstant: size.height * (ImageProperties.imageWidth / ImageProperties.imageHeight)),
-            self.movieImage.topAnchor.constraint(equalTo: self.topAnchor, constant: 5),
-            self.movieImage.bottomAnchor.constraint(equalTo: self.bottomAnchor),
-            self.containerView.leadingAnchor.constraint(equalTo: self.movieImage.trailingAnchor, constant: 15),
+            self.movieImageView.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor),
+            self.movieImageView.widthAnchor.constraint(equalToConstant: size.height * (ImageProperties.imageWidth / ImageProperties.imageHeight)),
+            self.movieImageView.topAnchor.constraint(equalTo: self.topAnchor, constant: 5),
+            self.movieImageView.bottomAnchor.constraint(equalTo: self.bottomAnchor),
+            self.containerView.leadingAnchor.constraint(equalTo: self.movieImageView.trailingAnchor, constant: 15),
             self.containerView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
             self.containerView.centerYAnchor.constraint(equalTo: self.centerYAnchor)
         ])
@@ -90,6 +65,6 @@ class SearchMoviesTableViewCell: UITableViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        self.movieImage.image = nil
+        self.movieImageView.image = nil
     }
 }

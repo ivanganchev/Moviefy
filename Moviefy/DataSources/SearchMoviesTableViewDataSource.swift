@@ -5,14 +5,87 @@
 //  Created by A-Team Intern on 17.09.21.
 //
 
-import Foundation
 import UIKit
 
-class SearchMoviesTableViewDataSource: NSObject, UITableViewDataSource {
-    var movies: [Movie] = []
-    let genres = MoviesService.genres
+class SearchMoviesTableViewDataSource: NSObject {
+    private var movies: [Movie] = []
+    private let genres = MoviesService.genres
     let cache = NSCache<NSString, UIImage>()
     
+    func resfreshMovies(completion: @escaping () -> Void) {
+        MoviesService().fetchMoviesByCategory(movieCategoryPath: EndPoint.MovieCategoryEndPoint.topRated.rawValue, page: 1, completion: { result in
+            self.getCompletionResult(result: result)
+            completion()
+       })
+    }
+    
+    func searchMovies(text: String, completion: @escaping () -> Void) {
+        MoviesService().searchMovies(text: text, completion: {result in
+            self.getCompletionResult(result: result)
+            completion()
+        })
+    }
+    
+    func loadImages(completion: @escaping () -> Void) {
+        self.movies.forEach { (movie) in
+            guard let posterPath = movie.movieResponse.posterPath else {
+                return
+            }
+            
+            let path = NSString(string: posterPath)
+            
+            MoviesService().fetchMovieImage(imageUrl: path as String, completion: {result in
+                switch result {
+                case .success(let data):
+                    guard let image = UIImage(data: data) else {
+                        return
+                    }
+                    self.cache.setObject(image, forKey: path)
+                    movie.imageData = data
+                case .failure(let err):
+                    print(err)
+                }
+            })
+        }
+        completion()
+    }
+    
+    func loadImage(movie: Movie, completion: ((UIImage) -> Void)? = nil) {
+        guard let posterPath = movie.movieResponse.posterPath else {
+            return
+        }
+        
+        let path = NSString(string: posterPath)
+        
+        MoviesService().fetchMovieImage(imageUrl: path as String, completion: {result in
+            switch result {
+            case .success(let data):
+                guard let loadedImage = UIImage(data: data) else {
+                    return
+                }
+                self.cache.setObject(loadedImage, forKey: path)
+                movie.imageData = data
+                completion!(loadedImage)
+            case .failure(let err):
+                print(err)
+            }
+        })
+    }
+    
+    func getCompletionResult(result: Result<MoviesResponse, Error>) {
+        switch result {
+        case .success(let moviesResponse):
+            let movies = moviesResponse.movies?.map { (movieResponse) -> Movie in
+                return Movie(movieResponse: movieResponse)
+            }
+            self.movies = movies ?? []
+        case.failure(let err):
+            print(err)
+        }
+    }
+}
+
+extension SearchMoviesTableViewDataSource: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.movies.count
     }
@@ -29,13 +102,10 @@ class SearchMoviesTableViewDataSource: NSObject, UITableViewDataSource {
         
         let model = self.movies[indexPath.row]
 
-        cell.title = model.movieResponse.title
+        cell.movieTitle.text = model.movieResponse.title
         
-        let arrayOfGenres: [String] = model.movieResponse.genreIds?.compactMap({ id in
-            return genres?[id]
-        }) ?? []
-        let joined = arrayOfGenres.joined(separator: ", ")
-        cell.genres = joined
+        let joined = model.genres?.joined(separator: ", ")
+        cell.movieGenres.text = joined
         
         return cell
     }
@@ -46,105 +116,35 @@ class SearchMoviesTableViewDataSource: NSObject, UITableViewDataSource {
 }
 
 extension SearchMoviesTableViewDataSource {
-    func fetchMovies(page: Int, completion: @escaping () -> Void) {
-        MoviesService().fetchMoviesByCategory(movieCategoryPath: EndPoint.MovieCategoryEndPoint.topRated.rawValue, page: page, completion: { result in
-           switch result {
-           case .success(let moviesResponse):
-                let movies = moviesResponse.movies?.map { (movieResponse) -> Movie in
-                    return Movie(movieResponse: movieResponse)
-                }
-                self.movies = movies ?? []
-                completion()
-           case .failure(let err):
-                print(err)
-           }
-       })
-    }
-    
-    func searchMovies(text: String, completion: @escaping () -> Void) {
-        MoviesService().searchMovies(text: text, completion: {result in
-            switch result {
-            case .success(let moviesResponse):
-                let movies = moviesResponse.movies?.map { (movieResponse) -> Movie in
-                    return Movie(movieResponse: movieResponse)
-                }
-                self.movies = movies ?? []
-                completion()
-            case.failure(let err):
-                print(err)
-            }
-        })
-    }
-    
-    func loadImages(completion: @escaping () -> Void) {
-        self.movies.forEach { (movie) in
-            guard let posterPath = movie.movieResponse.posterPath else {
-                return
-            }
-            
-            let path = NSString(string: posterPath)
-            
-            MoviesService().fetchMovieImage(imageUrl: path as String, completion: {result in
-                switch result {
-                case .success(let data):
-                    movie.imageData = data
-                    self.cache.setObject(UIImage(data: data)!, forKey: path)
-                case .failure(let err):
-                    print(err)
-                }
-            })
-        }
-        completion()
-    }
-    
-    func loadImage(index: Int, completion: ((UIImage) -> Void)? = nil) {
-        guard index >= 0 && index < self.movies.count else {
-            return
-        }
-        
-        let movie = self.movies[index]
-        
-        guard let posterPath = movie.movieResponse.posterPath else {
-            return
-        }
-        
-        let path = NSString(string: posterPath)
-        
-        MoviesService().fetchMovieImage(imageUrl: path as String, completion: {result in
-            switch result {
-            case .success(let data):
-                movie.imageData = data
-                let loadedImage = UIImage(data: data)!
-                self.cache.setObject(loadedImage, forKey: path)
-                completion!(loadedImage)
-            case .failure(let err):
-                print(err)
-            }
-        })
-    }
-}
-
-extension SearchMoviesTableViewDataSource {
-    func loadImageView(cell: UITableViewCell, index: Int) {
-        guard let cell = cell as? SearchMoviesTableViewCell else { return }
-
+    func loadImageView(cell: SearchMoviesTableViewCell, index: Int) {
         let movie = self.movies[index]
         
         guard let path = movie.movieResponse.posterPath else {
-            cell.movieImage.image = UIImage(named: "not_loaded_image.jpg")
+            cell.movieImageView.image = UIImage(named: "not_loaded_image.jpg")
             return
         }
         
         if let cachedImage = self.cache.object(forKey: NSString(string: path)) {
-            cell.movieImage.image = cachedImage
+            cell.movieImageView.image = cachedImage
         } else {
-            self.loadImage(index: index) { image in
+            self.loadImage(movie: movie) { image in
                 DispatchQueue.main.async {
                     if cell.tag == index {
-                        cell.movieImage.image = image
+                        cell.movieImageView.image = image
                     }
                 }
             }
         }
+    }
+    
+    func getMovies() -> [Movie] {
+        return self.movies
+    }
+    
+    func getMovieAt(index: Int) -> Movie? {
+        if index < self.movies.count {
+            return self.movies[index]
+        }
+        return nil
     }
 }

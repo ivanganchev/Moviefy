@@ -5,10 +5,9 @@
 //  Created by A-Team Intern on 12.10.21.
 //
 
-import Foundation
 import UIKit
 
-class MoviesTableViewViewControllerLayout: UIView {
+class MoviesTableView: UIView {
     var moviesTableView = UITableView(frame: .zero, style: .grouped)
     
     override init(frame: CGRect) {

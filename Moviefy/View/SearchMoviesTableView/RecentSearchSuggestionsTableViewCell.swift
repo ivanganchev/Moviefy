@@ -5,7 +5,6 @@
 //  Created by A-Team Intern on 21.10.21.
 //
 
-import Foundation
 import UIKit
 
 class RecentSearchSuggestionsTableViewCell: UITableViewCell {
@@ -19,8 +18,8 @@ class RecentSearchSuggestionsTableViewCell: UITableViewCell {
         return text
     }()
     
-    let deleteButton: RecentSearchSuggestionCloseButton = {
-        let closeButton = RecentSearchSuggestionCloseButton(type: .custom)
+    let deleteButton: CustomButtonDelete = {
+        let closeButton = CustomButtonDelete(type: .custom)
         closeButton.setImage(UIImage(systemName: "xmark"), for: .normal)
         closeButton.imageView?.contentMode = .scaleAspectFit
         closeButton.contentHorizontalAlignment = .fill

@@ -5,7 +5,6 @@
 //  Created by A-Team Intern on 10.09.21.
 //
 
-import Foundation
 import UIKit
 
 enum PresentationType {

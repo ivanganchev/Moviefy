@@ -8,7 +8,7 @@
 import Foundation
 
 class FilterHelper {
-    static func filterByGenres(movies: [Movie], selectedGenres: [String], allGenres: [Int: String]?) -> [Movie] {
+    static func getMoviesByGenres(movies: [Movie], selectedGenres: [String], allGenres: [Int: String]?) -> [Movie] {
         var newFilteredMovies: [Movie] = movies
         
         selectedGenres.forEach({ genre in

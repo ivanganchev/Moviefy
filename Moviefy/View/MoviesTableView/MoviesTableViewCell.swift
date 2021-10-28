@@ -5,7 +5,6 @@
 //  Created by A-Team Intern on 1.09.21.
 //
 
-import Foundation
 import UIKit
 
 protocol MoviesTableViewCellDelegate: AnyObject {
@@ -15,7 +14,7 @@ protocol MoviesTableViewCellDelegate: AnyObject {
 class MoviesTableViewCell: UITableViewCell {
     static let identifier = "MoviesTableViewCell"
     
-    let moviesCollectionViewLayout = MoviesCollectionViewLayout()
+    let moviesCollectionView = MoviesCollectionView()
     var moviesCollectionViewDataSource = MoviesCollectionViewDataSource()
     weak var delegate: MoviesTableViewCellDelegate?
     
@@ -24,7 +23,7 @@ class MoviesTableViewCell: UITableViewCell {
             self.moviesCollectionViewDataSource.fetchMovies(movieCategoryPath: movieCategoryPath, completion: {
                 self.moviesCollectionViewDataSource.loadImages {
                     DispatchQueue.main.async {
-                        self.moviesCollectionViewLayout.moviesCollectionView.reloadData()
+                        self.moviesCollectionView.moviesCollectionView.reloadData()
                     }
                 }
             })
@@ -33,19 +32,19 @@ class MoviesTableViewCell: UITableViewCell {
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        self.moviesCollectionViewLayout.translatesAutoresizingMaskIntoConstraints = false
+        self.moviesCollectionView.translatesAutoresizingMaskIntoConstraints = false
         
-        self.contentView.addSubview(self.moviesCollectionViewLayout)
+        self.contentView.addSubview(self.moviesCollectionView)
         
         NSLayoutConstraint.activate([
-            self.moviesCollectionViewLayout.topAnchor.constraint(equalTo: self.topAnchor),
-            self.moviesCollectionViewLayout.bottomAnchor.constraint(equalTo: self.bottomAnchor),
-            self.moviesCollectionViewLayout.leadingAnchor.constraint(equalTo: self.leadingAnchor),
-            self.moviesCollectionViewLayout.trailingAnchor.constraint(equalTo: self.trailingAnchor)
+            self.moviesCollectionView.topAnchor.constraint(equalTo: self.topAnchor),
+            self.moviesCollectionView.bottomAnchor.constraint(equalTo: self.bottomAnchor),
+            self.moviesCollectionView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
+            self.moviesCollectionView.trailingAnchor.constraint(equalTo: self.trailingAnchor)
         ])
         
-        self.moviesCollectionViewLayout.moviesCollectionView.dataSource = self.moviesCollectionViewDataSource
-        self.moviesCollectionViewLayout.moviesCollectionView.delegate = self
+        self.moviesCollectionView.moviesCollectionView.dataSource = self.moviesCollectionViewDataSource
+        self.moviesCollectionView.moviesCollectionView.delegate = self
     }
     
     required init?(coder: NSCoder) {
@@ -53,9 +52,9 @@ class MoviesTableViewCell: UITableViewCell {
     }
     
     override func layoutSubviews() {
-        self.moviesCollectionViewLayout.moviesCollectionView.reloadData()
-        let layout = MoviesCollectionViewLayout.setLayout()
-        self.moviesCollectionViewLayout.moviesCollectionView.collectionViewLayout = layout
+        self.moviesCollectionView.moviesCollectionView.reloadData()
+        let layout = MoviesCollectionView.setLayout()
+        self.moviesCollectionView.moviesCollectionView.collectionViewLayout = layout
         super.layoutSubviews()
     }
 }
@@ -65,7 +64,9 @@ extension MoviesTableViewCell: UICollectionViewDelegate {
         guard let selectedCell = collectionView.cellForItem(at: indexPath) as? MoviesCollectionViewCell else {
             return
         }
-        let movie = self.moviesCollectionViewDataSource.movies[indexPath.row]
+        guard let movie = self.moviesCollectionViewDataSource.getMovieAt(index: indexPath.row) else {
+            return
+        }
         self.delegate?.moviesTableViewCell(moviesTableViewCell: self, cell: selectedCell, movie: movie)
     }
 }

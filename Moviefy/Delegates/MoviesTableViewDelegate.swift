@@ -5,7 +5,6 @@
 //  Created by A-Team Intern on 2.09.21.
 //
 
-import Foundation
 import UIKit
 
 protocol MoviesTableViewButtonTapDelegate: AnyObject {

@@ -10,7 +10,7 @@ import RealmSwift
 
 class SuggestionEntity: Object {
     @Persisted(primaryKey: true) var id: String?
-    @Persisted var suggestion: String?
+    @Persisted var suggestion: String
     
     convenience init(suggestion: String) {
         self.init()

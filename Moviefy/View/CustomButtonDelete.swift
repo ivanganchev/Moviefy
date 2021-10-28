@@ -5,11 +5,10 @@
 //  Created by A-Team Intern on 25.10.21.
 //
 
-import Foundation
 import UIKit
 
-class RecentSearchSuggestionCloseButton: UIButton {
-    var deleteAction: ((_ sender: RecentSearchSuggestionCloseButton) -> Void)?
+class CustomButtonDelete: UIButton {
+    var clickAction: ((_ sender: CustomButtonDelete) -> Void)?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -21,7 +20,7 @@ class RecentSearchSuggestionCloseButton: UIButton {
         fatalError("init(coder:) has not been implemented")
     }
     
-    @objc func deleteAction(_ sender: RecentSearchSuggestionCloseButton) {
-        deleteAction?(sender)
+    @objc func deleteAction(_ sender: CustomButtonDelete) {
+        clickAction?(sender)
     }
 }

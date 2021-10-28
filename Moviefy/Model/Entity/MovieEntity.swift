@@ -18,7 +18,6 @@ class MovieEntity: Object {
     @Persisted var popularity: Float = 0.0
     @Persisted var releaseDate: String?
     @Persisted var runtime: String?
-    @Persisted var imageData: Data?
     @Persisted var genreIds = RealmSwift.List<Int>()
     
     convenience init(movie: Movie?) {
@@ -33,7 +32,26 @@ class MovieEntity: Object {
         self.popularity = movie?.movieResponse.popularity ?? 0.0
         self.releaseDate = movie?.movieResponse.releaseDate
         self.runtime = movie?.movieResponse.runtime
-        self.imageData = movie?.imageData
         self.genreIds.append(objectsIn: movie?.movieResponse.genreIds ?? [])
+        self.saveImageDataToFile(data: movie?.imageData)
+    }
+    
+    func getImageDataForSavedMovie() -> Data? {
+        let path = getPathForData()
+        return try? Data(contentsOf: path)
+    }
+    
+    func saveImageDataToFile(data: Data?) {
+        let path = self.getPathForData()
+        guard let imageData = data else {
+            return
+        }
+        try? imageData.write(to: path)
+    }
+    
+    func getPathForData() -> URL {
+        let savePath = FileManager.default.urls(for: .documentDirectory,
+                                                      in: .userDomainMask)[0].appendingPathComponent(String(self.id!))
+        return savePath
     }
 }

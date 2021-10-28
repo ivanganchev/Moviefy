@@ -5,22 +5,12 @@
 //  Created by A-Team Intern on 7.09.21.
 //
 
-import Foundation
-
 import UIKit
 
 class CategoryCollectionViewCell: UICollectionViewCell {
     static let identifier = "CategoryCollectionViewCell"
     
     let imageView = UIImageView()
-    
-    var image: UIImage? {
-        didSet {
-            DispatchQueue.main.async {
-                self.imageView.image = self.image
-            }
-        }
-    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)

@@ -5,10 +5,9 @@
 //  Created by A-Team Intern on 12.10.21.
 //
 
-import Foundation
 import UIKit
 
-class MovieInfoViewControllerLayout: UIView {
+class MovieInfoView: UIView {
     var movieInfoScrollView = UIScrollView()
     var movieTitle = UILabel()
     var movieImageView = UIImageView()

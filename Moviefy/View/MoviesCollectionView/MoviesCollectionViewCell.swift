@@ -12,14 +12,6 @@ class MoviesCollectionViewCell: UICollectionViewCell {
 
     let imageView = UIImageView()
     
-    var image: UIImage? {
-        didSet {
-            DispatchQueue.main.async {
-                self.imageView.image = self.image
-            }
-        }
-    }
-
     override init(frame: CGRect) {
         super.init(frame: frame)
         contentView.addSubview(imageView)

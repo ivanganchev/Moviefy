@@ -5,11 +5,10 @@
 //  Created by A-Team Intern on 23.09.21.
 //
 
-import Foundation
 import UIKit
 
 class GenreChipsCollectionViewDataSource: NSObject, UICollectionViewDataSource {
-    var genres: [String] = []
+    private var genres: [String] = []
     
     var deleteAction: (() -> Void)?
     
@@ -22,7 +21,7 @@ class GenreChipsCollectionViewDataSource: NSObject, UICollectionViewDataSource {
             return GenreChipsCollectionViewCell()
         }
         
-        cell.genre = self.genres[indexPath.row]
+        cell.genreLabel.text = self.genres[indexPath.row]
         cell.removeButton.tag = indexPath.row
         cell.removeButton.addTarget(self, action: #selector(self.deleteGenre(sender:)), for: .touchUpInside)
         return cell
@@ -31,5 +30,22 @@ class GenreChipsCollectionViewDataSource: NSObject, UICollectionViewDataSource {
     @objc func deleteGenre(sender: UIButton) {
         self.genres.remove(at: sender.tag)
         deleteAction?()
+    }
+}
+
+extension GenreChipsCollectionViewDataSource {
+    func getGenreAt(index: Int) -> String? {
+        if index < self.genres.count {
+            return self.genres[index]
+        }
+        return nil
+    }
+    
+    func getAllSelectedGenres() -> [String] {
+        return self.genres
+    }
+    
+    func addSelectedGenre(genre: String) {
+        self.genres.append(genre)
     }
 }

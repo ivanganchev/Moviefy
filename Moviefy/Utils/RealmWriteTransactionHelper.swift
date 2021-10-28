@@ -48,9 +48,9 @@ class RealmWriteTransactionHelper {
         return realm?.object(ofType: entityType, forPrimaryKey: primaryKey)
     }
     
-    static func filterRealmObject(filter: String, entityType: Object.Type) -> Object? {
+    static func filterRealmObject(entityType: Object.Type, predicate: NSPredicate) -> Object? {
         let realm = try? Realm()
         
-        return realm?.objects(entityType).filter("suggestion == %@", filter).first
+        return realm?.objects(entityType).filter(predicate).first
     }
 }

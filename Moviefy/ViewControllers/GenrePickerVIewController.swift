@@ -5,7 +5,6 @@
 //  Created by A-Team Intern on 24.09.21.
 //
 
-import Foundation
 import UIKit
 
 protocol GenrePickerViewControllerDelegate: AnyObject {
@@ -14,7 +13,7 @@ protocol GenrePickerViewControllerDelegate: AnyObject {
 }
 
 class GenrePickerViewController: UIViewController {
-    let genreChipsCollectionViewLayout = GenreChipsCollectionViewLayout()
+    let genreChipsCollectionView = GenreChipsCollectionView()
     let genrePickerViewControllerDataSource = GenrePickerViewControllerDataSource()
     var selectedGenres: [String] = []
     weak var delegate: GenrePickerViewControllerDelegate?
@@ -22,22 +21,22 @@ class GenrePickerViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         if let genres = MoviesService.genres {
-            self.genrePickerViewControllerDataSource.genres = Array(genres.values)
+            self.genrePickerViewControllerDataSource.setGenres(genres: Array(genres.values))
         }
         
-        self.genreChipsCollectionViewLayout.genrePickerView.delegate = self
-        self.genreChipsCollectionViewLayout.genrePickerView.dataSource = self.genrePickerViewControllerDataSource
+        self.genreChipsCollectionView.genrePickerView.delegate = self
+        self.genreChipsCollectionView.genrePickerView.dataSource = self.genrePickerViewControllerDataSource
         
         let gestureTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(animateDismissView))
-        self.genreChipsCollectionViewLayout.dimmedView.addGestureRecognizer(gestureTapRecognizer)
+        self.genreChipsCollectionView.dimmedView.addGestureRecognizer(gestureTapRecognizer)
         
-        self.genreChipsCollectionViewLayout.doneButton.addTarget(self, action: #selector(self.doneButtonTap), for: .touchUpInside)
-        if self.selectedGenres.count == self.genrePickerViewControllerDataSource.genres.count {
-            self.genreChipsCollectionViewLayout.doneButton.isUserInteractionEnabled = false
-            self.genreChipsCollectionViewLayout.doneButton.setTitleColor(.systemGray, for: .normal)
+        self.genreChipsCollectionView.doneButton.addTarget(self, action: #selector(self.doneButtonTap), for: .touchUpInside)
+        if self.selectedGenres.count == self.genrePickerViewControllerDataSource.getGenres().count {
+            self.genreChipsCollectionView.doneButton.isUserInteractionEnabled = false
+            self.genreChipsCollectionView.doneButton.setTitleColor(.systemGray, for: .normal)
         }
         
-        self.genreChipsCollectionViewLayout.closeButton.addTarget(self, action: #selector(self.closeButtonTap), for: .touchUpInside)
+        self.genreChipsCollectionView.closeButton.addTarget(self, action: #selector(self.closeButtonTap), for: .touchUpInside)
         
         self.setupPanGesture()
         
@@ -45,7 +44,7 @@ class GenrePickerViewController: UIViewController {
     }
     
     override func loadView() {
-        self.view = self.genreChipsCollectionViewLayout
+        self.view = self.genreChipsCollectionView
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -54,11 +53,14 @@ class GenrePickerViewController: UIViewController {
     }
     
     func selectRowAtBeginning() {
-        for i in (0...self.genrePickerViewControllerDataSource.genres.count) {
-            if selectedGenres.contains(self.genrePickerViewControllerDataSource.genres[i]) {
+        for i in (0...self.genrePickerViewControllerDataSource.getGenres().count) {
+            guard let genre = self.genrePickerViewControllerDataSource.getGenreAt(index: i) else {
+                return
+            }
+            if selectedGenres.contains(genre) {
                 continue
             } else {
-                self.genreChipsCollectionViewLayout.genrePickerView.selectRow(i, inComponent: 0, animated: false)
+                self.genreChipsCollectionView.genrePickerView.selectRow(i, inComponent: 0, animated: false)
                 break
             }
         }
@@ -66,27 +68,27 @@ class GenrePickerViewController: UIViewController {
     
     func animateShowContainerView() {
         UIView.animate(withDuration: 0.3) {
-            self.genreChipsCollectionViewLayout.containerViewBottomConstraint?.constant = 0
+            self.genreChipsCollectionView.containerViewBottomConstraint?.constant = 0
             self.view.layoutIfNeeded()
         }
     }
     
     func animateShowDimmedView() {
-        self.genreChipsCollectionViewLayout.dimmedView.alpha = 0
+        self.genreChipsCollectionView.dimmedView.alpha = 0
         UIView.animate(withDuration: 0.4) {
-            self.genreChipsCollectionViewLayout.dimmedView.alpha = self.genreChipsCollectionViewLayout.maxDimmedAlpha
+            self.genreChipsCollectionView.dimmedView.alpha = self.genreChipsCollectionView.maxDimmedAlpha
         }
     }
     
     @objc func animateDismissView() {
         UIView.animate(withDuration: 0.3) {
-            self.genreChipsCollectionViewLayout.containerViewBottomConstraint?.constant = self.genreChipsCollectionViewLayout.defaultHeight
+            self.genreChipsCollectionView.containerViewBottomConstraint?.constant = self.genreChipsCollectionView.defaultHeight
             self.view.layoutIfNeeded()
         }
         
-        self.genreChipsCollectionViewLayout.dimmedView.alpha = self.genreChipsCollectionViewLayout.maxDimmedAlpha
+        self.genreChipsCollectionView.dimmedView.alpha = self.genreChipsCollectionView.maxDimmedAlpha
         UIView.animate(withDuration: 0.4) {
-            self.genreChipsCollectionViewLayout.dimmedView.alpha = 0
+            self.genreChipsCollectionView.dimmedView.alpha = 0
         } completion: { _ in
             self.delegate?.viewDismissed(genrePickerViewController: self)
             self.dismiss(animated: false, completion: nil)
@@ -99,7 +101,7 @@ class GenrePickerViewController: UIViewController {
     }
     
     @objc func doneButtonTap() {
-        let chosenGenre = self.genrePickerViewControllerDataSource.genres[self.genreChipsCollectionViewLayout.genrePickerView.selectedRow(inComponent: 0)]
+        let chosenGenre = self.genrePickerViewControllerDataSource.getGenres()[self.genreChipsCollectionView.genrePickerView.selectedRow(inComponent: 0)]
         self.delegate?.genrePickerViewController(genrePickerViewController: self, genre: chosenGenre)
         self.animateDismissView()
     }
@@ -113,19 +115,19 @@ class GenrePickerViewController: UIViewController {
     
     @objc func handlePanAction(gesture: UIPanGestureRecognizer) {
         let translation = gesture.translation(in: self.view)
-        let newHeight = self.genreChipsCollectionViewLayout.currentContainerHeight - translation.y
+        let newHeight = self.genreChipsCollectionView.currentContainerHeight - translation.y
         
         switch gesture.state {
         case .changed:
-            if newHeight < self.genreChipsCollectionViewLayout.defaultHeight {
-                self.genreChipsCollectionViewLayout.containerViewHeightConstraint?.constant = newHeight
+            if newHeight < self.genreChipsCollectionView.defaultHeight {
+                self.genreChipsCollectionView.containerViewHeightConstraint?.constant = newHeight
                 self.view.layoutIfNeeded()
             }
         case .ended:
-            if newHeight < self.genreChipsCollectionViewLayout.dismissibleHeight {
+            if newHeight < self.genreChipsCollectionView.dismissibleHeight {
                 self.animateDismissView()
-            } else if newHeight < self.genreChipsCollectionViewLayout.defaultHeight {
-                self.animateContainerHeight(height: self.genreChipsCollectionViewLayout.defaultHeight)
+            } else if newHeight < self.genreChipsCollectionView.defaultHeight {
+                self.animateContainerHeight(height: self.genreChipsCollectionView.defaultHeight)
             }
         default:
             break
@@ -134,26 +136,26 @@ class GenrePickerViewController: UIViewController {
     
     func animateContainerHeight(height: CGFloat) {
         UIView.animate(withDuration: 0.4) {
-            self.genreChipsCollectionViewLayout.containerViewHeightConstraint?.constant = height
+            self.genreChipsCollectionView.containerViewHeightConstraint?.constant = height
             self.view.layoutIfNeeded()
         }
-        self.genreChipsCollectionViewLayout.currentContainerHeight = height
+        self.genreChipsCollectionView.currentContainerHeight = height
     }
 }
 
 extension GenrePickerViewController: UIPickerViewDelegate {
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        let row = self.genrePickerViewControllerDataSource.genres[row]
+        let row = self.genrePickerViewControllerDataSource.getGenreAt(index: row)
         return row
     }
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        let index = GenrePickerHelper.getUnselectedGenre(rowNumber: row, allGenres: self.genrePickerViewControllerDataSource.genres, selectedGenres: self.selectedGenres)
+        let index = GenrePickerHelper.getUnselectedGenre(rowNumber: row, allGenres: self.genrePickerViewControllerDataSource.getGenres(), selectedGenres: self.selectedGenres)
         pickerView.selectRow(index ?? 0, inComponent: component, animated: true)
     }
     
     func pickerView(_ pickerView: UIPickerView, attributedTitleForRow row: Int, forComponent component: Int) -> NSAttributedString? {
         var color: UIColor
-        let genres = self.genrePickerViewControllerDataSource.genres
+        let genres = self.genrePickerViewControllerDataSource.getGenres()
         
         if selectedGenres.contains(genres[row]) {
             color = UIColor.lightGray

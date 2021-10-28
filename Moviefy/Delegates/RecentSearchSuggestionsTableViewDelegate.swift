@@ -5,7 +5,6 @@
 //  Created by A-Team Intern on 22.10.21.
 //
 
-import Foundation
 import UIKit
 
 class RecentSearchSuggestionsTableViewDelegate: NSObject, UITableViewDelegate {

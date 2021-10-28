@@ -5,19 +5,10 @@
 //  Created by A-Team Intern on 23.09.21.
 //
 
-import Foundation
 import UIKit
 
 class GenreChipsCollectionViewCell: UICollectionViewCell {
     static let identifier = "GenreChipsCollectionViewCell"
-    
-    var genre: String? {
-        didSet {
-            DispatchQueue.main.async {
-                self.genreLabel.text = self.genre
-            }
-        }
-    }
     
     var genreLabel: UILabel = {
         let genreLabel = UILabel()
@@ -40,48 +31,49 @@ class GenreChipsCollectionViewCell: UICollectionViewCell {
         return removeButton
     }()
     
-    var containerView: UIStackView = {
-        let containerView = UIStackView()
-        containerView.axis = .horizontal
-        containerView.spacing = 5
-        containerView.translatesAutoresizingMaskIntoConstraints = false
-        return containerView
+    var stackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.spacing = 5
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        return stackView
     }()
     
-    var view = UIView()
+    var containerView = UIView()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
     
-        self.containerView.addArrangedSubview(self.genreLabel)
-        self.containerView.addArrangedSubview(self.removeButton)
-        self.containerView.addArrangedSubview(UIView(frame: CGRect(x: 0, y: 0, width: 1, height: 1)))
+        self.stackView.addArrangedSubview(self.genreLabel)
+        self.stackView.addArrangedSubview(self.removeButton)
         
-        self.view.translatesAutoresizingMaskIntoConstraints = false
+        self.stackView.setCustomSpacing(5, after: removeButton)
         
-        self.view.addSubview(self.containerView)
+        self.containerView.translatesAutoresizingMaskIntoConstraints = false
+        
+        self.containerView.addSubview(self.stackView)
 
-        self.addSubview(self.view)
+        self.addSubview(self.containerView)
         
         NSLayoutConstraint.activate([
-            self.containerView.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 10),
-            self.containerView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -10),
-            self.containerView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
+            self.stackView.topAnchor.constraint(equalTo: self.containerView.topAnchor, constant: 10),
+            self.stackView.bottomAnchor.constraint(equalTo: self.containerView.bottomAnchor, constant: -10),
+            self.stackView.leadingAnchor.constraint(equalTo: self.containerView.leadingAnchor),
             
             self.removeButton.widthAnchor.constraint(equalToConstant: 20),
             self.removeButton.heightAnchor.constraint(equalToConstant: 20),
             
             self.genreLabel.heightAnchor.constraint(equalToConstant: 25),
-            self.genreLabel.leadingAnchor.constraint(equalTo: self.containerView.leadingAnchor, constant: 5),
+            self.genreLabel.leadingAnchor.constraint(equalTo: self.stackView.leadingAnchor, constant: 5),
             
-            self.view.topAnchor.constraint(equalTo: self.topAnchor),
-            self.view.bottomAnchor.constraint(equalTo: self.bottomAnchor),
-            self.view.leadingAnchor.constraint(equalTo: self.leadingAnchor),
-            self.view.trailingAnchor.constraint(equalTo: self.trailingAnchor)
+            self.containerView.topAnchor.constraint(equalTo: self.topAnchor),
+            self.containerView.bottomAnchor.constraint(equalTo: self.bottomAnchor),
+            self.containerView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
+            self.containerView.trailingAnchor.constraint(equalTo: self.trailingAnchor)
         ])
         
-        self.containerView.layer.cornerRadius = 12.0
-        self.containerView.backgroundColor = .lightGray
+        self.stackView.layer.cornerRadius = 12.0
+        self.stackView.backgroundColor = .lightGray
     }
     
     required init?(coder: NSCoder) {
