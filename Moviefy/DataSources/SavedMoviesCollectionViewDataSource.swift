@@ -81,4 +81,8 @@ extension SavedMoviesCollectionViewDataSource {
         }
         return nil
     }
+    
+    func getSavedFilteredMovies() -> [MovieEntity ]{
+        return self.savedFilteredMovies
+    }
 }

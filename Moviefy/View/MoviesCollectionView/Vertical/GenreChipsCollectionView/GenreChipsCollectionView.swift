@@ -33,14 +33,14 @@ class GenreChipsCollectionView: UIView {
     
     lazy var genrePickerView: UIPickerView = {
         let genrePickerView = UIPickerView()
-        genrePickerView.translatesAutoresizingMaskIntoConstraints = true
+        genrePickerView.translatesAutoresizingMaskIntoConstraints = false
         return genrePickerView
     }()
     
     lazy var doneButton: UIButton = {
         let doneButton = UIButton()
         doneButton.setTitle("Done", for: .normal)
-//        doneButton.setTitleColor(.systemBlue, for: .normal)
+        doneButton.setTitleColor(.systemBlue, for: .normal)
         doneButton.translatesAutoresizingMaskIntoConstraints = false
         return doneButton
     }()
@@ -48,7 +48,7 @@ class GenreChipsCollectionView: UIView {
     lazy var closeButton: UIButton = {
         let closeButton = UIButton()
         closeButton.setTitle("Close", for: .normal)
-//        closeButton.setTitleColor(.systemBlue, for: .normal)
+        closeButton.setTitleColor(.systemBlue, for: .normal)
         closeButton.translatesAutoresizingMaskIntoConstraints = false
         return closeButton
     }()
@@ -103,6 +103,8 @@ class GenreChipsCollectionView: UIView {
 
         self.containerView.addSubview(self.genrePickerView)
         self.containerView.addSubview(self.barView)
+        self.genrePickerView.translatesAutoresizingMaskIntoConstraints = false
+        self.barView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
             self.dimmedView.topAnchor.constraint(equalTo: self.topAnchor),

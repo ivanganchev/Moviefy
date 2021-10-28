@@ -16,7 +16,8 @@ class CategoryCollectionView: UIView {
     }()
     let genreChipsView = GenreChipsView(frame: .zero)
     let barTitle = UILabel(frame: CGRect(x: 0, y: 0, width: 50, height: 40))
-    
+    let emptyCollectionViewText: UILabel = UILabel(frame: .zero)
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.backgroundColor = .white
@@ -24,6 +25,7 @@ class CategoryCollectionView: UIView {
         self.setBarTitle()
         self.setCategoryCollectionView()
         self.setGenreChipsView()
+        self.setEmptyCollectionViewText()
         self.setConstraints()
     }
     
@@ -33,7 +35,6 @@ class CategoryCollectionView: UIView {
     
     func setBarTitle() {
         self.barTitle.font = UIFont(name: "Helvetica-Bold", size: 16)
-
     }
     
     func setCategoryCollectionView() {
@@ -41,8 +42,6 @@ class CategoryCollectionView: UIView {
         self.categoryCollectionView.translatesAutoresizingMaskIntoConstraints = false
         self.categoryCollectionView.register(CategoryCollectionViewCell.self, forCellWithReuseIdentifier: CategoryCollectionViewCell.identifier)
         self.categoryCollectionView.register(FooterIndicator.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: FooterIndicator.identifier)
-        
-        self.addSubview(self.categoryCollectionView)
     }
     
     func setGenreChipsView() {
@@ -50,13 +49,23 @@ class CategoryCollectionView: UIView {
         chipsGenreCollectionViewLayout.scrollDirection = .horizontal
         
         self.genreChipsView.translatesAutoresizingMaskIntoConstraints = false
+    }
     
-        self.addSubview(self.genreChipsView)
+    func setEmptyCollectionViewText() {
+        self.emptyCollectionViewText.translatesAutoresizingMaskIntoConstraints = false
+        self.emptyCollectionViewText.text = "Your movie list is empty"
+        self.emptyCollectionViewText.font = UIFont(name: "Helvetica", size: 16)
+        self.emptyCollectionViewText.textAlignment = .center
+        self.emptyCollectionViewText.isHidden = true
     }
     
     func setConstraints() {
         let guide = self.safeAreaLayoutGuide
     
+        self.addSubview(self.categoryCollectionView)
+        self.addSubview(self.genreChipsView)
+        self.addSubview(self.emptyCollectionViewText)
+        
         NSLayoutConstraint.activate([
             self.categoryCollectionView.topAnchor.constraint(equalTo: self.genreChipsView.bottomAnchor),
             self.categoryCollectionView.bottomAnchor.constraint(equalTo: self.bottomAnchor),
@@ -67,7 +76,18 @@ class CategoryCollectionView: UIView {
             self.genreChipsView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
             self.genreChipsView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
             self.genreChipsView.heightAnchor.constraint(equalToConstant: 50),
-            self.genreChipsView.widthAnchor.constraint(equalTo: self.widthAnchor)
+            self.genreChipsView.widthAnchor.constraint(equalTo: self.widthAnchor),
+            
+            self.emptyCollectionViewText.topAnchor.constraint(equalTo: self.topAnchor),
+            self.emptyCollectionViewText.bottomAnchor.constraint(equalTo: self.bottomAnchor),
+            self.emptyCollectionViewText.leadingAnchor.constraint(equalTo: self.leadingAnchor),
+            self.emptyCollectionViewText.trailingAnchor.constraint(equalTo: self.trailingAnchor)
         ])
+    }
+    
+    func setLayoutBackgroundView(isEmpty: Bool) {
+        self.categoryCollectionView.isHidden = isEmpty
+        self.genreChipsView.isHidden = isEmpty
+        self.emptyCollectionViewText.isHidden = !isEmpty
     }
 }
