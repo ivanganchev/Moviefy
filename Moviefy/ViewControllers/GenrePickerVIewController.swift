@@ -53,7 +53,17 @@ class GenrePickerViewController: UIViewController {
     }
     
     func selectRowAtBeginning() {
-        for i in (0...self.genrePickerViewControllerDataSource.getGenres().count) {
+        let selectedGenresCount = self.selectedGenres.count
+        guard let allGenresCount = MoviesService.genres?.count else {
+            return
+        }
+        
+        guard selectedGenresCount < allGenresCount else {
+            self.genreChipsCollectionView.genrePickerView.selectRow(0, inComponent: 0, animated: false)
+            return
+        }
+        
+        for i in (0...) {
             guard let genre = self.genrePickerViewControllerDataSource.getGenreAt(index: i) else {
                 return
             }
@@ -64,6 +74,7 @@ class GenrePickerViewController: UIViewController {
                 break
             }
         }
+        
     }
     
     func animateShowContainerView() {
@@ -102,6 +113,10 @@ class GenrePickerViewController: UIViewController {
     
     @objc func doneButtonTap() {
         let chosenGenre = self.genrePickerViewControllerDataSource.getGenres()[self.genreChipsCollectionView.genrePickerView.selectedRow(inComponent: 0)]
+        guard !self.selectedGenres.contains(chosenGenre) else {
+            self.animateDismissView()
+            return
+        }
         self.delegate?.genrePickerViewController(genrePickerViewController: self, genre: chosenGenre)
         self.animateDismissView()
     }
@@ -150,6 +165,7 @@ extension GenrePickerViewController: UIPickerViewDelegate {
     }
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         let index = GenrePickerHelper.getUnselectedGenre(rowNumber: row, allGenres: self.genrePickerViewControllerDataSource.getGenres(), selectedGenres: self.selectedGenres)
+        
         pickerView.selectRow(index ?? 0, inComponent: component, animated: true)
     }
     

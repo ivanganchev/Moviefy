@@ -9,6 +9,10 @@ import Foundation
 
 class GenrePickerHelper {
     static func getUnselectedGenre(rowNumber: Int, allGenres: [String], selectedGenres: [String]) -> Int? {
+        guard selectedGenres.count < allGenres.count else {
+            return 0
+        }
+        
         var index: Int? = nil
         let firstHalf: [Int] = Array(0..<rowNumber).reversed()
         let secondHalf: [Int] = Array((rowNumber + 1)...allGenres.count)
