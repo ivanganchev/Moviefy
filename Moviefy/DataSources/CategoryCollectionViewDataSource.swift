@@ -16,23 +16,23 @@ class CategoryCollectionViewDataSource: NSObject {
     
     let activityIndicatorView = UIActivityIndicatorView(style: .medium)
     
-    func fetchMovies(completion: @escaping () -> Void) {
+    func fetchMovies(completion: @escaping (Result<Void, ApiResponseCustomError>) -> Void) {
         MoviesService().fetchMoviesByCategory(movieCategoryPath: self.movieCategoryPath!, page: self.currentPage, completion: { result in
                switch result {
                case .success(let moviesResponse):
-                let movieObjects = moviesResponse.movies?.map { (movieResponse) -> Movie in
-                    return Movie(movieResponse: movieResponse)
-                }
-                movieObjects?.forEach({ movie in
-                    if !self.movies.contains(movie) {
-                        self.movies.append(movie)
-                        self.filteredMovies.append(movie)
+                    let movieObjects = moviesResponse.movies?.map { (movieResponse) -> Movie in
+                        return Movie(movieResponse: movieResponse)
                     }
-                })
-                self.currentPage += 1
-                completion()	
+                    movieObjects?.forEach({ movie in
+                        if !self.movies.contains(movie) {
+                            self.movies.append(movie)
+                            self.filteredMovies.append(movie)
+                        }
+                    })
+                    self.currentPage += 1
+                    completion(.success(()))
                case .failure(let err):
-                   print(err)
+                    completion(.failure(err))
                }
            })
     }
@@ -98,7 +98,7 @@ class CategoryCollectionViewDataSource: NSObject {
         self.movies = []
         self.filteredMovies = []
         self.currentPage = 1
-        self.fetchMovies {
+        self.fetchMovies {_ in 
             self.filterMovies(genres: genres)
             completion()
         }
@@ -165,7 +165,7 @@ extension CategoryCollectionViewDataSource {
     }
     
     func getFilteredMovieAt(index: Int) -> Movie {
-        return self.filteredMovies[index]
+         return self.filteredMovies[index]
     }
     
     func getMovies() -> [Movie] {

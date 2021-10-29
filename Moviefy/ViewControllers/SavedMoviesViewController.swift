@@ -58,7 +58,11 @@ class SavedMoviesViewController: UIViewController, InitialTransitionAnimatableCo
             case .error(let err):
                 print(err)
             }
-            self.saveMoviesCollectionView.setLayoutBackgroundView(isEmpty: self.savedMoviesCollectionViewDataSource.getSavedFilteredMovies().isEmpty)
+            let isEmpty = self.savedMoviesCollectionViewDataSource.getSavedFilteredMovies().isEmpty
+            if  isEmpty == true {
+                self.saveMoviesCollectionView.setLayoutBackgroundView(isEmpty: isEmpty)
+                self.saveMoviesCollectionView.genreChipsView.isHidden = isEmpty
+            }
         }
     }
     

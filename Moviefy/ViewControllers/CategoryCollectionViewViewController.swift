@@ -54,12 +54,20 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
     }
 
     func fetchMovies() {
-        self.categoryCollectionViewDataSource.fetchMovies(completion: {
-            self.categoryCollectionViewDataSource.loadImages(completion: {
-                DispatchQueue.main.async {
-                    self.categoryCollectionView.categoryCollectionView.reloadData()
+        self.categoryCollectionViewDataSource.fetchMovies(completion: { result in
+            switch result {
+            case .success(()):
+                self.categoryCollectionViewDataSource.loadImages(completion: {
+                    DispatchQueue.main.async {
+                        self.categoryCollectionView.categoryCollectionView.reloadData()
+                    }
+                })
+            case.failure(_):
+                if self.isCollectionViewEmpty() {
+                    self.showEmptyCollectionViewTextIfNeeded(isEmpty: true)
                 }
-            })
+            }
+
         })
     }
     
@@ -75,14 +83,21 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
     }
         
     func fetchFilteredMovies(currentCellIndex: Int, completion: @escaping () -> Void) {
-        self.categoryCollectionViewDataSource.fetchMovies {
-            self.categoryCollectionViewDataSource.filterMovies(genres: self.genreChipsCollectionViewDataSource.getAllSelectedGenres())
-            let moviesOnScreen = self.categoryCollectionViewDataSource.getFilteredMovies().count
-            if moviesOnScreen - currentCellIndex > 1 {
-                self.categoryCollectionViewDataSource.loadImages()
-                completion()
-            } else {
-                self.fetchFilteredMovies(currentCellIndex: self.categoryCollectionViewDataSource.getFilteredMovies().count - 1, completion: completion)
+        self.categoryCollectionViewDataSource.fetchMovies { result in
+            switch result {
+            case .success():
+                self.categoryCollectionViewDataSource.filterMovies(genres: self.genreChipsCollectionViewDataSource.getAllSelectedGenres())
+                let moviesOnScreen = self.categoryCollectionViewDataSource.getFilteredMovies().count
+                if moviesOnScreen - currentCellIndex > 1 {
+                    self.categoryCollectionViewDataSource.loadImages()
+                    completion()
+                } else {
+                    self.fetchFilteredMovies(currentCellIndex: self.categoryCollectionViewDataSource.getFilteredMovies().count - 1, completion: completion)
+                }
+            case .failure(_):
+                if self.isCollectionViewEmpty() {
+                    self.showEmptyCollectionViewTextIfNeeded(isEmpty: true)
+                }
             }
         }
     }
@@ -111,18 +126,30 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
         self.setGenreChipsViewUILayout()
         self.categoryCollectionView.genreChipsView.genreChipsCollectionView.reloadData()
         self.categoryCollectionViewDataSource.filterMovies(genres: self.genreChipsCollectionViewDataSource.getAllSelectedGenres())
-        self.categoryCollectionView.categoryCollectionView.setContentOffset(.zero, animated: false)
-        self.categoryCollectionView.categoryCollectionView.reloadData()
+        if self.isCollectionViewEmpty() {
+            self.showEmptyCollectionViewTextIfNeeded(isEmpty: true)
+        } else {
+            self.showEmptyCollectionViewTextIfNeeded(isEmpty: false)
+            self.categoryCollectionView.categoryCollectionView.setContentOffset(.zero, animated: false)
+            self.categoryCollectionView.categoryCollectionView.reloadData()
+        }
     }
     
     func setGenreChipsViewUILayout() {
         let isHidden = self.genreChipsCollectionViewDataSource.getAllSelectedGenres().isEmpty
         self.categoryCollectionView.genreChipsView.hideChipsCollectioNView(isHidden: isHidden)
     }
+    
+    func showEmptyCollectionViewTextIfNeeded(isEmpty: Bool) {
+        self.categoryCollectionView.setLayoutBackgroundView(isEmpty: isEmpty)
+    }
+    
+    func isCollectionViewEmpty() -> Bool {
+        return self.categoryCollectionViewDataSource.getFilteredMovies().isEmpty
+    }
 }
 
 extension CategoryCollectionViewViewController: UICollectionViewDelegateFlowLayout {
-    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let ratio = ImageProperties.getThumbNailImageRatio()
         
@@ -186,6 +213,7 @@ extension CategoryCollectionViewViewController: GenrePickerViewControllerDelegat
         guard genre != "" else {
             return
         }
+        self.categoryCollectionView.setLayoutBackgroundView(isEmpty: false)
         self.genreChipsCollectionViewDataSource.addSelectedGenre(genre: genre)
         self.setGenreChipsViewUILayout()
         self.categoryCollectionView.genreChipsView.genreChipsCollectionView.reloadData()

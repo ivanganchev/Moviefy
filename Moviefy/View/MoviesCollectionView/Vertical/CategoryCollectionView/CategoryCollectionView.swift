@@ -53,7 +53,7 @@ class CategoryCollectionView: UIView {
     
     func setEmptyCollectionViewText() {
         self.emptyCollectionViewText.translatesAutoresizingMaskIntoConstraints = false
-        self.emptyCollectionViewText.text = "Your movie list is empty"
+        self.emptyCollectionViewText.text = "No movies found"
         self.emptyCollectionViewText.font = UIFont(name: "Helvetica", size: 16)
         self.emptyCollectionViewText.textAlignment = .center
         self.emptyCollectionViewText.isHidden = true
@@ -86,8 +86,9 @@ class CategoryCollectionView: UIView {
     }
     
     func setLayoutBackgroundView(isEmpty: Bool) {
-        self.categoryCollectionView.isHidden = isEmpty
-        self.genreChipsView.isHidden = isEmpty
-        self.emptyCollectionViewText.isHidden = !isEmpty
+        DispatchQueue.main.async {
+            self.categoryCollectionView.isHidden = isEmpty
+            self.emptyCollectionViewText.isHidden = !isEmpty
+        }
     }
 }

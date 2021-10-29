@@ -23,7 +23,7 @@ class MoviesService {
         }.resume()
     }
     
-    func fetchMoviesByCategory(movieCategoryPath: String, page: Int, completion: @escaping (Result<MoviesResponse, Error>) -> Void) {
+    func fetchMoviesByCategory(movieCategoryPath: String, page: Int, completion: @escaping (Result<MoviesResponse, ApiResponseCustomError>) -> Void) {
         guard var urlComponents = URLComponents(string: Link.defaultLink + movieCategoryPath) else {
             return
         }
@@ -34,13 +34,15 @@ class MoviesService {
             guard let data = data else {
                 return
             }
-            do {
-                var responseObj: MoviesResponse = try JSONDecoder().decode(MoviesResponse.self, from: data)
+            guard var responseObj: MoviesResponse = try? JSONDecoder().decode(MoviesResponse.self, from: data) else {
+                return
+            }
+            if responseObj.movies!.count > 0 {
                 responseObj.movies = responseObj.movies.map {$0.filter({ $0.id != nil })}
                 completion(.success(responseObj))
-            } catch let err {
-                completion(.failure(err))
-                print(err)
+            } else {
+                completion(.failure(ApiResponseCustomError.noMoviesFound))
+                return
             }
         })
     }
@@ -81,7 +83,7 @@ class MoviesService {
         })
     }
     
-    func searchMovies(text: String, completion: @escaping (Result<MoviesResponse, Error>) -> Void) {
+    func searchMovies(text: String, completion: @escaping (Result<MoviesResponse, ApiResponseCustomError>) -> Void) {
         guard var urlComponents = URLComponents(string: Link.defaultLink + EndPoint.searchPath) else {
             return
         }
@@ -92,12 +94,15 @@ class MoviesService {
             guard let data = data else {
                 return
             }
-            do {
-                let obj: MoviesResponse = try JSONDecoder().decode(MoviesResponse.self, from: data)
-                completion(.success(obj))
-            } catch let err {
-                completion(.failure(err))
-                print(err)
+            guard var responseObj: MoviesResponse = try? JSONDecoder().decode(MoviesResponse.self, from: data) else {
+                return
+            }
+            if responseObj.movies!.count > 0 {
+                responseObj.movies = responseObj.movies.map {$0.filter({ $0.id != nil })}
+                completion(.success(responseObj))
+            } else {
+                completion(.failure(ApiResponseCustomError.noMoviesFound))
+                return
             }
         })
     }

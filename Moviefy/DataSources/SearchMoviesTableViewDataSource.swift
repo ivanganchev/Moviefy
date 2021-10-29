@@ -72,7 +72,7 @@ class SearchMoviesTableViewDataSource: NSObject {
         })
     }
     
-    func getCompletionResult(result: Result<MoviesResponse, Error>) {
+    func getCompletionResult(result: Result<MoviesResponse, ApiResponseCustomError>) {
         switch result {
         case .success(let moviesResponse):
             let movies = moviesResponse.movies?.map { (movieResponse) -> Movie in
