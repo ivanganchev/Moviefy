@@ -7,14 +7,15 @@
 
 import UIKit
 
-class MoviesCollectionViewCell: UICollectionViewCell {
+class MoviesCollectionViewCell: UICollectionViewCell, ThumbnailCell {
     static let identifier = "MoviesCollectionViewCell"
 
-    let imageView = UIImageView()
+    var cellImageView = UIImageView()
+    var cellIndex = 0
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        contentView.addSubview(imageView)
+        contentView.addSubview(self.cellImageView)
     }
     
     required init?(coder: NSCoder) {
@@ -23,12 +24,12 @@ class MoviesCollectionViewCell: UICollectionViewCell {
     
     override func layoutSubviews() {
         DispatchQueue.main.async {
-            self.imageView.frame = CGRect(origin: .zero, size: ImageProperties.getThumbnailImageSize())
+            self.cellImageView.frame = CGRect(origin: .zero, size: ImageProperties.getThumbnailImageSize())
         }
     }
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        self.imageView.image = nil
+        self.cellImageView.image = nil
     }
 }

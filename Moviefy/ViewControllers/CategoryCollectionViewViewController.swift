@@ -190,7 +190,7 @@ extension CategoryCollectionViewViewController: UICollectionViewDelegateFlowLayo
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let selectedCell = collectionView.cellForItem(at: indexPath) as? CategoryCollectionViewCell
-        self.selectedCellImageView = selectedCell?.imageView
+        self.selectedCellImageView = selectedCell?.cellImageView
         self.selectedCellImageViewSnapshot = selectedCellImageView?.snapshotView(afterScreenUpdates: true)
         self.presentMovieInfoViewController(with: self.categoryCollectionViewDataSource.getFilteredMovieAt(index: indexPath.row), index: indexPath.row)
     }
@@ -249,7 +249,7 @@ extension CategoryCollectionViewViewController: MovieInfoDelegate {
             guard let index = self.categoryCollectionViewDataSource.getFilteredMovies().firstIndex(where: {$0 === movie}) else {
                 return
             }
-            self.categoryCollectionViewDataSource.loadImage(index: index, completion: {_ in
+            self.categoryCollectionViewDataSource.imageLoadingHelper.loadImage(movie: movie, completion: {_ in
                 completion(.success(self.categoryCollectionViewDataSource.getFilteredMovieAt(index: index).imageData!))
             })
         } else {

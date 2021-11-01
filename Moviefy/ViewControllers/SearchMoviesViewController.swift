@@ -132,7 +132,7 @@ extension SearchMoviesViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let selectedCell = tableView.cellForRow(at: indexPath) as? SearchMoviesTableViewCell
-        self.selectedCellImageView = selectedCell?.movieImageView
+        self.selectedCellImageView = selectedCell?.cellImageView
         self.selectedCellImageViewSnapshot = self.selectedCellImageView?.snapshotView(afterScreenUpdates: true)
         self.presentMovieInfoViewController(with: self.searchMoviesTableViewDataSource.getMovieAt(index: indexPath.row))
     }

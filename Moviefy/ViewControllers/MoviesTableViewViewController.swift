@@ -56,7 +56,7 @@ extension MoviesTableViewViewController: MoviesTableViewButtonTapDelegate {
     }
     
     func setClickedCollectionViewCell(cell: MoviesCollectionViewCell?, movie: Movie) {
-        self.selectedCellImageView = cell?.imageView
+        self.selectedCellImageView = cell?.cellImageView
         self.selectedCellImageViewSnapshot = self.selectedCellImageView?.snapshotView(afterScreenUpdates: true)
         self.presentMovieInfoViewController(with: movie)
     }

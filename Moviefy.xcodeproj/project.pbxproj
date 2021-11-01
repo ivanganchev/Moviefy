@@ -42,6 +42,8 @@
 		8E9357DD271F11B5000EB3E5 /* TestGenrePicking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E9357DC271F11B5000EB3E5 /* TestGenrePicking.swift */; };
 		8E9743C82727FB3000FCD337 /* RealmWriteTransactionHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E9743C72727FB3000FCD337 /* RealmWriteTransactionHelper.swift */; };
 		8E9743CA2728419200FCD337 /* ApiResponseCustomError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E9743C92728419200FCD337 /* ApiResponseCustomError.swift */; };
+		8E9743CC272FE77F00FCD337 /* ImageLoadingHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E9743CB272FE77F00FCD337 /* ImageLoadingHelper.swift */; };
+		8E9743CE273017C000FCD337 /* ThumbnailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E9743CD273017C000FCD337 /* ThumbnailCell.swift */; };
 		8E99FEDB2704B2E0001DC33F /* InitialTransitionAnimatableContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E99FEDA2704B2E0001DC33F /* InitialTransitionAnimatableContent.swift */; };
 		8E99FEDE2705F58D001DC33F /* Realm in Frameworks */ = {isa = PBXBuildFile; productRef = 8E99FEDD2705F58D001DC33F /* Realm */; };
 		8E99FEE02705F58D001DC33F /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 8E99FEDF2705F58D001DC33F /* RealmSwift */; };
@@ -135,6 +137,8 @@
 		8E9357DE271F11B5000EB3E5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8E9743C72727FB3000FCD337 /* RealmWriteTransactionHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmWriteTransactionHelper.swift; sourceTree = "<group>"; };
 		8E9743C92728419200FCD337 /* ApiResponseCustomError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiResponseCustomError.swift; sourceTree = "<group>"; };
+		8E9743CB272FE77F00FCD337 /* ImageLoadingHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageLoadingHelper.swift; sourceTree = "<group>"; };
+		8E9743CD273017C000FCD337 /* ThumbnailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThumbnailCell.swift; sourceTree = "<group>"; };
 		8E99FEDA2704B2E0001DC33F /* InitialTransitionAnimatableContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InitialTransitionAnimatableContent.swift; sourceTree = "<group>"; };
 		8E99FEE22705FA9B001DC33F /* MovieEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieEntity.swift; sourceTree = "<group>"; };
 		8E99FEE42706F082001DC33F /* SavedMoviesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedMoviesViewController.swift; sourceTree = "<group>"; };
@@ -375,6 +379,7 @@
 			isa = PBXGroup;
 			children = (
 				8E47BACE2726A8B3001C18A6 /* CustomButtonDelete.swift */,
+				8E9743CD273017C000FCD337 /* ThumbnailCell.swift */,
 				8E9357CF2715A4D8000EB3E5 /* MovieInfoView */,
 				8E56E40526F48B07001ADF70 /* SearchMoviesTableView */,
 				8E492C1926DF8E81002FAF8C /* MoviesCollectionView */,
@@ -394,6 +399,7 @@
 				8EAEFCC0272049ED0016F325 /* FilterHelper.swift */,
 				8E9743C72727FB3000FCD337 /* RealmWriteTransactionHelper.swift */,
 				8E9743C92728419200FCD337 /* ApiResponseCustomError.swift */,
+				8E9743CB272FE77F00FCD337 /* ImageLoadingHelper.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -646,10 +652,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8E9743CE273017C000FCD337 /* ThumbnailCell.swift in Sources */,
 				8E56E40926F48B86001ADF70 /* SearchMoviesTableViewCell.swift in Sources */,
 				8EAEFCC1272049ED0016F325 /* FilterHelper.swift in Sources */,
 				8E9743C82727FB3000FCD337 /* RealmWriteTransactionHelper.swift in Sources */,
 				8E8C85BA2722ACC300B063F6 /* RecentSearchSuggestionsTableViewDelegate.swift in Sources */,
+				8E9743CC272FE77F00FCD337 /* ImageLoadingHelper.swift in Sources */,
 				8E492C2826E22FA7002FAF8C /* CategoryCollectionViewDataSource.swift in Sources */,
 				8E492C1426DF69E3002FAF8C /* EndPoint.swift in Sources */,
 				8E99FEEE270C65D8001DC33F /* FooterIndicator.swift in Sources */,

@@ -7,14 +7,15 @@
 
 import UIKit
 
-class CategoryCollectionViewCell: UICollectionViewCell {
-    static let identifier = "CategoryCollectionViewCell"
+class CategoryCollectionViewCell: UICollectionViewCell, ThumbnailCell {
+    var cellImageView: UIImageView = UIImageView()
+    var cellIndex = 0
     
-    let imageView = UIImageView()
+    static let identifier = "CategoryCollectionViewCell"
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        contentView.addSubview(imageView)
+        contentView.addSubview(self.cellImageView)
     }
     
     required init?(coder: NSCoder) {
@@ -23,7 +24,7 @@ class CategoryCollectionViewCell: UICollectionViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        self.imageView.image = nil
+        self.cellImageView.image = nil
     }
     
     override func layoutSubviews() {
@@ -34,7 +35,7 @@ class CategoryCollectionViewCell: UICollectionViewCell {
         layout.itemSize = CGSize(width: width, height: height)
         
         DispatchQueue.main.async {
-            self.imageView.frame = CGRect(x: 0, y: 0, width: width, height: height)
+            self.cellImageView.frame = CGRect(x: 0, y: 0, width: width, height: height)
         }
     }
 }

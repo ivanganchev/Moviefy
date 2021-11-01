@@ -10,7 +10,7 @@ import UIKit
 class SearchMoviesTableViewDataSource: NSObject {
     private var movies: [Movie] = []
     private let genres = MoviesService.genres
-    let cache = NSCache<NSString, UIImage>()
+    private var imageLoadingHelper = ImageLoadingHelper()
     
     func resfreshMovies(completion: @escaping () -> Void) {
         MoviesService().fetchMoviesByCategory(movieCategoryPath: EndPoint.MovieCategoryEndPoint.topRated.rawValue, page: 1, completion: { result in
@@ -27,49 +27,17 @@ class SearchMoviesTableViewDataSource: NSObject {
     }
     
     func loadImages(completion: @escaping () -> Void) {
-        self.movies.forEach { (movie) in
-            guard let posterPath = movie.movieResponse.posterPath else {
-                return
-            }
-            
-            let path = NSString(string: posterPath)
-            
-            MoviesService().fetchMovieImage(imageUrl: path as String, completion: {result in
-                switch result {
-                case .success(let data):
-                    guard let image = UIImage(data: data) else {
-                        return
-                    }
-                    self.cache.setObject(image, forKey: path)
-                    movie.imageData = data
-                case .failure(let err):
-                    print(err)
-                }
-            })
-        }
-        completion()
+        self.imageLoadingHelper.loadImages(movies: self.movies, completion: {
+            completion()
+        })
     }
     
-    func loadImage(movie: Movie, completion: ((UIImage) -> Void)? = nil) {
-        guard let posterPath = movie.movieResponse.posterPath else {
+    func loadImageView(cell: SearchMoviesTableViewCell, index: Int) {
+        if self.movies.count > index {
+            self.imageLoadingHelper.loadImageView(cell: cell, movie: self.movies[index], index: index)
+        } else {
             return
         }
-        
-        let path = NSString(string: posterPath)
-        
-        MoviesService().fetchMovieImage(imageUrl: path as String, completion: {result in
-            switch result {
-            case .success(let data):
-                guard let loadedImage = UIImage(data: data) else {
-                    return
-                }
-                self.cache.setObject(loadedImage, forKey: path)
-                movie.imageData = data
-                completion!(loadedImage)
-            case .failure(let err):
-                print(err)
-            }
-        })
     }
     
     func getCompletionResult(result: Result<MoviesResponse, ApiResponseCustomError>) {
@@ -97,7 +65,7 @@ extension SearchMoviesTableViewDataSource: UITableViewDataSource {
         
         cell.selectionStyle = .none
         
-        cell.tag = indexPath.row
+        cell.cellIndex = indexPath.row
         self.loadImageView(cell: cell, index: indexPath.row)
         
         let model = self.movies[indexPath.row]
@@ -116,27 +84,6 @@ extension SearchMoviesTableViewDataSource: UITableViewDataSource {
 }
 
 extension SearchMoviesTableViewDataSource {
-    func loadImageView(cell: SearchMoviesTableViewCell, index: Int) {
-        let movie = self.movies[index]
-        
-        guard let path = movie.movieResponse.posterPath else {
-            cell.movieImageView.image = UIImage(named: "not_loaded_image.jpg")
-            return
-        }
-        
-        if let cachedImage = self.cache.object(forKey: NSString(string: path)) {
-            cell.movieImageView.image = cachedImage
-        } else {
-            self.loadImage(movie: movie) { image in
-                DispatchQueue.main.async {
-                    if cell.tag == index {
-                        cell.movieImageView.image = image
-                    }
-                }
-            }
-        }
-    }
-    
     func getMovies() -> [Movie] {
         return self.movies
     }

@@ -12,7 +12,7 @@ class CategoryCollectionViewDataSource: NSObject {
     private var filteredMovies = [Movie]()
     var movieCategoryPath: String?
     private var currentPage = 1
-    let cache = NSCache<NSString, UIImage>()
+    var imageLoadingHelper = ImageLoadingHelper()
     
     let activityIndicatorView = UIActivityIndicatorView(style: .medium)
     
@@ -37,53 +37,6 @@ class CategoryCollectionViewDataSource: NSObject {
            })
     }
     
-    func loadImages(completion: (() -> Void)? = nil) {
-        self.filteredMovies.forEach { (movie) in
-            guard let posterPath = movie.movieResponse.posterPath else {
-                return
-            }
-            
-            let path = NSString(string: posterPath)
-            
-            MoviesService().fetchMovieImage(imageUrl: path as String, completion: { result in
-                switch result {
-                case .success(let data):
-                    movie.imageData = data
-                    self.cache.setObject(UIImage(data: data)!, forKey: path)
-                case .failure(let err):
-                    print(err)
-                }
-            })
-        }
-        completion?()
-    }
-    
-    func loadImage(index: Int, completion: ((UIImage) -> Void)? = nil) {
-        guard index >= 0 && index < self.filteredMovies.count else {
-            return
-        }
-        
-        let movie: Movie = self.filteredMovies[index]
-        
-        guard let posterPath = movie.movieResponse.posterPath else {
-            return
-        }
-        
-        let path = NSString(string: posterPath)
-        
-        MoviesService().fetchMovieImage(imageUrl: path as String, completion: { result in
-            switch result {
-            case .success(let data):
-                movie.imageData = data
-                let loadedImage = UIImage(data: data)!
-                self.cache.setObject(loadedImage, forKey: path)
-                completion!(loadedImage)
-            case .failure(let err):
-                print(err)
-            }
-        })
-    }
-    
     func filterMovies(genres: [String]) {
         guard !genres.isEmpty else {
             self.filteredMovies = self.movies
@@ -103,6 +56,20 @@ class CategoryCollectionViewDataSource: NSObject {
             completion()
         }
    }
+    
+    func loadImages(completion: @escaping () -> Void) {
+        self.imageLoadingHelper.loadImages(movies: self.movies, completion: {
+            completion()
+        })
+    }
+    
+    func loadImageView(cell: CategoryCollectionViewCell, index: Int) {
+        if self.filteredMovies.count > index {
+            self.imageLoadingHelper.loadImageView(cell: cell, movie: self.filteredMovies[index], index: index)
+        } else {
+            return
+        }
+    }
 }
 
 extension CategoryCollectionViewDataSource: UICollectionViewDataSource {
@@ -114,7 +81,7 @@ extension CategoryCollectionViewDataSource: UICollectionViewDataSource {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CategoryCollectionViewCell.identifier, for: indexPath) as? CategoryCollectionViewCell else {
             return CategoryCollectionViewCell()
         }
-        cell.tag = indexPath.row
+        cell.cellIndex = indexPath.row
         self.loadImageView(cell: cell, index: indexPath.row)
         
         return cell
@@ -132,34 +99,6 @@ extension CategoryCollectionViewDataSource: UICollectionViewDataSource {
 }
 
 extension CategoryCollectionViewDataSource {
-    func loadImageView(cell: UICollectionViewCell, index: Int) {
-        guard let cell = cell as? CategoryCollectionViewCell else { return }
-        
-        let movie: Movie
-        if self.filteredMovies.count > index {
-           movie = self.filteredMovies[index]
-        } else {
-            return
-        }
-    
-        guard let path = movie.movieResponse.posterPath else {
-            cell.imageView.image = UIImage(named: "not_loaded_image.jpg")
-            return
-        }
-        
-        if let cachedImage = self.cache.object(forKey: NSString(string: path)) {
-            cell.imageView.image = cachedImage
-        } else {
-            self.loadImage(index: index) { image in
-                DispatchQueue.main.async {
-                    if cell.tag == index {
-                        cell.imageView.image = image
-                    }
-                }
-            }
-        }
-    }
-    
     func getMovieAt(index: Int) -> Movie {
         return self.movies[index]
     }

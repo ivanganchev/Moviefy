@@ -59,15 +59,15 @@ extension SavedMoviesCollectionViewDataSource: UICollectionViewDataSource {
             return CategoryCollectionViewCell()
         }
         
-        cell.imageView.image = nil
+        cell.cellImageView.image = nil
         
         let model = savedFilteredMovies[indexPath.row]
         
         if let imageData = model.getImageDataForSavedMovie() {
-            cell.imageView.image = UIImage(data: imageData)
+            cell.cellImageView.image = UIImage(data: imageData)
         } else {
             let defaultImage = UIImage(named: "not_loaded_image.jpg")
-            cell.imageView.image = defaultImage
+            cell.cellImageView.image = defaultImage
         }
         
         return cell

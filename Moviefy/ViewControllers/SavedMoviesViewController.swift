@@ -137,7 +137,7 @@ extension SavedMoviesViewController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let selectedCell = collectionView.cellForItem(at: indexPath) as? CategoryCollectionViewCell
-        self.selectedCellImageView = selectedCell?.imageView
+        self.selectedCellImageView = selectedCell?.cellImageView
         self.selectedCellImageViewSnapshot = selectedCellImageView?.snapshotView(afterScreenUpdates: true)
         guard let savedMovie = self.savedMoviesCollectionViewDataSource.getSavedFilteredMovieAt(index: indexPath.row) else {
             return
