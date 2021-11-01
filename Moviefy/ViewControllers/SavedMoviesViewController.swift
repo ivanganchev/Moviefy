@@ -44,7 +44,7 @@ class SavedMoviesViewController: UIViewController, InitialTransitionAnimatableCo
     
     func loadSavedMovies() {
         self.savedMoviesCollectionViewDataSource.loadSavedMovies()
-        self.savedMoviesCollectionViewDataSource.registerNotificationToken { changes in
+        self.savedMoviesCollectionViewDataSource.registerNotificationToken {changes in
             switch changes {
             case .initial:
                 self.saveMoviesCollectionView.categoryCollectionView.reloadData()
@@ -59,10 +59,8 @@ class SavedMoviesViewController: UIViewController, InitialTransitionAnimatableCo
                 print(err)
             }
             let isEmpty = self.savedMoviesCollectionViewDataSource.getSavedFilteredMovies().isEmpty
-            if  isEmpty == true {
-                self.saveMoviesCollectionView.setLayoutBackgroundView(isEmpty: isEmpty)
-                self.saveMoviesCollectionView.genreChipsView.isHidden = isEmpty
-            }
+            self.saveMoviesCollectionView.setLayoutBackgroundView(isEmpty: isEmpty)
+            self.saveMoviesCollectionView.genreChipsView.isHidden = isEmpty
         }
     }
     

@@ -89,8 +89,9 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
                 self.categoryCollectionViewDataSource.filterMovies(genres: self.genreChipsCollectionViewDataSource.getAllSelectedGenres())
                 let moviesOnScreen = self.categoryCollectionViewDataSource.getFilteredMovies().count
                 if moviesOnScreen - currentCellIndex > 1 {
-                    self.categoryCollectionViewDataSource.loadImages()
-                    completion()
+                    self.categoryCollectionViewDataSource.loadImages(completion: {
+                        completion()
+                    })
                 } else {
                     self.fetchFilteredMovies(currentCellIndex: self.categoryCollectionViewDataSource.getFilteredMovies().count - 1, completion: completion)
                 }
@@ -103,7 +104,7 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
     }
     
     func getIndexPathForPrefetchedMovies(currentCellIndex: Int) -> [IndexPath] {
-        var paths = [IndexPath]()
+         var paths = [IndexPath]()
         let moviesOnScreenCount = self.categoryCollectionViewDataSource.getFilteredMovies().count
         let hiddenMoviesCount = moviesOnScreenCount - currentCellIndex
         for item in 1..<hiddenMoviesCount {
