@@ -8,19 +8,19 @@
 import Foundation
 
 enum ApiResponseCustomError: Error {
-    case endOfPages
     case noMoviesFound
+    case currentlyFetching
     var description: String {
         switch self {
-        case .endOfPages:
-            return Messages.endOfPages
         case .noMoviesFound:
             return Messages.noMoviesFound
+        case .currentlyFetching:
+            return Messages.currentlyFetching
         }
     }
 }
 
 class Messages {
-    static let endOfPages = "You've reached maximum number of pages"
     static let noMoviesFound = "No movies found"
+    static let currentlyFetching = "Currently fetching"
 }

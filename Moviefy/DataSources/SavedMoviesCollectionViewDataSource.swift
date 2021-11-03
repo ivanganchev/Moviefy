@@ -45,7 +45,7 @@ class SavedMoviesCollectionViewDataSource: NSObject {
         }
         let movies = realm.objects(MovieEntity.self)
 
-        self.savedFilteredMovies = FilterHelper.getMoviesByGenres(movies: Array(movies.map({Movie(movieEntity: $0, imageData: $0.getImageDataForSavedMovie()!)})), selectedGenres: genres, allGenres: MoviesService.genres).map({MovieEntity(movie: $0)})
+        self.savedFilteredMovies = FilterHelper.filterByGenres(movies: Array(movies.map({Movie(movieEntity: $0, imageData: $0.getImageDataForSavedMovie()!)})), selectedGenres: genres, allGenres: MoviesService.genres).map({MovieEntity(movie: $0)})
     }
 }
 
@@ -82,7 +82,7 @@ extension SavedMoviesCollectionViewDataSource {
         return nil
     }
     
-    func getSavedFilteredMovies() -> [MovieEntity ]{
+    func getSavedFilteredMovies() -> [MovieEntity]{
         return self.savedFilteredMovies
     }
 }

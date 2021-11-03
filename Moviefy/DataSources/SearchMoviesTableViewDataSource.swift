@@ -13,7 +13,7 @@ class SearchMoviesTableViewDataSource: NSObject {
     private var imageLoadingHelper = ImageLoadingHelper()
     
     func resfreshMovies(completion: @escaping () -> Void) {
-        MoviesService().fetchMoviesByCategory(movieCategoryPath: EndPoint.MovieCategoryEndPoint.topRated.rawValue, page: 1, completion: { result in
+        MoviesService().fetchMoviesByCategory(movieCategoryPath: EndPoint.MovieCategoryEndPoint.topRated.rawValue, page: 1,  completion: { result in
             self.getCompletionResult(result: result)
             completion()
        })

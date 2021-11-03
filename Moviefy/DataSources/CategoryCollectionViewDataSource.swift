@@ -14,10 +14,12 @@ class CategoryCollectionViewDataSource: NSObject {
     private var currentPage = 1
     var imageLoadingHelper = ImageLoadingHelper()
     
+    let movieService = MoviesService()
+    
     let activityIndicatorView = UIActivityIndicatorView(style: .medium)
     
-    func fetchMovies(completion: @escaping (Result<Void, ApiResponseCustomError>) -> Void) {
-        MoviesService().fetchMoviesByCategory(movieCategoryPath: self.movieCategoryPath!, page: self.currentPage, completion: { result in
+    func fetchMovies(genres: [String], completion: @escaping (Result<Void, ApiResponseCustomError>) -> Void) {
+        movieService.fetchMoviesByCategory(movieCategoryPath: self.movieCategoryPath!, page: self.currentPage, completion: { result in
                switch result {
                case .success(let moviesResponse):
                     let movieObjects = moviesResponse.movies?.map { (movieResponse) -> Movie in
@@ -26,9 +28,9 @@ class CategoryCollectionViewDataSource: NSObject {
                     movieObjects?.forEach({ movie in
                         if !self.movies.contains(movie) {
                             self.movies.append(movie)
-                            self.filteredMovies.append(movie)
                         }
                     })
+                self.filterMovies(genres: genres)
                     self.currentPage += 1
                     completion(.success(()))
                case .failure(let err):
@@ -43,18 +45,17 @@ class CategoryCollectionViewDataSource: NSObject {
             return
         }
 
-        self.filteredMovies = FilterHelper.getMoviesByGenres(movies: self.movies, selectedGenres: genres, allGenres: MoviesService.genres)
-        print()
+        self.filteredMovies = FilterHelper.filterByGenres(movies: self.movies, selectedGenres: genres, allGenres: MoviesService.genres)
     }
     
     func refreshMovies(genres: [String], completion: @escaping () -> Void) {
         self.movies = []
         self.filteredMovies = []
         self.currentPage = 1
-        self.fetchMovies {_ in 
+        self.fetchMovies(genres: genres, completion: {_ in
             self.filterMovies(genres: genres)
             completion()
-        }
+        })
    }
     
     func loadImages(completion: @escaping () -> Void) {
@@ -99,12 +100,18 @@ extension CategoryCollectionViewDataSource: UICollectionViewDataSource {
 }
 
 extension CategoryCollectionViewDataSource {
-    func getMovieAt(index: Int) -> Movie {
-        return self.movies[index]
+    func getMovieAt(index: Int) -> Movie? {
+        if index < self.movies.count {
+            return self.movies[index]
+        }
+        return nil
     }
     
-    func getFilteredMovieAt(index: Int) -> Movie {
-         return self.filteredMovies[index]
+    func getFilteredMovieAt(index: Int) -> Movie? {
+        if index < self.filteredMovies.count {
+            return self.filteredMovies[index]
+        }
+        return nil
     }
     
     func getMovies() -> [Movie] {

@@ -8,7 +8,7 @@
 import UIKit
 
 class CategoryCollectionViewCell: UICollectionViewCell, ThumbnailCell {
-    var cellImageView: UIImageView = UIImageView()
+    var cellImageView = UIImageView()
     var cellIndex = 0
     
     static let identifier = "CategoryCollectionViewCell"

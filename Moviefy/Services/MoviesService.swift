@@ -16,11 +16,12 @@ enum QueryItems: String {
 class MoviesService {
     let session = URLSession.shared
     static var genres: [Int: String]?
+    var dataTask: URLSessionDataTask?
     
-    private static func provideService(url: URLRequest, completion: @escaping (Data?, URLResponse?, Error?) -> Void) {
-        URLSession.shared.dataTask(with: url) {(data, response, error) in
+    private static func provideService(url: URLRequest, completion: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
+        return URLSession.shared.dataTask(with: url) {(data, response, error) in
             completion(data, response, error)
-        }.resume()
+        }
     }
     
     func fetchMoviesByCategory(movieCategoryPath: String, page: Int, completion: @escaping (Result<MoviesResponse, ApiResponseCustomError>) -> Void) {
@@ -30,21 +31,37 @@ class MoviesService {
         let url = MoviesService.setQueryParams(urlComponents: &urlComponents, params: [QueryItems.page.rawValue: String(page), QueryItems.language.rawValue: "en-US"])
         let request: URLRequest = MoviesService.setHeaders(url: url)
         
-        MoviesService.provideService(url: request, completion: {(data, _, _) in
+//        if force {
+//            self.dataTask?.cancel()
+//            self.dataTask = nil
+//        }
+        
+//        guard dataTask == nil else {
+//            completion(.failure(ApiResponseCustomError.currentlyFetching))
+//            print(ApiResponseCustomError.currentlyFetching)
+//            return
+//        }
+        
+        self.dataTask = MoviesService.provideService(url: request, completion: {(data, _, _) in
             guard let data = data else {
                 return
             }
             guard var responseObj: MoviesResponse = try? JSONDecoder().decode(MoviesResponse.self, from: data) else {
                 return
             }
+            
+            self.dataTask = nil
+            
             if responseObj.movies!.count > 0 {
                 responseObj.movies = responseObj.movies.map {$0.filter({ $0.id != nil })}
                 completion(.success(responseObj))
             } else {
                 completion(.failure(ApiResponseCustomError.noMoviesFound))
+                print(ApiResponseCustomError.noMoviesFound)
                 return
             }
         })
+        self.dataTask?.resume()
     }
     
     func fetchMovieImage(imageUrl: String, completion: @escaping(Result<Data, Error>) -> Void) {
@@ -59,7 +76,7 @@ class MoviesService {
                 return
             }
             completion(.success(data))
-        }
+        }.resume()
     }
     
     static func loadMoviesGenreList() {
@@ -80,7 +97,7 @@ class MoviesService {
                 print(err)
                 MoviesService.genres = nil
             }
-        })
+        }).resume()
     }
     
     func searchMovies(text: String, completion: @escaping (Result<MoviesResponse, ApiResponseCustomError>) -> Void) {
@@ -104,7 +121,7 @@ class MoviesService {
                 completion(.failure(ApiResponseCustomError.noMoviesFound))
                 return
             }
-        })
+        }).resume()
     }
 }
 
