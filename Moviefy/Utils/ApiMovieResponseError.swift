@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum ApiResponseCustomError: Error {
+enum ApiMovieResponseError: Error {
     case noMoviesFound
     case currentlyFetching
     var description: String {

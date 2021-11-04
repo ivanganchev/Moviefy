@@ -18,7 +18,6 @@ class MovieInfoViewController: UIViewController, PresentedTransitionAnimatableCo
     var movieInfoView = MovieInfoView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height))
     var movie: Movie?
     var genres: [String]?
-    var isHeartFilled: Bool = false
     weak var delegate: MovieInfoDelegate?
     
     override func viewDidLoad() {
@@ -32,8 +31,7 @@ class MovieInfoViewController: UIViewController, PresentedTransitionAnimatableCo
         guard let primaryKey = self.movie?.movieResponse.id else {
             return
         }
-        self.isHeartFilled = RealmWriteTransactionHelper.getRealmObject(primaryKey: String(primaryKey), entityType: MovieEntity.self) != nil ? true : false
-        self.movieInfoView.setHeart(isFilled: self.isHeartFilled)
+        self.movieInfoView.setHeart(isFilled: RealmWriteTransactionHelper.getRealmObject(primaryKey: String(primaryKey), entityType: MovieEntity.self) != nil ? true : false)
         self.movieInfoView.heartButton.addTarget(self, action: #selector(MovieInfoViewController.heartButtonTap), for: .touchUpInside)
         
         if movie?.imageData == nil {
@@ -62,23 +60,20 @@ class MovieInfoViewController: UIViewController, PresentedTransitionAnimatableCo
     }
     
     @objc func heartButtonTap() {
-        guard let movie = self.movie else {
-            return
-        }
-    
-        guard let primaryKey = self.movie?.movieResponse.id else {
+        guard let movie = self.movie, let primaryKey = movie.movieResponse.id else {
             return
         }
         
+        var isHeartFilled: Bool
         if let movieEntity = RealmWriteTransactionHelper.getRealmObject(primaryKey: String(primaryKey), entityType: MovieEntity.self) {
             RealmWriteTransactionHelper.realmDelete(entity: movieEntity)
-            self.isHeartFilled = false
+            isHeartFilled = false
         } else {
             let movieEntity = MovieEntity(movie: movie)
             RealmWriteTransactionHelper.realmAdd(entity: movieEntity)
-            self.isHeartFilled = true
+            isHeartFilled = true
         }
-        self.movieInfoView.setHeart(isFilled: self.isHeartFilled)
+        self.movieInfoView.setHeart(isFilled: isHeartFilled)
     }
     
     func getMovieGenresAsString() -> String {

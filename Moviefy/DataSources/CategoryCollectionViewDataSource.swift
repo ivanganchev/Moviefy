@@ -18,7 +18,7 @@ class CategoryCollectionViewDataSource: NSObject {
     
     let activityIndicatorView = UIActivityIndicatorView(style: .medium)
     
-    func fetchMovies(genres: [String], completion: @escaping (Result<Void, ApiResponseCustomError>) -> Void) {
+    func fetchMovies(genres: [String], completion: @escaping (Result<Void, ApiMovieResponseError>) -> Void) {
         movieService.fetchMoviesByCategory(movieCategoryPath: self.movieCategoryPath!, page: self.currentPage, completion: { result in
                switch result {
                case .success(let moviesResponse):
@@ -65,11 +65,10 @@ class CategoryCollectionViewDataSource: NSObject {
     }
     
     func loadImageView(cell: CategoryCollectionViewCell, index: Int) {
-        if self.filteredMovies.count > index {
-            self.imageLoadingHelper.loadImageView(cell: cell, movie: self.filteredMovies[index], index: index)
-        } else {
+        guard self.filteredMovies.count > index else {
             return
         }
+        self.imageLoadingHelper.loadImageView(cell: cell, movie: self.filteredMovies[index], index: index)
     }
 }
 
@@ -89,7 +88,7 @@ extension CategoryCollectionViewDataSource: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        if kind == UICollectionView.elementKindSectionFooter {
+        guard kind != UICollectionView.elementKindSectionFooter else {
             let footer = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: FooterIndicator.identifier, for: indexPath)
             footer.addSubview(self.activityIndicatorView)
             self.activityIndicatorView.frame = CGRect(origin: .zero, size: CGSize(width: collectionView.bounds.width, height: 50))

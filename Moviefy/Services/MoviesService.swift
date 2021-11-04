@@ -18,13 +18,13 @@ class MoviesService {
     static var genres: [Int: String]?
     var dataTask: URLSessionDataTask?
     
-    private static func provideService(url: URLRequest, completion: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
+    private static func provideService(url: URLRequest, completion: @escaping (Result<Data, Error>) -> Void) -> URLSessionDataTask {
         return URLSession.shared.dataTask(with: url) {(data, response, error) in
-            completion(data, response, error)
+            completion(.success(data!))
         }
     }
     
-    func fetchMoviesByCategory(movieCategoryPath: String, page: Int, completion: @escaping (Result<MoviesResponse, ApiResponseCustomError>) -> Void) {
+    func fetchMoviesByCategory(movieCategoryPath: String, page: Int, completion: @escaping (Result<MoviesResponse, ApiMovieResponseError>) -> Void) {
         guard var urlComponents = URLComponents(string: Link.defaultLink + movieCategoryPath) else {
             return
         }
@@ -42,23 +42,25 @@ class MoviesService {
 //            return
 //        }
         
-        self.dataTask = MoviesService.provideService(url: request, completion: {(data, _, _) in
-            guard let data = data else {
-                return
-            }
-            guard var responseObj: MoviesResponse = try? JSONDecoder().decode(MoviesResponse.self, from: data) else {
-                return
-            }
-            
-            self.dataTask = nil
-            
-            if responseObj.movies!.count > 0 {
-                responseObj.movies = responseObj.movies.map {$0.filter({ $0.id != nil })}
-                completion(.success(responseObj))
-            } else {
-                completion(.failure(ApiResponseCustomError.noMoviesFound))
-                print(ApiResponseCustomError.noMoviesFound)
-                return
+        self.dataTask = MoviesService.provideService(url: request, completion: {result in
+            switch result{
+            case .success(let data):
+                guard var responseObj: MoviesResponse = try? JSONDecoder().decode(MoviesResponse.self, from: data) else {
+                    return
+                }
+                
+                self.dataTask = nil
+                
+                if responseObj.movies!.count > 0 {
+                    responseObj.movies = responseObj.movies.map {$0.filter({ $0.id != nil })}
+                    completion(.success(responseObj))
+                } else {
+                    completion(.failure(ApiMovieResponseError.noMoviesFound))
+                    print(ApiMovieResponseError.noMoviesFound)
+                    return
+                }
+            case .failure(let err):
+                print(err)
             }
         })
         self.dataTask?.resume()
@@ -71,11 +73,13 @@ class MoviesService {
         }
         let request = URLRequest(url: url)
         
-        MoviesService.provideService(url: request) { (data, _, _) in
-            guard let data = data else {
-                return
+        MoviesService.provideService(url: request) { result in
+            switch result {
+            case .success(let data):
+                completion(.success(data))
+            case .failure(let err):
+                print(err)
             }
-            completion(.success(data))
         }.resume()
     }
     
@@ -86,40 +90,45 @@ class MoviesService {
         let url = MoviesService.setQueryParams(urlComponents: &urlComponents, params: [QueryItems.language.rawValue: "en-US"])
         let request: URLRequest = MoviesService.setHeaders(url: url)
         
-        MoviesService.provideService(url: request, completion: {(data, _, _) in
-            guard let data = data else {
-                return
-            }
-            do {
-                let result: GenresResponse = try JSONDecoder().decode(GenresResponse.self, from: data)
-                MoviesService.genres = Dictionary(uniqueKeysWithValues: result.genres.map {($0.id, $0.name ?? "")})
-            } catch let err {
+        MoviesService.provideService(url: request, completion: {result in
+            switch result {
+            case .success(let data):
+                do {
+                    let result: GenresResponse = try JSONDecoder().decode(GenresResponse.self, from: data)
+                    MoviesService.genres = Dictionary(uniqueKeysWithValues: result.genres.map {($0.id, $0.name ?? "")})
+                } catch let err {
+                    print(err)
+                    MoviesService.genres = nil
+                }
+            case .failure(let err):
                 print(err)
-                MoviesService.genres = nil
             }
+
         }).resume()
     }
     
-    func searchMovies(text: String, completion: @escaping (Result<MoviesResponse, ApiResponseCustomError>) -> Void) {
+    func searchMovies(text: String, completion: @escaping (Result<MoviesResponse, ApiMovieResponseError>) -> Void) {
         guard var urlComponents = URLComponents(string: Link.defaultLink + EndPoint.searchPath) else {
             return
         }
         let url = MoviesService.setQueryParams(urlComponents: &urlComponents, params: [QueryItems.query.rawValue: text])
         let request: URLRequest = MoviesService.setHeaders(url: url)
         
-        MoviesService.provideService(url: request, completion: {(data, _, _) in
-            guard let data = data else {
-                return
-            }
-            guard var responseObj: MoviesResponse = try? JSONDecoder().decode(MoviesResponse.self, from: data) else {
-                return
-            }
-            if responseObj.movies!.count > 0 {
-                responseObj.movies = responseObj.movies.map {$0.filter({ $0.id != nil })}
-                completion(.success(responseObj))
-            } else {
-                completion(.failure(ApiResponseCustomError.noMoviesFound))
-                return
+        MoviesService.provideService(url: request, completion: {result in
+            switch result {
+            case .success(let data):
+                guard var responseObj: MoviesResponse = try? JSONDecoder().decode(MoviesResponse.self, from: data) else {
+                    return
+                }
+                if responseObj.movies!.count > 0 {
+                    responseObj.movies = responseObj.movies.map {$0.filter({ $0.id != nil })}
+                    completion(.success(responseObj))
+                } else {
+                    completion(.failure(ApiMovieResponseError.noMoviesFound))
+                    return
+                }
+            case .failure(let err):
+                print(err)
             }
         }).resume()
     }

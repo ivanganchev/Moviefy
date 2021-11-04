@@ -61,9 +61,9 @@ extension SavedMoviesCollectionViewDataSource: UICollectionViewDataSource {
         
         cell.cellImageView.image = nil
         
-        let model = savedFilteredMovies[indexPath.row]
+        let model = self.getSavedFilteredMovie(at: indexPath.row)
         
-        if let imageData = model.getImageDataForSavedMovie() {
+        if let imageData = model?.getImageDataForSavedMovie() {
             cell.cellImageView.image = UIImage(data: imageData)
         } else {
             let defaultImage = UIImage(named: "not_loaded_image.jpg")
@@ -75,14 +75,14 @@ extension SavedMoviesCollectionViewDataSource: UICollectionViewDataSource {
 }
 
 extension SavedMoviesCollectionViewDataSource {
-    func getSavedFilteredMovieAt(index: Int) -> MovieEntity? {
+    func getSavedFilteredMovie(at index: Int) -> MovieEntity? {
         if index < self.savedFilteredMovies.count {
             return self.savedFilteredMovies[index]
         }
         return nil
     }
     
-    func getSavedFilteredMovies() -> [MovieEntity]{
+    func getSavedFilteredMovies() -> [MovieEntity] {
         return self.savedFilteredMovies
     }
 }

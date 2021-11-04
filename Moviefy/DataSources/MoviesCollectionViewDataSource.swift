@@ -33,11 +33,14 @@ class MoviesCollectionViewDataSource: NSObject {
     }
     
     func loadImageView(cell: MoviesCollectionViewCell, index: Int) {
-        if self.movies.count > index {
-            self.imageLoadingHelper.loadImageView(cell: cell, movie: self.movies[index], index: index)
-        } else {
+        guard self.movies.count > index else {
             return
         }
+        
+        guard let movie = self.getMovie(at: index) else {
+            return
+        }
+        self.imageLoadingHelper.loadImageView(cell: cell, movie: movie, index: index)
     }
 }
 
@@ -63,7 +66,7 @@ extension MoviesCollectionViewDataSource: UICollectionViewDataSource {
 }
 
 extension MoviesCollectionViewDataSource {
-    func getMovieAt(index: Int) -> Movie? {
+    func getMovie(at index: Int) -> Movie? {
         if index < self.movies.count {
             return self.movies[index]
         }

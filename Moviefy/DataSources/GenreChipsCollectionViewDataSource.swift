@@ -21,7 +21,7 @@ class GenreChipsCollectionViewDataSource: NSObject, UICollectionViewDataSource {
             return GenreChipsCollectionViewCell()
         }
         
-        cell.genreLabel.text = self.genres[indexPath.row]
+        cell.genreLabel.text = self.getGenre(at: indexPath.row)
         cell.removeButton.tag = indexPath.row
         cell.removeButton.addTarget(self, action: #selector(self.deleteGenre(sender:)), for: .touchUpInside)
         return cell
@@ -34,7 +34,7 @@ class GenreChipsCollectionViewDataSource: NSObject, UICollectionViewDataSource {
 }
 
 extension GenreChipsCollectionViewDataSource {
-    func getGenreAt(index: Int) -> String? {
+    func getGenre(at index: Int) -> String? {
         if index < self.genres.count {
             return self.genres[index]
         }

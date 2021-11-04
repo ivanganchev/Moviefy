@@ -44,7 +44,7 @@ class RecentSearchSuggestionsDataSource: NSObject {
     }
     
     func deleteSearchTextAt(index: Int) {
-        guard index < self.suggestions.count, let id = self.suggestions[index].id else {
+        guard index < self.suggestions.count, let id = self.getSuggestion(at: index)?.id else {
             return
         }
         
@@ -65,7 +65,7 @@ extension RecentSearchSuggestionsDataSource: UITableViewDataSource {
             return RecentSearchSuggestionsTableViewCell()
         }
         
-        cell.textSuggestion.text = suggestions[indexPath.row].suggestion
+        cell.textSuggestion.text = self.getSuggestion(at: indexPath.row)?.suggestion
         cell.deleteButton.clickAction = { _ in
             self.deleteSearchTextAt(index: indexPath.row)
         }
@@ -78,7 +78,7 @@ extension RecentSearchSuggestionsDataSource: UITableViewDataSource {
 }
 
 extension RecentSearchSuggestionsDataSource {
-    func getSuggestionAt(index: Int) -> SuggestionEntity? {
+    func getSuggestion(at index: Int) -> SuggestionEntity? {
         if index < self.suggestions.count {
             return self.suggestions[index]
         }

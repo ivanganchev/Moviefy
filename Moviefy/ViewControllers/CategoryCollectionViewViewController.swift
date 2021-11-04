@@ -21,6 +21,10 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
     
     var selectedCellImageView: UIImageView?
     var selectedCellImageViewSnapshot: UIView?
+    
+    var isCollectionViewEmpty: Bool {
+        return self.categoryCollectionViewDataSource.getFilteredMovies().isEmpty
+    }
 
     override func viewDidLoad() {
         self.navigationItem.hidesSearchBarWhenScrolling = false
@@ -63,7 +67,7 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
                     }
                 })
             case.failure(_):
-                if self.isCollectionViewEmpty() {
+                if self.isCollectionViewEmpty {
                     self.showEmptyCollectionViewTextIfNeeded(isEmpty: true)
                 }
             }
@@ -108,7 +112,7 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
                 }
             case .failure(let err):
                 print(err)
-                if self.isCollectionViewEmpty() {
+                if self.isCollectionViewEmpty {
                     self.showEmptyCollectionViewTextIfNeeded(isEmpty: true)
                 }
             }
@@ -139,7 +143,7 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
         self.setGenreChipsViewUILayout()
         self.categoryCollectionView.genreChipsView.genreChipsCollectionView.reloadData()
         self.categoryCollectionViewDataSource.filterMovies(genres: self.genreChipsCollectionViewDataSource.getAllSelectedGenres())
-        if self.isCollectionViewEmpty() {
+        if self.isCollectionViewEmpty {
             self.showEmptyCollectionViewTextIfNeeded(isEmpty: true)
         } else {
             self.showEmptyCollectionViewTextIfNeeded(isEmpty: false)
@@ -150,15 +154,11 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
     
     func setGenreChipsViewUILayout() {
         let isHidden = self.genreChipsCollectionViewDataSource.getAllSelectedGenres().isEmpty
-        self.categoryCollectionView.genreChipsView.hideChipsCollectioNView(isHidden: isHidden)
+        self.categoryCollectionView.genreChipsView.hideChipsCollectionView(isHidden: isHidden)
     }
     
     func showEmptyCollectionViewTextIfNeeded(isEmpty: Bool) {
         self.categoryCollectionView.setLayoutBackgroundView(isEmpty: isEmpty)
-    }
-    
-    func isCollectionViewEmpty() -> Bool {
-        return self.categoryCollectionViewDataSource.getFilteredMovies().isEmpty
     }
 }
 
@@ -270,18 +270,25 @@ extension CategoryCollectionViewViewController: GenrePickerViewControllerDelegat
 
 extension CategoryCollectionViewViewController: MovieInfoDelegate {
     func movieInfoViewController(movieInfoViewController: MovieInfoViewController, getMovieImageData movie: Movie, completion: @escaping (Result<Data, Error>) -> Void) {
-        if movie.imageData == nil {
-            guard let index = self.categoryCollectionViewDataSource.getFilteredMovies().firstIndex(where: {$0 === movie}) else {
+        guard movie.imageData != nil else {
+            completion(.success(movie.imageData!))
+            return
+        }
+        
+        guard let index = self.categoryCollectionViewDataSource.getFilteredMovies().firstIndex(where: {$0 === movie}) else {
+            return
+        }
+        
+        self.categoryCollectionViewDataSource.imageLoadingHelper.loadImage(movie: movie, completion: {_ in
+            guard let filteredMovie = self.categoryCollectionViewDataSource.getFilteredMovieAt(index: index) else {
                 return
             }
-            self.categoryCollectionViewDataSource.imageLoadingHelper.loadImage(movie: movie, completion: {_ in
-                guard let filteredMovie = self.categoryCollectionViewDataSource.getFilteredMovieAt(index: index) else {
-                    return
-                }
-                completion(.success(filteredMovie.imageData!))
-            })
-        } else {
-            completion(.success(movie.imageData!))
-        }
+            
+            guard let filteredMovieImageData = filteredMovie.imageData else {
+                return
+            }
+            
+            completion(.success(filteredMovieImageData))
+        })
     }
 }

@@ -18,8 +18,8 @@ class RecentSearchSuggestionsTableViewCell: UITableViewCell {
         return text
     }()
     
-    let deleteButton: CustomButtonDelete = {
-        let closeButton = CustomButtonDelete(type: .custom)
+    let deleteButton: CustomDeleteButton = {
+        let closeButton = CustomDeleteButton(type: .custom)
         closeButton.setImage(UIImage(systemName: "xmark"), for: .normal)
         closeButton.imageView?.contentMode = .scaleAspectFit
         closeButton.contentHorizontalAlignment = .fill

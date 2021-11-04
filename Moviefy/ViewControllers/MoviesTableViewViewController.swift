@@ -19,23 +19,20 @@ class MoviesTableViewViewController: UIViewController, InitialTransitionAnimatab
     override func viewDidLoad() {
         super.viewDidLoad()
         self.navigationController?.navigationBar.isHidden = true
-        self.view = self.moviesTableView
         
         self.moviesTableView.moviesTableView.dataSource = self.moviesTableViewDataSource
         self.moviesTableView.moviesTableView.delegate = self.moviesTableViewDelegateInstance
-        self.moviesTableView.moviesTableView.refreshControl?.addTarget(self, action: #selector(pullToRefresh), for: .valueChanged)
         self.moviesTableViewDelegateInstance.delegate = self
         MoviesService.loadMoviesGenreList()
         self.moviesTableView.moviesTableView.reloadData()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        self.navigationController?.navigationBar.isHidden = true
+    override func loadView() {
+        self.view = self.moviesTableView
     }
     
-    @objc func pullToRefresh() {
-        self.moviesTableView.moviesTableView.reloadData()
-        self.moviesTableView.moviesTableView.refreshControl?.endRefreshing()
+    override func viewWillAppear(_ animated: Bool) {
+        self.navigationController?.navigationBar.isHidden = true
     }
     
     func presentMovieInfoViewController(with movie: Movie) {

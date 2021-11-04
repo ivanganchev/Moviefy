@@ -33,14 +33,18 @@ class SearchMoviesTableViewDataSource: NSObject {
     }
     
     func loadImageView(cell: SearchMoviesTableViewCell, index: Int) {
-        if self.movies.count > index {
-            self.imageLoadingHelper.loadImageView(cell: cell, movie: self.movies[index], index: index)
-        } else {
+        guard self.movies.count > index else {
             return
         }
+        
+        guard let movie = self.getMovie(at: index) else {
+            return
+        }
+        
+        self.imageLoadingHelper.loadImageView(cell: cell, movie: movie, index: index)
     }
     
-    func getCompletionResult(result: Result<MoviesResponse, ApiResponseCustomError>) {
+    func getCompletionResult(result: Result<MoviesResponse, ApiMovieResponseError>) {
         switch result {
         case .success(let moviesResponse):
             let movies = moviesResponse.movies?.map { (movieResponse) -> Movie in
@@ -68,11 +72,11 @@ extension SearchMoviesTableViewDataSource: UITableViewDataSource {
         cell.cellIndex = indexPath.row
         self.loadImageView(cell: cell, index: indexPath.row)
         
-        let model = self.movies[indexPath.row]
+        let model = self.getMovie(at: indexPath.row)
 
-        cell.movieTitle.text = model.movieResponse.title
+        cell.movieTitle.text = model?.movieResponse.title
         
-        let joined = model.genres?.joined(separator: ", ")
+        let joined = model?.genres?.joined(separator: ", ")
         cell.movieGenres.text = joined
         
         return cell
@@ -88,7 +92,7 @@ extension SearchMoviesTableViewDataSource {
         return self.movies
     }
     
-    func getMovieAt(index: Int) -> Movie? {
+    func getMovie(at index: Int) -> Movie? {
         if index < self.movies.count {
             return self.movies[index]
         }

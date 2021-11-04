@@ -64,7 +64,7 @@ extension MoviesTableViewCell: UICollectionViewDelegate {
         guard let selectedCell = collectionView.cellForItem(at: indexPath) as? MoviesCollectionViewCell else {
             return
         }
-        guard let movie = self.moviesCollectionViewDataSource.getMovieAt(index: indexPath.row) else {
+        guard let movie = self.moviesCollectionViewDataSource.getMovie(at: indexPath.row) else {
             return
         }
         self.delegate?.moviesTableViewCell(moviesTableViewCell: self, cell: selectedCell, movie: movie)

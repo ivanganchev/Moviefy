@@ -7,8 +7,8 @@
 
 import UIKit
 
-class CustomButtonDelete: UIButton {
-    var clickAction: ((_ sender: CustomButtonDelete) -> Void)?
+class CustomDeleteButton: UIButton {
+    var clickAction: ((_ sender: CustomDeleteButton) -> Void)?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -20,7 +20,7 @@ class CustomButtonDelete: UIButton {
         fatalError("init(coder:) has not been implemented")
     }
     
-    @objc func deleteAction(_ sender: CustomButtonDelete) {
+    @objc func deleteAction(_ sender: CustomDeleteButton) {
         clickAction?(sender)
     }
 }

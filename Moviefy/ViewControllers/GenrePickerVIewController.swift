@@ -64,7 +64,7 @@ class GenrePickerViewController: UIViewController {
         }
         
         for i in (0...) {
-            guard let genre = self.genrePickerViewControllerDataSource.getGenreAt(index: i) else {
+            guard let genre = self.genrePickerViewControllerDataSource.getGenre(at: i) else {
                 return
             }
             if selectedGenres.contains(genre) {
@@ -112,11 +112,16 @@ class GenrePickerViewController: UIViewController {
     }
     
     @objc func doneButtonTap() {
-        let chosenGenre = self.genrePickerViewControllerDataSource.getGenres()[self.genreChipsCollectionView.genrePickerView.selectedRow(inComponent: 0)]
+        guard let chosenGenre = self.genrePickerViewControllerDataSource.getGenre(at: self.genreChipsCollectionView.genrePickerView.selectedRow(inComponent: 0)) else {
+            self.animateDismissView()
+            return
+        }
+        
         guard !self.selectedGenres.contains(chosenGenre) else {
             self.animateDismissView()
             return
         }
+        
         self.delegate?.genrePickerViewController(genrePickerViewController: self, genre: chosenGenre)
         self.animateDismissView()
     }
@@ -160,9 +165,9 @@ class GenrePickerViewController: UIViewController {
 
 extension GenrePickerViewController: UIPickerViewDelegate {
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        let row = self.genrePickerViewControllerDataSource.getGenreAt(index: row)
-        return row
+        return self.genrePickerViewControllerDataSource.getGenre(at: row)
     }
+    
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         let index = GenrePickerHelper.getUnselectedGenre(rowNumber: row, allGenres: self.genrePickerViewControllerDataSource.getGenres(), selectedGenres: self.selectedGenres)
         
@@ -171,14 +176,14 @@ extension GenrePickerViewController: UIPickerViewDelegate {
     
     func pickerView(_ pickerView: UIPickerView, attributedTitleForRow row: Int, forComponent component: Int) -> NSAttributedString? {
         var color: UIColor
-        let genres = self.genrePickerViewControllerDataSource.getGenres()
+        let genre = self.genrePickerViewControllerDataSource.getGenre(at: row)
         
-        if selectedGenres.contains(genres[row]) {
+        if selectedGenres.contains(genre!) {
             color = UIColor.lightGray
         } else {
             color = UIColor.black
         }
         
-        return NSAttributedString(string: genres[row], attributes: [NSAttributedString.Key.foregroundColor: color])
+        return NSAttributedString(string: genre!, attributes: [NSAttributedString.Key.foregroundColor: color])
     }
 }

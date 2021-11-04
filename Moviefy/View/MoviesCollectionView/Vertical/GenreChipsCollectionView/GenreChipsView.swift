@@ -96,7 +96,7 @@ class GenreChipsView: UIView {
         self.delegate?.didSelectAddGenre(genreChipsView: self)
     }
     
-    func hideChipsCollectioNView(isHidden: Bool) {
+    func hideChipsCollectionView(isHidden: Bool) {
         self.genreChipsCollectionView.isHidden = isHidden
         self.addButton.isHidden = isHidden
         self.addFilterButton.isHidden = !isHidden
@@ -108,7 +108,7 @@ extension GenreChipsView: UICollectionViewDelegateFlowLayout {
         let text: UILabel = UILabel()
         text.font = UIFont(name: "Helvetica", size: 20)
         if let dataSource = self.genreChipsCollectionView.dataSource as? GenreChipsCollectionViewDataSource {
-            text.text = dataSource.getGenreAt(index: indexPath.row)
+            text.text = dataSource.getGenre(at: indexPath.row)
         }
         return CGSize(width: Int(text.intrinsicContentSize.width) + self.buttonWidth + self.chipViewsSpacing * 3, height: 50)
     }

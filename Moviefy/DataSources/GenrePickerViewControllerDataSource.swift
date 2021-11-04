@@ -24,7 +24,7 @@ extension GenrePickerViewControllerDataSource {
         return self.genres
     }
     
-    func getGenreAt(index: Int) -> String? {
+    func getGenre(at index: Int) -> String? {
         if index < self.genres.count {
             return self.genres[index]
         }

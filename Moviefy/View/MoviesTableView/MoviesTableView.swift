@@ -25,7 +25,6 @@ class MoviesTableView: UIView {
         self.moviesTableView.register(MoviesTableViewCell.self, forCellReuseIdentifier: MoviesTableViewCell.identifier)
         self.moviesTableView.showsVerticalScrollIndicator = false
         self.moviesTableView.backgroundColor = .white
-        self.moviesTableView.refreshControl = UIRefreshControl()
         
         self.addSubview(self.moviesTableView)
         

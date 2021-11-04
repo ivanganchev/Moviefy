@@ -21,8 +21,6 @@ class SavedMoviesViewController: UIViewController, InitialTransitionAnimatableCo
     let transitioningContentDelegateInstance = TransitioningDelegate()
 
     override func viewDidLoad() {
-        self.loadSavedMovies()
-        
         self.saveMoviesCollectionView.barTitle.text = "My List"
         self.navigationItem.titleView = self.saveMoviesCollectionView.barTitle
         
@@ -81,7 +79,7 @@ class SavedMoviesViewController: UIViewController, InitialTransitionAnimatableCo
     
     func setGenreChipsViewUILayout() {
         let isHidden = self.genreChipsCollectionViewDataSource.getAllSelectedGenres().isEmpty
-        self.saveMoviesCollectionView.genreChipsView.hideChipsCollectioNView(isHidden: isHidden)
+        self.saveMoviesCollectionView.genreChipsView.hideChipsCollectionView(isHidden: isHidden)
     }
 }
 
@@ -139,7 +137,7 @@ extension SavedMoviesViewController: UICollectionViewDelegateFlowLayout {
         let selectedCell = collectionView.cellForItem(at: indexPath) as? CategoryCollectionViewCell
         self.selectedCellImageView = selectedCell?.cellImageView
         self.selectedCellImageViewSnapshot = selectedCellImageView?.snapshotView(afterScreenUpdates: true)
-        guard let savedMovie = self.savedMoviesCollectionViewDataSource.getSavedFilteredMovieAt(index: indexPath.row) else {
+        guard let savedMovie = self.savedMoviesCollectionViewDataSource.getSavedFilteredMovie(at: indexPath.row) else {
             return
         }
         self.presentMovieInfoViewController(with: Movie(movieEntity: savedMovie, imageData: savedMovie.getImageDataForSavedMovie()!))
