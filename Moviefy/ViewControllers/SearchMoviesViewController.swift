@@ -103,6 +103,7 @@ class SearchMoviesViewController: UIViewController, InitialTransitionAnimatableC
         movieInfoViewController.movie = movie
         movieInfoViewController.modalPresentationStyle = .fullScreen
         movieInfoViewController.transitioningDelegate = self.transitioningContentDelegateInstance
+        movieInfoViewController.delegate = self
         present(movieInfoViewController, animated: true)
     }
     
@@ -163,5 +164,13 @@ extension SearchMoviesViewController: UISearchBarDelegate {
         self.searchMoviesView.emptyTableViewText.isHidden = true
         self.setSuggestionVisibility(isVisible: true)
         return true
+    }
+}
+
+extension SearchMoviesViewController: MovieInfoDelegate {
+    func movieInfoViewController(movieInfoViewController: MovieInfoViewController, getMovieImageData movie: Movie, completion: @escaping (Result<Data, Error>) -> Void) {
+        self.searchMoviesTableViewDataSource.imageLoadingHelper.reloadImage(movie: movie, completion: { imageData in
+            completion(.success(imageData))
+        })
     }
 }

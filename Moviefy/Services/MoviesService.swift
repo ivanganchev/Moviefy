@@ -19,8 +19,12 @@ class MoviesService {
     var dataTask: URLSessionDataTask?
     
     private static func provideService(url: URLRequest, completion: @escaping (Result<Data, Error>) -> Void) -> URLSessionDataTask {
-        return URLSession.shared.dataTask(with: url) {(data, response, error) in
-            completion(.success(data!))
+        return URLSession.shared.dataTask(with: url) {(data, _, error) in
+            guard let moviesData = data else {
+                completion(.failure(error!))
+                return
+            }
+            completion(.success(moviesData))
         }
     }
     
@@ -31,19 +35,8 @@ class MoviesService {
         let url = MoviesService.setQueryParams(urlComponents: &urlComponents, params: [QueryItems.page.rawValue: String(page), QueryItems.language.rawValue: "en-US"])
         let request: URLRequest = MoviesService.setHeaders(url: url)
         
-//        if force {
-//            self.dataTask?.cancel()
-//            self.dataTask = nil
-//        }
-        
-//        guard dataTask == nil else {
-//            completion(.failure(ApiResponseCustomError.currentlyFetching))
-//            print(ApiResponseCustomError.currentlyFetching)
-//            return
-//        }
-        
         self.dataTask = MoviesService.provideService(url: request, completion: {result in
-            switch result{
+            switch result {
             case .success(let data):
                 guard var responseObj: MoviesResponse = try? JSONDecoder().decode(MoviesResponse.self, from: data) else {
                     return

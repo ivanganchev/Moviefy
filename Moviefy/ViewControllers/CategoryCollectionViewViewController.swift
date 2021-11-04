@@ -212,7 +212,7 @@ extension CategoryCollectionViewViewController: UICollectionViewDelegateFlowLayo
         let selectedCell = collectionView.cellForItem(at: indexPath) as? CategoryCollectionViewCell
         self.selectedCellImageView = selectedCell?.cellImageView
         self.selectedCellImageViewSnapshot = selectedCellImageView?.snapshotView(afterScreenUpdates: true)
-        guard let filteredMovie = self.categoryCollectionViewDataSource.getFilteredMovieAt(index: indexPath.row) else {
+        guard let filteredMovie = self.categoryCollectionViewDataSource.getFilteredMovie(at: indexPath.row) else {
             return
         }
         self.presentMovieInfoViewController(with: filteredMovie, index: indexPath.row)
@@ -270,25 +270,8 @@ extension CategoryCollectionViewViewController: GenrePickerViewControllerDelegat
 
 extension CategoryCollectionViewViewController: MovieInfoDelegate {
     func movieInfoViewController(movieInfoViewController: MovieInfoViewController, getMovieImageData movie: Movie, completion: @escaping (Result<Data, Error>) -> Void) {
-        guard movie.imageData != nil else {
-            completion(.success(movie.imageData!))
-            return
-        }
-        
-        guard let index = self.categoryCollectionViewDataSource.getFilteredMovies().firstIndex(where: {$0 === movie}) else {
-            return
-        }
-        
-        self.categoryCollectionViewDataSource.imageLoadingHelper.loadImage(movie: movie, completion: {_ in
-            guard let filteredMovie = self.categoryCollectionViewDataSource.getFilteredMovieAt(index: index) else {
-                return
-            }
-            
-            guard let filteredMovieImageData = filteredMovie.imageData else {
-                return
-            }
-            
-            completion(.success(filteredMovieImageData))
+        self.categoryCollectionViewDataSource.imageLoadingHelper.reloadImage(movie: movie, completion: { imageData in
+            completion(.success(imageData))
         })
     }
 }

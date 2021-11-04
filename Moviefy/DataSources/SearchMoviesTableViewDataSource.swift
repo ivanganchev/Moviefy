@@ -10,7 +10,7 @@ import UIKit
 class SearchMoviesTableViewDataSource: NSObject {
     private var movies: [Movie] = []
     private let genres = MoviesService.genres
-    private var imageLoadingHelper = ImageLoadingHelper()
+    var imageLoadingHelper = ImageLoadingHelper()
     
     func resfreshMovies(completion: @escaping () -> Void) {
         MoviesService().fetchMoviesByCategory(movieCategoryPath: EndPoint.MovieCategoryEndPoint.topRated.rawValue, page: 1,  completion: { result in

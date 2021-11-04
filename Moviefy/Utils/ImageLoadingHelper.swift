@@ -74,4 +74,24 @@ class ImageLoadingHelper {
             }
         }
     }
+    
+    func reloadImage(movie: Movie, completion: @escaping (Data) -> Void) {
+        guard movie.movieResponse.posterPath != nil else {
+            completion((UIImage(named: "not_loaded_image")?.pngData())!)
+            return
+        }
+        
+        guard movie.imageData == nil else {
+            completion(movie.imageData!)
+            return
+        }
+        
+        self.loadImage(movie: movie, completion: {_ in
+            guard let filteredMovieImageData = movie.imageData else {
+                return
+            }
+            
+            completion(filteredMovieImageData)
+        })
+    }
 }

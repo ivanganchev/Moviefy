@@ -99,14 +99,14 @@ extension CategoryCollectionViewDataSource: UICollectionViewDataSource {
 }
 
 extension CategoryCollectionViewDataSource {
-    func getMovieAt(index: Int) -> Movie? {
+    func getMovie(at index: Int) -> Movie? {
         if index < self.movies.count {
             return self.movies[index]
         }
         return nil
     }
     
-    func getFilteredMovieAt(index: Int) -> Movie? {
+    func getFilteredMovie(at index: Int) -> Movie? {
         if index < self.filteredMovies.count {
             return self.filteredMovies[index]
         }
