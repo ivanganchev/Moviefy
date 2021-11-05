@@ -38,7 +38,7 @@ class GenreChipsView: UIView {
     func setGenreChipsCollectionView() {
         self.genreChipsCollectionView.backgroundColor = .white
         self.genreChipsCollectionView.translatesAutoresizingMaskIntoConstraints = false
-        self.genreChipsCollectionView.delegate = self
+         self.genreChipsCollectionView.delegate = self
         self.genreChipsCollectionView.register(GenreChipsCollectionViewCell.self, forCellWithReuseIdentifier: GenreChipsCollectionViewCell.identifier)
         self.genreChipsCollectionView.isHidden = true
     }
@@ -110,6 +110,6 @@ extension GenreChipsView: UICollectionViewDelegateFlowLayout {
         if let dataSource = self.genreChipsCollectionView.dataSource as? GenreChipsCollectionViewDataSource {
             text.text = dataSource.getGenre(at: indexPath.row)
         }
-        return CGSize(width: Int(text.intrinsicContentSize.width) + self.buttonWidth + self.chipViewsSpacing * 3, height: 50)
+        return CGSize(width: Int(text.intrinsicContentSize.width) + self.buttonWidth + self.chipViewsSpacing * 3, height: 30)
     }
 }
