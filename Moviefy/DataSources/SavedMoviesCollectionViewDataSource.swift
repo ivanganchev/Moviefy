@@ -45,7 +45,7 @@ class SavedMoviesCollectionViewDataSource: NSObject {
         }
         let movies = realm.objects(MovieEntity.self)
 
-        self.savedFilteredMovies = FilterHelper.filterByGenres(movies: Array(movies.map({Movie(movieEntity: $0, imageData: $0.getImageDataForSavedMovie()!)})), selectedGenres: genres, allGenres: MoviesService.genres).map({MovieEntity(movie: $0)})
+        self.savedFilteredMovies = FilterHelper.filterByGenres(movies: Array(movies.map({Movie(movieEntity: $0)})), selectedGenres: genres, allGenres: MoviesService.genres).map({MovieEntity(movie: $0)})
     }
 }
 

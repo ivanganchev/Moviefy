@@ -18,6 +18,8 @@ class CategoryCollectionViewDataSource: NSObject {
     
     let activityIndicatorView = UIActivityIndicatorView(style: .medium)
     
+    var isEndOfPagesReached = false
+    
     func fetchMovies(genres: [String], completion: @escaping (Result<Void, ApiMovieResponseError>) -> Void) {
         movieService.fetchMoviesByCategory(movieCategoryPath: self.movieCategoryPath!, page: self.currentPage, completion: { result in
                switch result {

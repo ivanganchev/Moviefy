@@ -13,14 +13,14 @@ class SearchMoviesTableViewDataSource: NSObject {
     var imageLoadingHelper = ImageLoadingHelper()
     
     func resfreshMovies(completion: @escaping () -> Void) {
-        MoviesService().fetchMoviesByCategory(movieCategoryPath: EndPoint.MovieCategoryEndPoint.topRated.rawValue, page: 1,  completion: { result in
+        MoviesService().fetchMoviesByCategory(movieCategoryPath: EndPoint.MovieCategoryEndPoint.topRated.rawValue, page: 1, completion: { result in
             self.getCompletionResult(result: result)
             completion()
        })
     }
     
     func searchMovies(text: String, completion: @escaping () -> Void) {
-        MoviesService().searchMovies(text: text, completion: {result in
+        MoviesService().searchMovies(text: text, completion: { result in
             self.getCompletionResult(result: result)
             completion()
         })
@@ -52,6 +52,7 @@ class SearchMoviesTableViewDataSource: NSObject {
             }
             self.movies = movies ?? []
         case.failure(let err):
+            self.movies = []
             print(err)
         }
     }

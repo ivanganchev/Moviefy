@@ -16,8 +16,7 @@ class SearchMoviesViewController: UIViewController, InitialTransitionAnimatableC
     let recentSearchSuggestionsDataSource = RecentSearchSuggestionsDataSource()
     let recentSearchSuggestionsTableViewDelegateInstance = RecentSearchSuggestionsTableViewDelegate()
     
-    var searchBarBackButton: SearchSuggestionsBackButton?
-    var backButtonItem: UIBarButtonItem?
+    var searchBarBackButton: UIBarButtonItem?
     
     var selectedCellImageView: UIImageView?
     var selectedCellImageViewSnapshot: UIView?
@@ -33,11 +32,7 @@ class SearchMoviesViewController: UIViewController, InitialTransitionAnimatableC
         self.recentSearchSuggestionsTableViewDelegateInstance.getSelectedSuggestionIndex = self.searchBySelectedSuggestionIndex
         self.searchMoviesView.searchBar.delegate = self
         self.navigationItem.titleView = self.searchMoviesView.searchBar
-        self.searchBarBackButton = SearchSuggestionsBackButton(type: .custom)
-        self.searchBarBackButton?.areSuggestionsVisible = false
-        self.searchBarBackButton?.setImage(UIImage(systemName: "arrow.left"), for: .normal)
-        self.searchBarBackButton?.addTarget(self, action: #selector(backButtonTap(sender:)), for: .touchUpInside)
-        self.backButtonItem = UIBarButtonItem(customView: searchBarBackButton!)
+        self.searchBarBackButton = UIBarButtonItem(image: UIImage(systemName: "arrow.left"), style: .done, target: self, action: #selector(backButtonTap))
         self.searchMoviesView.recentSearchesTableView.dataSource = self.recentSearchSuggestionsDataSource
         
         self.refreshMovies()
@@ -57,10 +52,6 @@ class SearchMoviesViewController: UIViewController, InitialTransitionAnimatableC
     }
     
     @objc func searchMovies(text: String) {
-        guard text != "" else {
-            self.refreshMovies()
-            return
-        }
         self.searchMoviesTableViewDataSource.searchMovies(text: text, completion: {
             if self.searchMoviesTableViewDataSource.getMovies().count > 0 {
                 self.searchMoviesTableViewDataSource.loadImages(completion: {
@@ -107,24 +98,14 @@ class SearchMoviesViewController: UIViewController, InitialTransitionAnimatableC
         present(movieInfoViewController, animated: true)
     }
     
-    func setSuggestionVisibility(isVisible: Bool) {
-        if isVisible {
-            self.navigationItem.setLeftBarButton(self.backButtonItem, animated: true)
-            self.recentSearchSuggestionsDataSource.loadSavedSuggestions()
-            self.searchMoviesView.recentSearchesTableView.reloadData()
-        } else {
-            self.navigationItem.setLeftBarButton(nil, animated: true)
-            self.searchMoviesView.setSearchMoviesTableViewBackground(isEmpty: self.shouldShowEmptyTableTextMessage)
-            self.searchMoviesView.searchBar.endEditing(false)
-        }
+    func setSuggestionsVisibility(isVisible: Bool) {
+        isVisible == true ? self.navigationItem.setLeftBarButton(self.searchBarBackButton, animated: true) : self.navigationItem.setLeftBarButton(nil, animated: true)
+        self.searchMoviesView.searchBar.endEditing(!isVisible)
         self.searchMoviesView.setSearchMoviesLayout(isSuggesting: isVisible)
     }
     
-    @objc func backButtonTap(sender: SearchSuggestionsBackButton) {
-        guard let areSuggestionsVisible = sender.areSuggestionsVisible else {
-            return
-        }
-        setSuggestionVisibility(isVisible: areSuggestionsVisible)
+    @objc func backButtonTap() {
+        self.setSuggestionsVisibility(isVisible: false)
     }
     
     func searchBySelectedSuggestionIndex(_ index: Int) {
@@ -133,7 +114,7 @@ class SearchMoviesViewController: UIViewController, InitialTransitionAnimatableC
         }
         self.searchMoviesView.searchBar.text = suggestion
         self.searchMovies(text: suggestion)
-        self.setSuggestionVisibility(isVisible: false)
+        self.setSuggestionsVisibility(isVisible: false)
     }
 }
 
@@ -156,14 +137,23 @@ extension SearchMoviesViewController: UISearchBarDelegate {
         guard let text = self.searchMoviesView.searchBar.text else { return }
         self.searchMovies(text: text)
         self.searchMoviesView.emptyTableViewText.isHidden = false
-        self.setSuggestionVisibility(isVisible: false)
+        self.setSuggestionsVisibility(isVisible: false)
         self.recentSearchSuggestionsDataSource.saveSearchText(text: text)
     }
     
     func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
         self.searchMoviesView.emptyTableViewText.isHidden = true
-        self.setSuggestionVisibility(isVisible: true)
+        self.setSuggestionsVisibility(isVisible: true)
+        self.recentSearchSuggestionsDataSource.loadSavedSuggestions()
+        self.searchMoviesView.recentSearchesTableView.reloadData()
         return true
+    }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchText == "" {
+            self.refreshMovies()
+            self.searchMoviesView.searchBar.endEditing(true)
+        }
     }
 }
 

@@ -68,7 +68,6 @@
 		8EAEFCD12721B4A00016F325 /* RecentSearchSuggestionsDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EAEFCD02721B4A00016F325 /* RecentSearchSuggestionsDataSource.swift */; };
 		8EAEFCD32721B52C0016F325 /* RecentSearchSuggestionsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EAEFCD22721B52C0016F325 /* RecentSearchSuggestionsTableViewCell.swift */; };
 		8EE4A86526FDF46C00388877 /* GenrePickerVIewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EE4A86426FDF46C00388877 /* GenrePickerVIewController.swift */; };
-		8EE4F5BA2732ED5500BDA12B /* SearchSuggestionsBackButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EE4F5B92732ED5500BDA12B /* SearchSuggestionsBackButton.swift */; };
 		8EE7782926FC855900C98DA5 /* GenreChipsCollectionViewDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EE7782826FC855900C98DA5 /* GenreChipsCollectionViewDataSource.swift */; };
 		8EE7782B26FC8B7F00C98DA5 /* GenreChipsCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EE7782A26FC8B7F00C98DA5 /* GenreChipsCollectionViewCell.swift */; };
 		8EE7782E26FC9B6300C98DA5 /* GenreChipsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EE7782D26FC9B6300C98DA5 /* GenreChipsView.swift */; };
@@ -166,7 +165,6 @@
 		8EAEFCD02721B4A00016F325 /* RecentSearchSuggestionsDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentSearchSuggestionsDataSource.swift; sourceTree = "<group>"; };
 		8EAEFCD22721B52C0016F325 /* RecentSearchSuggestionsTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentSearchSuggestionsTableViewCell.swift; sourceTree = "<group>"; };
 		8EE4A86426FDF46C00388877 /* GenrePickerVIewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenrePickerVIewController.swift; sourceTree = "<group>"; };
-		8EE4F5B92732ED5500BDA12B /* SearchSuggestionsBackButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchSuggestionsBackButton.swift; sourceTree = "<group>"; };
 		8EE7782826FC855900C98DA5 /* GenreChipsCollectionViewDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenreChipsCollectionViewDataSource.swift; sourceTree = "<group>"; };
 		8EE7782A26FC8B7F00C98DA5 /* GenreChipsCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenreChipsCollectionViewCell.swift; sourceTree = "<group>"; };
 		8EE7782D26FC9B6300C98DA5 /* GenreChipsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenreChipsView.swift; sourceTree = "<group>"; };
@@ -382,7 +380,6 @@
 			children = (
 				8E47BACE2726A8B3001C18A6 /* CustomDeleteButton.swift */,
 				8E9743CD273017C000FCD337 /* ThumbnailCell.swift */,
-				8EE4F5B92732ED5500BDA12B /* SearchSuggestionsBackButton.swift */,
 				8E9357CF2715A4D8000EB3E5 /* MovieInfoView */,
 				8E56E40526F48B07001ADF70 /* SearchMoviesTableView */,
 				8E492C1926DF8E81002FAF8C /* MoviesCollectionView */,
@@ -687,7 +684,6 @@
 				8E192DD327032C2800AD1249 /* ImageProperties.swift in Sources */,
 				8E492C4326EB406C002FAF8C /* TransitionAnimator.swift in Sources */,
 				8E9F27E526D901A000E60D9F /* MoviesResponse.swift in Sources */,
-				8EE4F5BA2732ED5500BDA12B /* SearchSuggestionsBackButton.swift in Sources */,
 				8E99FEF82710A7E6001DC33F /* MoviesTableViewHeader.swift in Sources */,
 				8E56E40426F38171001ADF70 /* RootTabBarViewController.swift in Sources */,
 				8EAEFCD32721B52C0016F325 /* RecentSearchSuggestionsTableViewCell.swift in Sources */,

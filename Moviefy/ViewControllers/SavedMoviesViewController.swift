@@ -100,6 +100,7 @@ extension SavedMoviesViewController: GenrePickerViewControllerDelegate {
         guard genre != "" else {
             return
         }
+        
         self.genreChipsCollectionViewDataSource.addSelectedGenre(genre: genre)
         self.setGenreChipsViewUILayout()
         self.saveMoviesCollectionView.genreChipsView.genreChipsCollectionView.reloadData()
@@ -140,6 +141,6 @@ extension SavedMoviesViewController: UICollectionViewDelegateFlowLayout {
         guard let savedMovie = self.savedMoviesCollectionViewDataSource.getSavedFilteredMovie(at: indexPath.row) else {
             return
         }
-        self.presentMovieInfoViewController(with: Movie(movieEntity: savedMovie, imageData: savedMovie.getImageDataForSavedMovie()!))
+        self.presentMovieInfoViewController(with: Movie(movieEntity: savedMovie, imageData: savedMovie.getImageDataForSavedMovie()))
     }
 }

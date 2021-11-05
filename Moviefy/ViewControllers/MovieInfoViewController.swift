@@ -39,13 +39,13 @@ class MovieInfoViewController: UIViewController, PresentedTransitionAnimatableCo
                 switch result {
                 case .success(let data):
                     self.movie?.imageData = data
-                    self.movieInfoView.setMovieImage(movie: self.movie!)
+                    self.movieInfoView.setMovieImage(imageData: self.movie?.imageData)
                 case .failure(let err):
                     print(err)
                 }
             })
         }
-        self.movieInfoView.setMovieImage(movie: self.movie!)
+        self.movieInfoView.setMovieImage(imageData: self.movie?.imageData)
     }
     
     override func loadView() {

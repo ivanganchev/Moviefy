@@ -20,19 +20,20 @@ class MoviesService {
     
     private static func provideService(url: URLRequest, completion: @escaping (Result<Data, Error>) -> Void) -> URLSessionDataTask {
         return URLSession.shared.dataTask(with: url) {(data, _, error) in
-            guard let moviesData = data else {
+            guard let data = data else {
                 completion(.failure(error!))
                 return
             }
-            completion(.success(moviesData))
+            completion(.success(data))
         }
     }
     
     func fetchMoviesByCategory(movieCategoryPath: String, page: Int, completion: @escaping (Result<MoviesResponse, ApiMovieResponseError>) -> Void) {
-        guard var urlComponents = URLComponents(string: Link.defaultLink + movieCategoryPath) else {
+        guard var urlComponents = URLComponents(string: Link.defaultLink + movieCategoryPath),
+              let url = MoviesService.setQueryParams(urlComponents: &urlComponents, params: [QueryItems.page.rawValue: String(page), QueryItems.language.rawValue: "en-US"]) else {
             return
         }
-        let url = MoviesService.setQueryParams(urlComponents: &urlComponents, params: [QueryItems.page.rawValue: String(page), QueryItems.language.rawValue: "en-US"])
+        
         let request: URLRequest = MoviesService.setHeaders(url: url)
         
         self.dataTask = MoviesService.provideService(url: request, completion: {result in
@@ -44,7 +45,7 @@ class MoviesService {
                 
                 self.dataTask = nil
                 
-                if responseObj.movies!.count > 0 {
+                if let movies = responseObj.movies, !movies.isEmpty {
                     responseObj.movies = responseObj.movies.map {$0.filter({ $0.id != nil })}
                     completion(.success(responseObj))
                 } else {
@@ -77,10 +78,11 @@ class MoviesService {
     }
     
     static func loadMoviesGenreList() {
-        guard var urlComponents = URLComponents(string: Link.defaultLink + EndPoint.genresPath) else {
+        guard var urlComponents = URLComponents(string: Link.defaultLink + EndPoint.genresPath),
+              let url = MoviesService.setQueryParams(urlComponents: &urlComponents, params: [QueryItems.language.rawValue: "en-US"]) else {
             return
         }
-        let url = MoviesService.setQueryParams(urlComponents: &urlComponents, params: [QueryItems.language.rawValue: "en-US"])
+        
         let request: URLRequest = MoviesService.setHeaders(url: url)
         
         MoviesService.provideService(url: request, completion: {result in
@@ -101,10 +103,12 @@ class MoviesService {
     }
     
     func searchMovies(text: String, completion: @escaping (Result<MoviesResponse, ApiMovieResponseError>) -> Void) {
-        guard var urlComponents = URLComponents(string: Link.defaultLink + EndPoint.searchPath) else {
+        guard var urlComponents = URLComponents(string: Link.defaultLink + EndPoint.searchPath),
+              let url = MoviesService.setQueryParams(urlComponents: &urlComponents, params: [QueryItems.query.rawValue: text])
+              else {
             return
         }
-        let url = MoviesService.setQueryParams(urlComponents: &urlComponents, params: [QueryItems.query.rawValue: text])
+        
         let request: URLRequest = MoviesService.setHeaders(url: url)
         
         MoviesService.provideService(url: request, completion: {result in
@@ -113,7 +117,7 @@ class MoviesService {
                 guard var responseObj: MoviesResponse = try? JSONDecoder().decode(MoviesResponse.self, from: data) else {
                     return
                 }
-                if responseObj.movies!.count > 0 {
+                if let movies = responseObj.movies, !movies.isEmpty {
                     responseObj.movies = responseObj.movies.map {$0.filter({ $0.id != nil })}
                     completion(.success(responseObj))
                 } else {
@@ -136,14 +140,14 @@ extension MoviesService {
         return request
     }
     
-    private static func setQueryParams(urlComponents: inout URLComponents, params: [String: String]) -> URL {
+    private static func setQueryParams(urlComponents: inout URLComponents, params: [String: String]) -> URL? {
         var queryItems: [URLQueryItem] = urlComponents.queryItems ?? []
         params.forEach({ (key: String, value: String) in
             let queryItem = URLQueryItem(name: key, value: value)
             queryItems.append(queryItem)
         })
         urlComponents.queryItems = queryItems
-        let url = urlComponents.url!
+        let url = urlComponents.url
         return url
     }
 }

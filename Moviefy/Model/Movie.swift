@@ -9,7 +9,7 @@ import Foundation
 
 class Movie: Hashable {
     let movieResponse: MovieResponse
-    var imageData: Data? = nil
+    var imageData: Data?
     lazy var genres: [String]? = movieResponse.genreIds?.compactMap { id -> String in
         let allGenres = MoviesService.genres
         return (allGenres?[id])!
@@ -19,7 +19,7 @@ class Movie: Hashable {
         self.movieResponse = movieResponse
     }
     
-    init(movieEntity: MovieEntity, imageData: Data) {
+    init(movieEntity: MovieEntity, imageData: Data? = nil) {
         self.movieResponse = MovieResponse(
             id: Int(movieEntity.id!),
             originalTitle: movieEntity.originalTitle,

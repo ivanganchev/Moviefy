@@ -176,14 +176,16 @@ extension GenrePickerViewController: UIPickerViewDelegate {
     
     func pickerView(_ pickerView: UIPickerView, attributedTitleForRow row: Int, forComponent component: Int) -> NSAttributedString? {
         var color: UIColor
-        let genre = self.genrePickerViewControllerDataSource.getGenre(at: row)
+        guard let genre = self.genrePickerViewControllerDataSource.getGenre(at: row) else {
+            return nil
+        }
         
-        if selectedGenres.contains(genre!) {
+        if selectedGenres.contains(genre) {
             color = UIColor.lightGray
         } else {
             color = UIColor.black
         }
         
-        return NSAttributedString(string: genre!, attributes: [NSAttributedString.Key.foregroundColor: color])
+        return NSAttributedString(string: genre, attributes: [NSAttributedString.Key.foregroundColor: color])
     }
 }

@@ -13,7 +13,7 @@ class GenrePickerHelper {
             return 0
         }
         
-        var index: Int? = nil
+        var index: Int?
         let firstHalf: [Int] = Array(0..<rowNumber).reversed()
         let secondHalf: [Int] = Array((rowNumber + 1)...allGenres.count)
         
