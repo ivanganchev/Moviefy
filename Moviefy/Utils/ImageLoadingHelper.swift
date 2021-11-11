@@ -11,7 +11,10 @@ class ImageLoadingHelper {
     let cache = NSCache<NSString, UIImage>()
     
     func loadImages(movies: [Movie], completion: @escaping () -> Void) {
+        let group = DispatchGroup()
+        
         movies.forEach { (movie) in
+            group.enter()
             guard let posterPath = movie.movieResponse.posterPath else {
                 return
             }
@@ -21,6 +24,7 @@ class ImageLoadingHelper {
             MoviesService().fetchMovieImage(imageUrl: path as String, completion: {result in
                 switch result {
                 case .success(let data):
+                    group.leave()
                     movie.imageData = data
                     guard let loadedImage = UIImage(data: data) else {
                         return
@@ -28,10 +32,14 @@ class ImageLoadingHelper {
                     self.cache.setObject(loadedImage, forKey: path)
                 case .failure(let err):
                     print(err)
+                    group.leave()
                 }
             })
         }
-        completion()
+        
+        group.notify(queue: .main, execute: {
+            completion()
+        })
     }
     
     func loadImage(movie: Movie, completion: ((UIImage) -> Void)? = nil) {
