@@ -19,7 +19,9 @@ class MoviesService {
     var dataTask: URLSessionDataTask?
     
     private static func provideService(url: URLRequest, completion: @escaping (Result<Data, Error>) -> Void) -> URLSessionDataTask {
-        return URLSession.shared.dataTask(with: url) {(data, _, error) in
+        let urlSession = URLSession.shared
+        urlSession.configuration.waitsForConnectivity = true
+        return urlSession.dataTask(with: url) {(data, _, error) in
             guard let data = data else {
                 completion(.failure(error!))
                 return
@@ -34,7 +36,9 @@ class MoviesService {
             return
         }
         
-        let request: URLRequest = MoviesService.setHeaders(url: url)
+        var request: URLRequest = MoviesService.setHeaders(url: url)
+        request.timeoutInterval = 120.0
+        request.cachePolicy = .reloadIgnoringLocalCacheData
         
         self.dataTask = MoviesService.provideService(url: request, completion: {result in
             switch result {
@@ -65,7 +69,10 @@ class MoviesService {
         guard let url = urlComponents?.url else {
             return
         }
-        let request = URLRequest(url: url)
+        
+        var request = URLRequest(url: url)
+        request.timeoutInterval = 120.0
+        request.cachePolicy = .reloadIgnoringLocalCacheData
         
         MoviesService.provideService(url: request) { result in
             switch result {
@@ -73,6 +80,7 @@ class MoviesService {
                 completion(.success(data))
             case .failure(let err):
                 print(err)
+                completion(.failure(err))
             }
         }.resume()
     }

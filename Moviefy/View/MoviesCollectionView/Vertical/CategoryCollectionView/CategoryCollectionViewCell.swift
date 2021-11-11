@@ -16,6 +16,7 @@ class CategoryCollectionViewCell: UICollectionViewCell, ThumbnailCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         contentView.addSubview(self.cellImageView)
+        self.cellImageView.backgroundColor = .cyan
     }
     
     required init?(coder: NSCoder) {

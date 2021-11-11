@@ -35,13 +35,13 @@ class FilterMoviesTest: XCTestCase {
     }
 
     func testFilterWithOneGenre() throws {
-        let filteredMovies = FilterHelper.getMoviesByGenres(movies: movies, selectedGenres: ["Horror"], allGenres: allGenres)
+        let filteredMovies = FilterHelper.filterByGenres(movies: movies, selectedGenres: ["Horror"], allGenres: allGenres)
         
         XCTAssertEqual(2, filteredMovies.count)
     }
     
     func testFilterWithMultipleGenres() throws {
-        let filteredMovies = FilterHelper.getMoviesByGenres(movies: movies, selectedGenres: ["Western", "Action", "Adventure"], allGenres: allGenres)
+        let filteredMovies = FilterHelper.filterByGenres(movies: movies, selectedGenres: ["Western", "Action", "Adventure"], allGenres: allGenres)
         
         XCTAssertEqual(1, filteredMovies.count)
     }

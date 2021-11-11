@@ -48,6 +48,11 @@
                BlueprintName = "FilterMoviesTest"
                ReferencedContainer = "container:Moviefy.xcodeproj">
             </BuildableReference>
+            <SkippedTests>
+               <Test
+                  Identifier = "sdfs">
+               </Test>
+            </SkippedTests>
          </TestableReference>
          <TestableReference
             skipped = "NO">
@@ -56,6 +61,16 @@
                BlueprintIdentifier = "8EAEFCC52721A7F80016F325"
                BuildableName = "MoviefyUITests.xctest"
                BlueprintName = "MoviefyUITests"
+               ReferencedContainer = "container:Moviefy.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "8E3D79B4273C0C6D00087E53"
+               BuildableName = "IndexPathBuilderTest.xctest"
+               BlueprintName = "IndexPathBuilderTest"
                ReferencedContainer = "container:Moviefy.xcodeproj">
             </BuildableReference>
          </TestableReference>

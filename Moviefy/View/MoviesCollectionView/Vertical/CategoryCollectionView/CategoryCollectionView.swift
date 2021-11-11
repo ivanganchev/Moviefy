@@ -11,9 +11,9 @@ class CategoryCollectionView: UIView {
     let categoryCollectionView: UICollectionView = {
         let categoryCollectionViewLayout = UICollectionViewFlowLayout()
         categoryCollectionViewLayout.scrollDirection = .vertical
-        
         return UICollectionView(frame: .zero, collectionViewLayout: categoryCollectionViewLayout)
     }()
+    
     let genreChipsView = GenreChipsView(frame: .zero)
     let barTitle = UILabel(frame: CGRect(x: 0, y: 0, width: 50, height: 40))
     let emptyCollectionViewText: UILabel = UILabel(frame: .zero)

@@ -20,7 +20,11 @@ class CategoryCollectionViewDataSource: NSObject {
     
     var isEndOfPagesReached = false
     
-    func fetchMovies(genres: [String], completion: @escaping (Result<Void, ApiMovieResponseError>) -> Void) {
+    func fetchMovies(genres: [String], completion: @escaping (Result<Int, ApiMovieResponseError>) -> Void) {
+        guard self.movieService.dataTask == nil else {
+            return
+        }
+        
         movieService.fetchMoviesByCategory(movieCategoryPath: self.movieCategoryPath!, page: self.currentPage, completion: { result in
                switch result {
                case .success(let moviesResponse):
@@ -32,10 +36,13 @@ class CategoryCollectionViewDataSource: NSObject {
                             self.movies.append(movie)
                         }
                     })
-                self.filterMovies(genres: genres)
+                    self.filterMovies(genres: genres)
                     self.currentPage += 1
-                    completion(.success(()))
+                    completion(.success((self.filteredMovies.count)))
                case .failure(let err):
+                    if case ApiMovieResponseError.noMoviesFound = err {
+                        self.isEndOfPagesReached = true
+                    }
                     completion(.failure(err))
                }
            })
@@ -48,21 +55,24 @@ class CategoryCollectionViewDataSource: NSObject {
         }
 
         self.filteredMovies = FilterHelper.filterByGenres(movies: self.movies, selectedGenres: genres, allGenres: MoviesService.genres)
+        print("filtered movies count", filteredMovies.count)
     }
     
     func refreshMovies(genres: [String], completion: @escaping () -> Void) {
+        self.movieService.dataTask?.cancel()
+        self.movieService.dataTask = nil
+        
         self.movies = []
         self.filteredMovies = []
         self.currentPage = 1
         self.fetchMovies(genres: genres, completion: {_ in
-            self.filterMovies(genres: genres)
             completion()
         })
    }
     
-    func loadImages(completion: @escaping () -> Void) {
+    func loadImages(completion: (() -> Void)?) {
         self.imageLoadingHelper.loadImages(movies: self.movies, completion: {
-            completion()
+            completion?()
         })
     }
     

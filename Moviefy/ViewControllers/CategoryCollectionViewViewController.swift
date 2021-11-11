@@ -66,17 +66,20 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
                         self.categoryCollectionView.categoryCollectionView.reloadData()
                     }
                 })
-            case .failure:
+            case .failure(let err):
+                if case ApiMovieResponseError.noMoviesFound = err {
+                    self.categoryCollectionViewDataSource.isEndOfPagesReached = true
+                }
+                
                 if self.isCollectionViewEmpty {
                     self.showEmptyCollectionViewTextIfNeeded(isEmpty: true)
-                } else {
-                    DispatchQueue.main.async {
-                        self.categoryCollectionViewDataSource.activityIndicatorView.stopAnimating()
-                        self.categoryCollectionViewDataSource.isEndOfPagesReached = true
-                    }
+                }
+                
+                DispatchQueue.main.async {
+                    self.categoryCollectionViewDataSource.activityIndicatorView.stopAnimating()
+                    self.categoryCollectionView.categoryCollectionView.collectionViewLayout.invalidateLayout()
                 }
             }
-
         })
     }
     
@@ -91,63 +94,36 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
         })
     }
         
-    func fetchFilteredMovies(currentCellIndex: Int, completion: @escaping (_ currentMoviesFilteredCount: Int) -> Void) {
-        self.categoryCollectionViewDataSource.movieService.dataTask?.cancel()
-        self.categoryCollectionViewDataSource.movieService.dataTask = nil
-        
-        self.categoryCollectionViewDataSource.fetchMovies(genres: self.genreChipsCollectionViewDataSource.getAllSelectedGenres(), completion: { result in
+    func fetchFilteredMovies(completion: @escaping (_ filteredMoviesCount: Int) -> Void) {
+        let moviesCount = self.categoryCollectionViewDataSource.getFilteredMovies().count
+        // print filter
+        let filters = self.genreChipsCollectionViewDataSource.getAllSelectedGenres()
+        print("fetchFilteredMovies - filters - ", filters)
+        self.categoryCollectionViewDataSource.fetchMovies(genres: filters, completion: { result in
             switch result {
-            case .success:
-                let moviesOnScreen = self.categoryCollectionViewDataSource.getFilteredMovies().count
+            case .success(let filteredMoviesCount):
                 // moviesOnScreen - currentCellIndex must be bigger than 1, cuz if there are 7 movies after filtering and current index is 5, this means that you need to show one more movie at index 6
-                let res = moviesOnScreen - currentCellIndex
-                if res > 1 {
-                    self.categoryCollectionViewDataSource.loadImages(completion: {
-                        print(res)
-                        print(moviesOnScreen)
-                        print(currentCellIndex)
-                        completion(moviesOnScreen)
-                    })
+                let res = filteredMoviesCount - moviesCount
+                if res > 0 {
+                    self.categoryCollectionViewDataSource.loadImages(completion: nil)
+                    print("fetchFilteredMovies - filteredMoviesCount ", filteredMoviesCount)
+                    completion(filteredMoviesCount)
                 } else {
-                    let cellIndex: Int
-                    
-                    if moviesOnScreen > 1 {
-                        cellIndex = moviesOnScreen - 1
-                    } else {
-                        cellIndex = 0
-                    }
-                    self.fetchFilteredMovies(currentCellIndex: cellIndex, completion: completion)
+                    self.fetchFilteredMovies(completion: completion)
                 }
             case .failure(let err):
                 print(err)
+                
                 if self.isCollectionViewEmpty {
                     self.showEmptyCollectionViewTextIfNeeded(isEmpty: true)
-                } else {
-                    DispatchQueue.main.async {
-                        self.categoryCollectionViewDataSource.activityIndicatorView.stopAnimating()
-                        self.categoryCollectionViewDataSource.isEndOfPagesReached = true
-                    }
+                }
+                
+                DispatchQueue.main.async {
+                    self.categoryCollectionViewDataSource.activityIndicatorView.stopAnimating()
+                    self.categoryCollectionView.categoryCollectionView.collectionViewLayout.invalidateLayout()
                 }
             }
         })
-    }
-    
-    func getIndexPathForPrefetchedMovies(currentCellIndex: Int, currentFilteredMoviesCount: Int) -> [IndexPath] {
-        var paths = [IndexPath]()
-        let moviesOnScreenCount = self.categoryCollectionViewDataSource.getFilteredMovies().count
-        let hiddenMoviesCount: Int
-        if moviesOnScreenCount == currentFilteredMoviesCount {
-            hiddenMoviesCount = moviesOnScreenCount - currentCellIndex
-        } else {
-            return paths
-        }
-        
-        for item in 1..<hiddenMoviesCount {
-            let indexPath = IndexPath(row: item + currentCellIndex, section: 0)
-            paths.append(indexPath)
-        }
-        
-        return paths
     }
     
     func presentMovieInfoViewController(with movie: Movie, index: Int) {
@@ -192,8 +168,8 @@ extension CategoryCollectionViewViewController: UICollectionViewDelegateFlowLayo
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
-        // self.categoryCollectionViewDataSource.activityIndicatorView.isA
-        return CGSize(width: UIScreen.main.bounds.width, height: 50)
+        let size = self.categoryCollectionViewDataSource.activityIndicatorView.isAnimating ? CGSize(width: UIScreen.main.bounds.width, height: 50) : CGSize(width: 0, height: 0)
+        return size
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
@@ -209,18 +185,20 @@ extension CategoryCollectionViewViewController: UICollectionViewDelegateFlowLayo
     }
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        if indexPath.row == (self.categoryCollectionViewDataSource.getFilteredMovies().count - 1) {
-            
-            guard indexPath.row < self.categoryCollectionViewDataSource.getFilteredMovies().count else {
+        let currentMoviesCount = self.categoryCollectionViewDataSource.getFilteredMovies().count
+        if indexPath.row == (currentMoviesCount - 1) {
+            guard !self.categoryCollectionViewDataSource.isEndOfPagesReached else {
                 return
             }
-            
             self.categoryCollectionViewDataSource.activityIndicatorView.startAnimating()
-            self.fetchFilteredMovies(currentCellIndex: indexPath.row) { count in
-                let paths = self.getIndexPathForPrefetchedMovies(currentCellIndex: indexPath.row, currentFilteredMoviesCount: count)
+            self.categoryCollectionView.categoryCollectionView.collectionViewLayout.invalidateLayout()
+            
+            self.fetchFilteredMovies { filteredMoviesCount in
+                print("willDisplay - filteredMoviesCount ", filteredMoviesCount)
                 DispatchQueue.main.async {
                     self.categoryCollectionViewDataSource.activityIndicatorView.stopAnimating()
-                    self.categoryCollectionView.categoryCollectionView.insertItems(at: paths)
+                    self.categoryCollectionView.categoryCollectionView.collectionViewLayout.invalidateLayout()
+                    self.categoryCollectionView.categoryCollectionView.reloadData()
                 }
             }
         }
@@ -262,15 +240,25 @@ extension CategoryCollectionViewViewController: GenrePickerViewControllerDelegat
         self.setGenreChipsViewUILayout()
         self.categoryCollectionView.genreChipsView.genreChipsCollectionView.reloadData()
         self.categoryCollectionView.categoryCollectionView.setContentOffset(.zero, animated: false)
-        self.categoryCollectionViewDataSource.filterMovies(genres: self.genreChipsCollectionViewDataSource.getAllSelectedGenres())
+        // print filters
+        let filters = self.genreChipsCollectionViewDataSource.getAllSelectedGenres()
+        print("genrePickerViewController - filters - ", filters)
+        self.categoryCollectionViewDataSource.filterMovies(genres: filters)
         let filteredMovies = self.categoryCollectionViewDataSource.getFilteredMovies()
         self.categoryCollectionView.categoryCollectionView.reloadData()
         if filteredMovies.isEmpty {
             self.categoryCollectionViewDataSource.activityIndicatorView.startAnimating()
-            self.fetchFilteredMovies(currentCellIndex: 0) { count in
-                DispatchQueue.main.async {
+            self.categoryCollectionView.categoryCollectionView.layoutIfNeeded()
+            self.fetchFilteredMovies { filteredMoviesCount in
+                 DispatchQueue.main.async {
                     self.categoryCollectionViewDataSource.activityIndicatorView.stopAnimating()
-                    let paths = self.getIndexPathForPrefetchedMovies(currentCellIndex: 0, currentFilteredMoviesCount: count)
+//                    guard self.categoryCollectionViewDataSource.getFilteredMovies().isEmpty else {
+//                        return
+//                    }
+                    
+                    let paths = IndexPathBuilder.getIndexPathForHiddenContent(oldCount: 0, newCount: self.categoryCollectionViewDataSource.getFilteredMovies().count)
+                    print("genrePickerViewControllerDelegate - ", paths.count)
+                    print("genrePickerViewControllerDelegate - after paths - ", self.genreChipsCollectionViewDataSource.getAllSelectedGenres())
                     self.categoryCollectionView.categoryCollectionView.insertItems(at: paths)
                 }
             }
