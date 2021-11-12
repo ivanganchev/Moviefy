@@ -10,7 +10,7 @@ import UIKit
 class CategoryCollectionViewDataSource: NSObject {
     private var movies = [Movie]()
     private var filteredMovies = [Movie]()
-    var movieCategoryPath: String?
+    var movieCategoryPath: String
     private var currentPage = 1
     var imageLoadingHelper = ImageLoadingHelper()
     
@@ -20,12 +20,17 @@ class CategoryCollectionViewDataSource: NSObject {
     
     var isEndOfPagesReached = false
     
+    init(movieCategoryPath: String) {
+        self.movieCategoryPath = movieCategoryPath
+        super.init()
+    }
+    
     func fetchMovies(genres: [String], completion: @escaping (Result<Int, ApiMovieResponseError>) -> Void) {
         guard self.movieService.dataTask == nil else {
             return
         }
         
-        movieService.fetchMoviesByCategory(movieCategoryPath: self.movieCategoryPath!, page: self.currentPage, completion: { result in
+        movieService.fetchMoviesByCategory(movieCategoryPath: self.movieCategoryPath, page: self.currentPage, completion: { result in
                switch result {
                case .success(let moviesResponse):
                     let movieObjects = moviesResponse.movies?.map { (movieResponse) -> Movie in

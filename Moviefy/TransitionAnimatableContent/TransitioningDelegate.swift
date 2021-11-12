@@ -18,16 +18,17 @@ class TransitioningDelegate: NSObject, UIViewControllerTransitioningDelegate {
                 let selectedCellImageViewSnapshot = self.initialTransitionAnimatableContent?.selectedCellImageViewSnapshot
                 else { return nil }
 
-        self.transitionAnimator = TransitionAnimator(type: .present, initialAnimatableContent: self.initialTransitionAnimatableContent!, presentedAnimatableContent: movieInfoViewController, selectedCellImageViewSnapshot: selectedCellImageViewSnapshot)
+        self.transitionAnimator = TransitionAnimator(type: .present, initialAnimatableContent: initialTransitionAnimatableContent, presentedAnimatableContent: movieInfoViewController, selectedCellImageViewSnapshot: selectedCellImageViewSnapshot)
         return self.transitionAnimator
     }
 
     func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         guard let movieInfoViewController = dismissed as? PresentedTransitionAnimatableContent,
+              let initialTransitionAnimatableContent = self.initialTransitionAnimatableContent,
               let selectedCellImageViewSnapshot = self.initialTransitionAnimatableContent?.selectedCellImageViewSnapshot
             else { return nil }
 
-        self.transitionAnimator = TransitionAnimator(type: .dismiss, initialAnimatableContent: self.initialTransitionAnimatableContent!, presentedAnimatableContent: movieInfoViewController, selectedCellImageViewSnapshot: selectedCellImageViewSnapshot)
+        self.transitionAnimator = TransitionAnimator(type: .dismiss, initialAnimatableContent: initialTransitionAnimatableContent, presentedAnimatableContent: movieInfoViewController, selectedCellImageViewSnapshot: selectedCellImageViewSnapshot)
         return self.transitionAnimator
     }
 }

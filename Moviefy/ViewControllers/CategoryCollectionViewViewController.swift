@@ -9,9 +9,9 @@ import UIKit
 
 class CategoryCollectionViewViewController: UIViewController, UIViewControllerTransitioningDelegate, InitialTransitionAnimatableContent {
     let categoryCollectionView = CategoryCollectionView()
-    var categoryType: String = ""
-    var categoryCollectionViewDataSource = CategoryCollectionViewDataSource()
-    var movieCategoryPath: EndPoint.MovieCategoryEndPoint?
+    var categoryType: String
+    var categoryCollectionViewDataSource: CategoryCollectionViewDataSource
+    var movieCategoryPath: EndPoint.MovieCategoryEndPoint
     var genreChipsCollectionViewDataSource = GenreChipsCollectionViewDataSource()
     let transitioningContentDelegateInstance = TransitioningDelegate()
 
@@ -25,14 +25,24 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
     var isCollectionViewEmpty: Bool {
         return self.categoryCollectionViewDataSource.getFilteredMovies().isEmpty
     }
-
+    
+    init(movieCategoryPath: EndPoint.MovieCategoryEndPoint, categoryType: String) {
+        self.categoryType = categoryType
+        self.movieCategoryPath = movieCategoryPath
+        self.categoryCollectionViewDataSource = CategoryCollectionViewDataSource(movieCategoryPath: movieCategoryPath.rawValue)
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         self.navigationItem.hidesSearchBarWhenScrolling = false
         
         self.categoryCollectionView.barTitle.text = self.categoryType
         self.navigationItem.titleView = self.categoryCollectionView.barTitle
         
-        self.categoryCollectionViewDataSource.movieCategoryPath = self.movieCategoryPath?.rawValue
         self.categoryCollectionView.categoryCollectionView.dataSource = self.categoryCollectionViewDataSource
         self.categoryCollectionView.categoryCollectionView.delegate = self
         

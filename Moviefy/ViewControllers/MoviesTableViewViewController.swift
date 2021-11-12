@@ -38,9 +38,7 @@ class MoviesTableViewViewController: UIViewController, InitialTransitionAnimatab
 
 extension MoviesTableViewViewController: MoviesTableViewButtonTapDelegate {
     func switchView(path: EndPoint.MovieCategoryEndPoint, categoryType: String) {
-        let viewController = CategoryCollectionViewViewController()
-        viewController.movieCategoryPath = path
-        viewController.categoryType = categoryType
+        let viewController = CategoryCollectionViewViewController(movieCategoryPath: path, categoryType: categoryType)
         self.navigationController?.pushViewController(viewController, animated: true)
     }
     

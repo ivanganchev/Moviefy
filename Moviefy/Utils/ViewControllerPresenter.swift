@@ -9,8 +9,7 @@ import UIKit
 
 class ViewControllerPresenter {
     static func presentMovieInfoViewController(movie: Movie, completion: (_ movieInfoViewController: MovieInfoViewController) -> Void) {
-        let movieInfoViewController = MovieInfoViewController()
-        movieInfoViewController.movie = movie
+        let movieInfoViewController = MovieInfoViewController(movie: movie)
         movieInfoViewController.modalPresentationStyle = .fullScreen
         completion(movieInfoViewController)
     }

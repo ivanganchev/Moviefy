@@ -16,36 +16,45 @@ class MovieInfoViewController: UIViewController, PresentedTransitionAnimatableCo
         self.movieInfoView.movieImageView
     }
     var movieInfoView = MovieInfoView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height))
-    var movie: Movie?
+    var movie: Movie
     var genres: [String]?
     weak var delegate: MovieInfoDelegate?
+    
+    init(movie: Movie) {
+        self.movie = movie
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         self.movieInfoView.closeButton.addTarget(self, action: #selector(MovieInfoViewController.closeButtonTap), for: .touchUpInside)
-        self.movieInfoView.movieTitle.text = self.movie?.movieResponse.title
-        self.movieInfoView.movieOverview.text = self.movie?.movieResponse.overview
-        self.movieInfoView.movieDateReleased.text = self.movie?.movieResponse.releaseDate
+        self.movieInfoView.movieTitle.text = self.movie.movieResponse.title
+        self.movieInfoView.movieOverview.text = self.movie.movieResponse.overview
+        self.movieInfoView.movieDateReleased.text = self.movie.movieResponse.releaseDate
         self.movieInfoView.setGenres(genres: self.getMovieGenresAsString())
-        guard let primaryKey = self.movie?.movieResponse.id else {
+        guard let primaryKey = self.movie.movieResponse.id else {
             return
         }
         self.movieInfoView.setHeart(isFilled: RealmWriteTransactionHelper.getRealmObject(primaryKey: String(primaryKey), entityType: MovieEntity.self) != nil ? true : false)
         self.movieInfoView.heartButton.addTarget(self, action: #selector(MovieInfoViewController.heartButtonTap), for: .touchUpInside)
         
-        if movie?.imageData == nil {
-            delegate?.movieInfoViewController(movieInfoViewController: self, getMovieImageData: self.movie!, completion: { result in
+        if movie.imageData == nil {
+            delegate?.movieInfoViewController(movieInfoViewController: self, getMovieImageData: self.movie, completion: { result in
                 switch result {
                 case .success(let data):
-                    self.movie?.imageData = data
-                    self.movieInfoView.setMovieImage(imageData: self.movie?.imageData)
+                    self.movie.imageData = data
+                    self.movieInfoView.setMovieImage(imageData: self.movie.imageData)
                 case .failure(let err):
                     print(err)
                 }
             })
         }
-        self.movieInfoView.setMovieImage(imageData: self.movie?.imageData)
+        self.movieInfoView.setMovieImage(imageData: self.movie.imageData)
     }
     
     override func loadView() {
@@ -60,7 +69,7 @@ class MovieInfoViewController: UIViewController, PresentedTransitionAnimatableCo
     }
     
     @objc func heartButtonTap() {
-        guard let movie = self.movie, let primaryKey = movie.movieResponse.id else {
+        guard let primaryKey = movie.movieResponse.id else {
             return
         }
         
@@ -77,7 +86,7 @@ class MovieInfoViewController: UIViewController, PresentedTransitionAnimatableCo
     }
     
     func getMovieGenresAsString() -> String {
-        guard let joined = self.movie?.genres?.joined(separator: ", ") else {
+        guard let joined = self.movie.genres?.joined(separator: ", ") else {
             return ""
         }
         
