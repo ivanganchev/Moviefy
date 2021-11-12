@@ -20,9 +20,6 @@ class GenrePickerViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        if let genres = MoviesService.genres {
-            self.genrePickerViewControllerDataSource.setGenres(genres: Array(genres.values))
-        }
         
         self.genreChipsCollectionView.genrePickerView.delegate = self
         self.genreChipsCollectionView.genrePickerView.dataSource = self.genrePickerViewControllerDataSource

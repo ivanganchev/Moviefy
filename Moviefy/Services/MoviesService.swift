@@ -104,6 +104,7 @@ class MoviesService {
                     MoviesService.genres = nil
                 }
             case .failure(let err):
+                MoviesService.genres = [:]
                 print(err)
             }
 

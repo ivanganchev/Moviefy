@@ -19,8 +19,8 @@ class SavedMoviesCollectionViewDataSource: NSObject {
         guard let realm = try? Realm() else {
             return
         }
+        
         let results = realm.objects(MovieEntity.self)
-        // values capturing
         self.token = results.observe {(changes: RealmCollectionChange) in
             completion(changes)
         }
@@ -30,6 +30,7 @@ class SavedMoviesCollectionViewDataSource: NSObject {
         guard let realm = try? Realm() else {
             return
         }
+        
         let results = realm.objects(MovieEntity.self) 
         self.savedMovies = Array(results)
         self.savedFilteredMovies = Array(results)
@@ -40,9 +41,11 @@ class SavedMoviesCollectionViewDataSource: NSObject {
             self.savedFilteredMovies = self.savedMovies
             return
         }
+        
         guard let realm = try? Realm() else {
             return
         }
+        
         let movies = realm.objects(MovieEntity.self)
 
         self.savedFilteredMovies = FilterHelper.filterByGenres(movies: Array(movies.map({Movie(movieEntity: $0)})), selectedGenres: genres, allGenres: MoviesService.genres).map({MovieEntity(movie: $0)})

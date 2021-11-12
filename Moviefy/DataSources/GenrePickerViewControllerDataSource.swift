@@ -8,30 +8,35 @@
 import UIKit
 
 class GenrePickerViewControllerDataSource: NSObject, UIPickerViewDataSource {
-    private var genres = [String]()
+    static var genres: [String] = {
+        guard let genres = MoviesService.genres else {
+            return []
+        }
+        return Array((genres.values)).sorted(by: {$0.compare($1) == .orderedAscending})
+    }()
     
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
        return 1
     }
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        return self.genres.count
+        return GenrePickerViewControllerDataSource.genres.count
     }
 }
 
 extension GenrePickerViewControllerDataSource {
     func getGenres() -> [String] {
-        return self.genres
+        return GenrePickerViewControllerDataSource.genres
     }
-    
+
     func getGenre(at index: Int) -> String? {
-        if index < self.genres.count {
-            return self.genres[index]
+        if index < GenrePickerViewControllerDataSource.genres.count {
+            return GenrePickerViewControllerDataSource.genres[index]
         }
         return nil
     }
-    
+
     func setGenres(genres: [String]) {
-        self.genres = genres
+        GenrePickerViewControllerDataSource.genres = genres
     }
 }

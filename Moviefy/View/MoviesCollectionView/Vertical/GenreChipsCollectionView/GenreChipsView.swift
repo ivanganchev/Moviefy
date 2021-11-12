@@ -41,6 +41,7 @@ class GenreChipsView: UIView {
          self.genreChipsCollectionView.delegate = self
         self.genreChipsCollectionView.register(GenreChipsCollectionViewCell.self, forCellWithReuseIdentifier: GenreChipsCollectionViewCell.identifier)
         self.genreChipsCollectionView.isHidden = true
+         self.genreChipsCollectionView.accessibilityIdentifier = "genreChipsCollectionView"
     }
     
     func setAddButton() {

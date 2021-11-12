@@ -60,6 +60,8 @@ class MovieInfoView: UIView {
         self.movieTitle.lineBreakMode = .byWordWrapping
         self.movieTitle.font = UIFont(name: "Helvetica-Bold", size: 28)
         self.movieTitle.translatesAutoresizingMaskIntoConstraints = false
+        self.movieTitle.accessibilityIdentifier = "movieTitle"
+        self.movieTitle.isAccessibilityElement = true
     }
     
     func setLoadingIndicator() {

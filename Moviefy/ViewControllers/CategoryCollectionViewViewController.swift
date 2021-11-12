@@ -96,17 +96,13 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
         
     func fetchFilteredMovies(completion: @escaping (_ filteredMoviesCount: Int) -> Void) {
         let moviesCount = self.categoryCollectionViewDataSource.getFilteredMovies().count
-        // print filter
         let filters = self.genreChipsCollectionViewDataSource.getAllSelectedGenres()
-        print("fetchFilteredMovies - filters - ", filters)
         self.categoryCollectionViewDataSource.fetchMovies(genres: filters, completion: { result in
             switch result {
             case .success(let filteredMoviesCount):
-                // moviesOnScreen - currentCellIndex must be bigger than 1, cuz if there are 7 movies after filtering and current index is 5, this means that you need to show one more movie at index 6
                 let res = filteredMoviesCount - moviesCount
                 if res > 0 {
                     self.categoryCollectionViewDataSource.loadImages(completion: nil)
-                    print("fetchFilteredMovies - filteredMoviesCount ", filteredMoviesCount)
                     completion(filteredMoviesCount)
                 } else {
                     self.fetchFilteredMovies(completion: completion)
@@ -124,15 +120,6 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
                 }
             }
         })
-    }
-    
-    func presentMovieInfoViewController(with movie: Movie, index: Int) {
-        let movieInfoViewController = MovieInfoViewController()
-        movieInfoViewController.movie = movie
-        movieInfoViewController.delegate = self
-        movieInfoViewController.modalPresentationStyle = .fullScreen
-        movieInfoViewController.transitioningDelegate = self.transitioningContentDelegateInstance
-        present(movieInfoViewController, animated: true)
     }
     
     func deleteGenreChip() {
@@ -194,7 +181,6 @@ extension CategoryCollectionViewViewController: UICollectionViewDelegateFlowLayo
             self.categoryCollectionView.categoryCollectionView.collectionViewLayout.invalidateLayout()
             
             self.fetchFilteredMovies { filteredMoviesCount in
-                print("willDisplay - filteredMoviesCount ", filteredMoviesCount)
                 DispatchQueue.main.async {
                     self.categoryCollectionViewDataSource.activityIndicatorView.stopAnimating()
                     self.categoryCollectionView.categoryCollectionView.collectionViewLayout.invalidateLayout()
@@ -213,7 +199,11 @@ extension CategoryCollectionViewViewController: UICollectionViewDelegateFlowLayo
             return
         }
         
-        self.presentMovieInfoViewController(with: filteredMovie, index: indexPath.row)
+        ViewControllerPresenter.presentMovieInfoViewController(movie: filteredMovie, completion: { viewController in
+            viewController.delegate = self
+            viewController.transitioningDelegate = self.transitioningContentDelegateInstance
+            present(viewController, animated: true)
+        })
     }
 }
 
@@ -242,7 +232,6 @@ extension CategoryCollectionViewViewController: GenrePickerViewControllerDelegat
         self.categoryCollectionView.categoryCollectionView.setContentOffset(.zero, animated: false)
         // print filters
         let filters = self.genreChipsCollectionViewDataSource.getAllSelectedGenres()
-        print("genrePickerViewController - filters - ", filters)
         self.categoryCollectionViewDataSource.filterMovies(genres: filters)
         let filteredMovies = self.categoryCollectionViewDataSource.getFilteredMovies()
         self.categoryCollectionView.categoryCollectionView.reloadData()
@@ -257,8 +246,6 @@ extension CategoryCollectionViewViewController: GenrePickerViewControllerDelegat
 //                    }
                     
                     let paths = IndexPathBuilder.getIndexPathForHiddenContent(oldCount: 0, newCount: self.categoryCollectionViewDataSource.getFilteredMovies().count)
-                    print("genrePickerViewControllerDelegate - ", paths.count)
-                    print("genrePickerViewControllerDelegate - after paths - ", self.genreChipsCollectionViewDataSource.getAllSelectedGenres())
                     self.categoryCollectionView.categoryCollectionView.insertItems(at: paths)
                 }
             }

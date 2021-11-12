@@ -26,9 +26,9 @@ class SearchMoviesTableViewDataSource: NSObject {
         })
     }
     
-    func loadImages(completion: @escaping () -> Void) {
+    func loadImages(completion: (() -> Void)?) {
         self.imageLoadingHelper.loadImages(movies: self.movies, completion: {
-            completion()
+            completion?()
         })
     }
     

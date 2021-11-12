@@ -16,6 +16,8 @@ class GenreChipsCollectionViewCell: UICollectionViewCell {
         genreLabel.textColor = .black
         genreLabel.translatesAutoresizingMaskIntoConstraints = false
         genreLabel.lineBreakMode = .byClipping
+        genreLabel.accessibilityIdentifier = "genreLabel"
+        genreLabel.isAccessibilityElement = true
         
         return genreLabel
     }()

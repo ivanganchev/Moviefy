@@ -10,7 +10,7 @@ import UIKit
 class ImageLoadingHelper {
     let cache = NSCache<NSString, UIImage>()
     
-    func loadImages(movies: [Movie], completion: @escaping () -> Void) {
+    func loadImages(movies: [Movie], completion: (() -> Void)? = nil) {
         let group = DispatchGroup()
         
         movies.forEach { (movie) in
@@ -38,7 +38,7 @@ class ImageLoadingHelper {
         }
         
         group.notify(queue: .main, execute: {
-            completion()
+            completion?()
         })
     }
     

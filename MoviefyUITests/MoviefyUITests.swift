@@ -22,13 +22,33 @@ class MoviefyUITests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
-    func testExample() throws {
-        // UI tests must launch the application that they test.
+    func testGenreChipsText() throws {
+        let app = XCUIApplication()
+        app.launch()
+
+        app.tables.children(matching: .button).matching(identifier: "See all").element(boundBy: 0).staticTexts["See all"].tap()
+        
+        app/*@START_MENU_TOKEN@*/.staticTexts["Add filter"]/*[[".buttons[\"Add filter\"].staticTexts[\"Add filter\"]",".staticTexts[\"Add filter\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.tap()
+        
+        let doneButton = app.buttons["Done"]
+        doneButton.tap()
+        app.buttons["add"].tap()
+        doneButton.tap()
+        
+        let collectionViewsQuery = app.collectionViews.matching(identifier: "genreChipsCollectionView")
+        
+        XCTAssertEqual("Action", collectionViewsQuery.cells.element(boundBy: 0).children(matching: .any).matching(identifier: "genreLabel").firstMatch.label)
+    }
+    
+    func test() {
         let app = XCUIApplication()
         app.launch()
         
-        // Use recording to get started writing UI tests.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+        app.tables.children(matching: .button).matching(identifier: "See all").element(boundBy: 0).staticTexts["See all"].tap()
+        app.collectionViews.children(matching: .cell).element(boundBy: 0).children(matching: .other).element.tap()
+        
+        XCTAssertEqual("Dilwale Dulhania Le Jayenge", app.staticTexts.matching(identifier: "movieTitle").firstMatch.label)
+        
     }
 
     func testLaunchPerformance() throws {

@@ -61,15 +61,7 @@ class SavedMoviesViewController: UIViewController, InitialTransitionAnimatableCo
             self.saveMoviesCollectionView.genreChipsView.isHidden = isEmpty
         }
     }
-    
-    func presentMovieInfoViewController(with movie: Movie) {
-        let movieInfoViewController = MovieInfoViewController()
-        movieInfoViewController.movie = movie
-        movieInfoViewController.modalPresentationStyle = .fullScreen
-        movieInfoViewController.transitioningDelegate = self.transitioningContentDelegateInstance
-        present(movieInfoViewController, animated: true)
-    }
-    
+
     func deleteGenreChip() {
         self.setGenreChipsViewUILayout()
         self.saveMoviesCollectionView.genreChipsView.genreChipsCollectionView.reloadData()
@@ -141,6 +133,9 @@ extension SavedMoviesViewController: UICollectionViewDelegateFlowLayout {
         guard let savedMovie = self.savedMoviesCollectionViewDataSource.getSavedFilteredMovie(at: indexPath.row) else {
             return
         }
-        self.presentMovieInfoViewController(with: Movie(movieEntity: savedMovie, imageData: savedMovie.getImageDataForSavedMovie()))
+        ViewControllerPresenter.presentMovieInfoViewController(movie: Movie(movieEntity: savedMovie, imageData: savedMovie.getImageDataForSavedMovie()), completion: { viewController in
+            viewController.transitioningDelegate = self.transitioningContentDelegateInstance
+            present(viewController, animated: true)
+        })
     }
 }

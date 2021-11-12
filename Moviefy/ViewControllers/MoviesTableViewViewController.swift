@@ -34,14 +34,6 @@ class MoviesTableViewViewController: UIViewController, InitialTransitionAnimatab
     override func viewWillAppear(_ animated: Bool) {
         self.navigationController?.navigationBar.isHidden = true
     }
-    
-    func presentMovieInfoViewController(with movie: Movie) {
-        let movieInfoViewController = MovieInfoViewController()
-        movieInfoViewController.movie = movie
-        movieInfoViewController.modalPresentationStyle = .fullScreen
-        movieInfoViewController.transitioningDelegate = self.transitioningContentDelegateInstance
-        present(movieInfoViewController, animated: true)
-    }
 }
 
 extension MoviesTableViewViewController: MoviesTableViewButtonTapDelegate {
@@ -55,6 +47,11 @@ extension MoviesTableViewViewController: MoviesTableViewButtonTapDelegate {
     func setClickedCollectionViewCell(cell: MoviesCollectionViewCell?, movie: Movie) {
         self.selectedCellImageView = cell?.cellImageView
         self.selectedCellImageViewSnapshot = self.selectedCellImageView?.snapshotView(afterScreenUpdates: true)
-        self.presentMovieInfoViewController(with: movie)
+        
+        ViewControllerPresenter.presentMovieInfoViewController(movie: movie, completion: { viewController in
+            viewController.modalPresentationStyle = .fullScreen
+            viewController.transitioningDelegate = self.transitioningContentDelegateInstance
+            present(viewController, animated: true)
+        })
     }
 }

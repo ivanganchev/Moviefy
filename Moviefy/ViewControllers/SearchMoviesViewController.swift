@@ -54,13 +54,12 @@ class SearchMoviesViewController: UIViewController, InitialTransitionAnimatableC
     @objc func searchMovies(text: String) {
         self.searchMoviesTableViewDataSource.searchMovies(text: text, completion: {
             if self.searchMoviesTableViewDataSource.getMovies().count > 0 {
-                self.searchMoviesTableViewDataSource.loadImages(completion: {
-                    DispatchQueue.main.async {
-                        self.searchMoviesView.setSearchMoviesTableViewBackground(isEmpty: false)
-                        self.searchMoviesView.searchMoviesTableView.reloadData()
-                        self.searchMoviesView.searchMoviesTableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
-                    }
-                })
+                self.searchMoviesTableViewDataSource.loadImages(completion: nil)
+                DispatchQueue.main.async {
+                    self.searchMoviesView.setSearchMoviesTableViewBackground(isEmpty: false)
+                    self.searchMoviesView.searchMoviesTableView.reloadData()
+                    self.searchMoviesView.searchMoviesTableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
+                }
             } else {
                 DispatchQueue.main.async {
                     self.searchMoviesView.searchMoviesTableView.reloadData()
@@ -87,15 +86,6 @@ class SearchMoviesViewController: UIViewController, InitialTransitionAnimatableC
                 print(err)
             }
         }
-    }
-    
-    func presentMovieInfoViewController(with movie: Movie?) {
-        let movieInfoViewController = MovieInfoViewController()
-        movieInfoViewController.movie = movie
-        movieInfoViewController.modalPresentationStyle = .fullScreen
-        movieInfoViewController.transitioningDelegate = self.transitioningContentDelegateInstance
-        movieInfoViewController.delegate = self
-        present(movieInfoViewController, animated: true)
     }
     
     func setSuggestionsVisibility(isVisible: Bool) {
@@ -127,8 +117,18 @@ extension SearchMoviesViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let selectedCell = tableView.cellForRow(at: indexPath) as? SearchMoviesTableViewCell
         self.selectedCellImageView = selectedCell?.cellImageView
+        
+        guard let movie = self.searchMoviesTableViewDataSource.getMovie(at: indexPath.row) else {
+            return
+        }
+        
         self.selectedCellImageViewSnapshot = self.selectedCellImageView?.snapshotView(afterScreenUpdates: true)
-        self.presentMovieInfoViewController(with: self.searchMoviesTableViewDataSource.getMovie(at: indexPath.row))
+        
+        ViewControllerPresenter.presentMovieInfoViewController(movie: movie, completion: { viewController in
+            viewController.transitioningDelegate = self.transitioningContentDelegateInstance
+            viewController.delegate = self
+            present(viewController, animated: true)
+        })
     }
 }
 

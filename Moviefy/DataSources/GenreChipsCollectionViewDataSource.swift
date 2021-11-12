@@ -22,6 +22,8 @@ class GenreChipsCollectionViewDataSource: NSObject, UICollectionViewDataSource {
         }
         
         cell.genreLabel.text = self.getGenre(at: indexPath.row)
+        cell.genreLabel.isAccessibilityElement = true
+        cell.genreLabel.accessibilityIdentifier = "genreLabel"
         cell.removeButton.tag = indexPath.row
         cell.removeButton.addTarget(self, action: #selector(self.deleteGenre(sender:)), for: .touchUpInside)
         return cell
