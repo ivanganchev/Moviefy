@@ -26,7 +26,6 @@ class IndexPathBuilderTest: XCTestCase {
         let row = IndexPathBuilder.getIndexPathForHiddenContent(oldCount: 5, newCount: 7)[0].row
         
         XCTAssertEqual(5, row)
-        XCTAssertNotEqual(6, row)
     }
 
     func testPerformanceExample() throws {

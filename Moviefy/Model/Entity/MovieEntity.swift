@@ -33,25 +33,15 @@ class MovieEntity: Object {
         self.releaseDate = movie?.movieResponse.releaseDate
         self.runtime = movie?.movieResponse.runtime
         self.genreIds.append(objectsIn: movie?.movieResponse.genreIds ?? [])
-        self.saveImageDataToFile(data: movie?.imageData)
     }
     
-    func getImageDataForSavedMovie() -> Data? {
-        let path = getPathForData()
-        return try? Data(contentsOf: path)
-    }
-    
-    func saveImageDataToFile(data: Data?) {
-        let path = self.getPathForData()
-        guard let imageData = data else {
-            return
+    lazy var imageLocalPath: URL? = {
+        guard let id = self.id else {
+            return nil
         }
-        try? imageData.write(to: path)
-    }
-    
-    func getPathForData() -> URL {
+        
         let savePath = FileManager.default.urls(for: .documentDirectory,
-                                                      in: .userDomainMask)[0].appendingPathComponent(String(self.id!))
+                                                      in: .userDomainMask)[0].appendingPathComponent(String(id))
         return savePath
-    }
+    }()
 }

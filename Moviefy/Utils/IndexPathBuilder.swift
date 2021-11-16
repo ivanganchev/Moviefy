@@ -14,9 +14,6 @@ class IndexPathBuilder {
             let indexPath = IndexPath(row: item, section: 0)
             paths.append(indexPath)
         }
-//        print("getIndexPathForPrefetchedMovies - old - ", oldMoviesCount)
-//        print("getIndexPathForPrefetchedMovies - new - ", newMoviesCount)
-//        print("getIndexPathForPrefetchedMovies - current - ", self.categoryCollectionViewDataSource.getFilteredMovies().count)
         return paths
     }
 }

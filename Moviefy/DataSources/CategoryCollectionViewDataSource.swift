@@ -137,4 +137,14 @@ extension CategoryCollectionViewDataSource {
     func getFilteredMovies() -> [Movie] {
         return self.filteredMovies
     }
+    
+    func getMovieImage(movie: Movie) -> UIImage? {
+        guard let path = movie.movieResponse.posterPath,
+              let image = self.imageLoadingHelper.cache.object(forKey: NSString(string: path))
+              else {
+            return nil
+        }
+        
+        return image
+    }
 }

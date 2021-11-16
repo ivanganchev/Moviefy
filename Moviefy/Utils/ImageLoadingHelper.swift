@@ -8,7 +8,11 @@
 import UIKit
 
 class ImageLoadingHelper {
-    let cache = NSCache<NSString, UIImage>()
+    let cache: NSCache<NSString, UIImage> = {
+        let cache = NSCache<NSString, UIImage>()
+        cache.totalCostLimit = 200
+        return cache
+    }()
     
     func loadImages(movies: [Movie], completion: (() -> Void)? = nil) {
         let group = DispatchGroup()
@@ -25,7 +29,6 @@ class ImageLoadingHelper {
                 switch result {
                 case .success(let data):
                     group.leave()
-                    movie.imageData = data
                     guard let loadedImage = UIImage(data: data) else {
                         return
                     }
@@ -52,12 +55,11 @@ class ImageLoadingHelper {
         MoviesService().fetchMovieImage(imageUrl: path as String, completion: {result in
             switch result {
             case .success(let data):
-                movie.imageData = data
                 guard let loadedImage = UIImage(data: data) else {
                     return
                 }
                 self.cache.setObject(loadedImage, forKey: path)
-                completion!(loadedImage)
+                completion?(loadedImage)
             case .failure(let err):
                 print(err)
             }
@@ -81,25 +83,5 @@ class ImageLoadingHelper {
                 }
             }
         }
-    }
-    
-    func reloadImage(movie: Movie, completion: @escaping (Data) -> Void) {
-        guard movie.movieResponse.posterPath != nil else {
-            completion((UIImage(named: "not_loaded_image")?.pngData())!)
-            return
-        }
-        
-        guard movie.imageData == nil else {
-            completion(movie.imageData!)
-            return
-        }
-        
-        self.loadImage(movie: movie, completion: {_ in
-            guard let filteredMovieImageData = movie.imageData else {
-                return
-            }
-            
-            completion(filteredMovieImageData)
-        })
     }
 }

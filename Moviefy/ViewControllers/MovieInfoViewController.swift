@@ -8,7 +8,7 @@ import UIKit
 import RealmSwift
 
 protocol MovieInfoDelegate: AnyObject {
-    func movieInfoViewController(movieInfoViewController: MovieInfoViewController, getMovieImageData movie: Movie, completion: @escaping (Result<Data, Error>) -> Void)
+    func movieInfoViewController(movieInfoViewController: MovieInfoViewController, getMovieImageData movie: Movie, completion: @escaping (UIImage) -> Void)
 }
 
 class MovieInfoViewController: UIViewController, PresentedTransitionAnimatableContent {
@@ -17,11 +17,13 @@ class MovieInfoViewController: UIViewController, PresentedTransitionAnimatableCo
     }
     var movieInfoView = MovieInfoView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height))
     var movie: Movie
+    var movieImage: UIImage?
     var genres: [String]?
     weak var delegate: MovieInfoDelegate?
     
-    init(movie: Movie) {
+    init(movie: Movie, image: UIImage?) {
         self.movie = movie
+        self.movieImage = image
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -43,18 +45,25 @@ class MovieInfoViewController: UIViewController, PresentedTransitionAnimatableCo
         self.movieInfoView.setHeart(isFilled: RealmWriteTransactionHelper.getRealmObject(primaryKey: String(primaryKey), entityType: MovieEntity.self) != nil ? true : false)
         self.movieInfoView.heartButton.addTarget(self, action: #selector(MovieInfoViewController.heartButtonTap), for: .touchUpInside)
         
-        if movie.imageData == nil {
-            delegate?.movieInfoViewController(movieInfoViewController: self, getMovieImageData: self.movie, completion: { result in
-                switch result {
-                case .success(let data):
-                    self.movie.imageData = data
-                    self.movieInfoView.setMovieImage(imageData: self.movie.imageData)
-                case .failure(let err):
-                    print(err)
+        if self.movieImage == nil {
+            delegate?.movieInfoViewController(movieInfoViewController: self, getMovieImageData: self.movie, completion: { image in
+                self.movieInfoView.setMovieImage(image: image)
+                guard let primaryKey = self.movie.movieResponse.id,
+                      let movieEntity: MovieEntity = RealmWriteTransactionHelper.getRealmObject(primaryKey: String(primaryKey), entityType: MovieEntity.self)
+                else {
+                    return
                 }
+                
+                guard let path = movieEntity.imageLocalPath,
+                      let data = image.pngData()
+                      else {
+                    return
+                }
+                
+                LocalPathFileManager.saveData(path: path, data: data)
             })
         }
-        self.movieInfoView.setMovieImage(imageData: self.movie.imageData)
+        self.movieInfoView.setMovieImage(image: self.movieImage)
     }
     
     override func loadView() {
@@ -81,15 +90,19 @@ class MovieInfoViewController: UIViewController, PresentedTransitionAnimatableCo
             let movieEntity = MovieEntity(movie: movie)
             RealmWriteTransactionHelper.realmAdd(entity: movieEntity)
             isHeartFilled = true
+            
+            guard let localPath = movieEntity.imageLocalPath,
+                  let data = self.movieImage?.pngData() else {
+                self.movieInfoView.setHeart(isFilled: isHeartFilled)
+                return
+            }
+            
+            LocalPathFileManager.saveData(path: localPath, data: data)
         }
         self.movieInfoView.setHeart(isFilled: isHeartFilled)
     }
     
     func getMovieGenresAsString() -> String {
-        guard let joined = self.movie.genres?.joined(separator: ", ") else {
-            return ""
-        }
-        
-        return joined
+        self.movie.genres.joined(separator: ", ")
     }
 }

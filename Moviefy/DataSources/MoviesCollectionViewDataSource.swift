@@ -72,4 +72,13 @@ extension MoviesCollectionViewDataSource {
         }
         return nil
     }
+    
+    func getMovieImage(movie: Movie) -> UIImage? {
+        guard let path = movie.movieResponse.posterPath,
+              let image = self.imageLoadingHelper.cache.object(forKey: NSString(string: path)) else {
+            return nil
+        }
+        
+        return image
+    }
 }

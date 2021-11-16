@@ -8,8 +8,8 @@
 import UIKit
 
 protocol MoviesTableViewButtonTapDelegate: AnyObject {
-    func switchView(path: EndPoint.MovieCategoryEndPoint, categoryType: String)
-    func setClickedCollectionViewCell(cell: MoviesCollectionViewCell?, movie: Movie)
+    func switchView(path: EndPoint.MovieCategoryEndPoint, movieCategoryType: String)
+    func didTapCollectionViewCell(moviesTableViewCell: MoviesTableViewCell, cell: ThumbnailCell?, movie: Movie)
 }
 
 class MoviesTableViewDelegate: NSObject, UITableViewDelegate, MoviesTableViewCellDelegate {
@@ -37,11 +37,12 @@ class MoviesTableViewDelegate: NSObject, UITableViewDelegate, MoviesTableViewCel
     }
     
     @objc func headerButtonTapped(sender: UIButton) {
-        delegate?.switchView(path: self.movieCategoryCases[sender.tag], categoryType: self.moviesSections[sender.tag])
+        delegate?.switchView(path: self.movieCategoryCases[sender.tag], movieCategoryType: self.moviesSections[sender.tag])
     }
     
     func moviesTableViewCell(moviesTableViewCell: MoviesTableViewCell, cell: MoviesCollectionViewCell, movie: Movie) {
-        self.delegate?.setClickedCollectionViewCell(cell: cell, movie: movie)
+
+        self.delegate?.didTapCollectionViewCell(moviesTableViewCell: moviesTableViewCell, cell: cell, movie: movie)
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {

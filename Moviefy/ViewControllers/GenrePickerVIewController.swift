@@ -51,9 +51,7 @@ class GenrePickerViewController: UIViewController {
     
     func selectRowAtBeginning() {
         let selectedGenresCount = self.selectedGenres.count
-        guard let allGenresCount = MoviesService.genres?.count else {
-            return
-        }
+        let allGenresCount = MoviesService.genres.count
         
         guard selectedGenresCount < allGenresCount else {
             self.genreChipsCollectionView.genrePickerView.selectRow(0, inComponent: 0, animated: false)

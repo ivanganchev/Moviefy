@@ -15,7 +15,8 @@ enum QueryItems: String {
 
 class MoviesService {
     let session = URLSession.shared
-    static var genres: [Int: String]?
+    static var genres: [Int: String] = [:]
+    
     var dataTask: URLSessionDataTask?
     
     private static func provideService(url: URLRequest, completion: @escaping (Result<Data, Error>) -> Void) -> URLSessionDataTask {
@@ -101,7 +102,7 @@ class MoviesService {
                     MoviesService.genres = Dictionary(uniqueKeysWithValues: result.genres.map {($0.id, $0.name ?? "")})
                 } catch let err {
                     print(err)
-                    MoviesService.genres = nil
+                    MoviesService.genres = [:]
                 }
             case .failure(let err):
                 MoviesService.genres = [:]

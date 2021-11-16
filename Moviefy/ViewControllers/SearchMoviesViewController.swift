@@ -124,11 +124,12 @@ extension SearchMoviesViewController: UITableViewDelegate {
         
         self.selectedCellImageViewSnapshot = self.selectedCellImageView?.snapshotView(afterScreenUpdates: true)
         
-        ViewControllerPresenter.presentMovieInfoViewController(movie: movie, completion: { viewController in
-            viewController.transitioningDelegate = self.transitioningContentDelegateInstance
-            viewController.delegate = self
-            present(viewController, animated: true)
-        })
+        let image = self.searchMoviesTableViewDataSource.getMovieImage(movie: movie)
+        
+        let movieInfoViewController = ViewControllerPresenter.configMovieInfoViewController(movie: movie, movieImage: image)
+        movieInfoViewController.transitioningDelegate = self.transitioningContentDelegateInstance
+        movieInfoViewController.delegate = self
+        present(movieInfoViewController, animated: true)
     }
 }
 
@@ -158,9 +159,9 @@ extension SearchMoviesViewController: UISearchBarDelegate {
 }
 
 extension SearchMoviesViewController: MovieInfoDelegate {
-    func movieInfoViewController(movieInfoViewController: MovieInfoViewController, getMovieImageData movie: Movie, completion: @escaping (Result<Data, Error>) -> Void) {
-        self.searchMoviesTableViewDataSource.imageLoadingHelper.reloadImage(movie: movie, completion: { imageData in
-            completion(.success(imageData))
+    func movieInfoViewController(movieInfoViewController: MovieInfoViewController, getMovieImageData movie: Movie, completion: @escaping (UIImage) -> Void) {
+        self.searchMoviesTableViewDataSource.imageLoadingHelper.loadImage(movie: movie, completion: { image in
+            completion(image)
         })
     }
 }

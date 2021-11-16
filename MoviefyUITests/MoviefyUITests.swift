@@ -40,16 +40,15 @@ class MoviefyUITests: XCTestCase {
         XCTAssertEqual("Action", collectionViewsQuery.cells.element(boundBy: 0).children(matching: .any).matching(identifier: "genreLabel").firstMatch.label)
     }
     
-    func test() {
-        let app = XCUIApplication()
-        app.launch()
-        
-        app.tables.children(matching: .button).matching(identifier: "See all").element(boundBy: 0).staticTexts["See all"].tap()
-        app.collectionViews.children(matching: .cell).element(boundBy: 0).children(matching: .other).element.tap()
-        
-        XCTAssertEqual("Dilwale Dulhania Le Jayenge", app.staticTexts.matching(identifier: "movieTitle").firstMatch.label)
-        
-    }
+//    func test() {
+//        let app = XCUIApplication()
+//        app.launch()
+//        
+//        app.tables.children(matching: .button).matching(identifier: "See all").element(boundBy: 0).staticTexts["See all"].tap()
+//        app.collectionViews.children(matching: .cell).element(boundBy: 0).children(matching: .other).element.tap()
+//        
+//        XCTAssertEqual("Dilwale Dulhania Le Jayenge", app.staticTexts.matching(identifier: "movieTitle").firstMatch.label)
+//    }
 
     func testLaunchPerformance() throws {
         if #available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 7.0, *) {

@@ -77,7 +77,7 @@ extension SearchMoviesTableViewDataSource: UITableViewDataSource {
 
         cell.movieTitle.text = model?.movieResponse.title
         
-        let joined = model?.genres?.joined(separator: ", ")
+        let joined = model?.genres.joined(separator: ", ")
         cell.movieGenres.text = joined
         
         return cell
@@ -98,5 +98,15 @@ extension SearchMoviesTableViewDataSource {
             return self.movies[index]
         }
         return nil
+    }
+    
+    func getMovieImage(movie: Movie) -> UIImage? {
+        guard let path = movie.movieResponse.posterPath,
+              let image = self.imageLoadingHelper.cache.object(forKey: NSString(string: path))
+              else {
+            return nil
+        }
+        
+        return image
     }
 }

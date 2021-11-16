@@ -14,6 +14,8 @@ class SavedMoviesCollectionViewDataSource: NSObject {
     
     private var token: NotificationToken?
     
+    var imageLoadingHelper = ImageLoadingHelper()
+    
     func registerNotificationToken(completion: @escaping (RealmCollectionChange<Results<MovieEntity>>) -> Void) {
         self.token?.invalidate()
         guard let realm = try? Realm() else {
@@ -64,13 +66,26 @@ extension SavedMoviesCollectionViewDataSource: UICollectionViewDataSource {
         
         cell.cellImageView.image = nil
         
-        let model = self.getSavedFilteredMovie(at: indexPath.row)
-        
-        if let imageData = model?.getImageDataForSavedMovie() {
-            cell.cellImageView.image = UIImage(data: imageData)
+        if let image = self.getImageForSavedMovie(at: indexPath.row) {
+            cell.cellImageView.image = image
         } else {
-            let defaultImage = UIImage(named: "not_loaded_image.jpg")
-            cell.cellImageView.image = defaultImage
+            guard let movie = self.getSavedFilteredMovie(at: indexPath.row), movie.posterPath != nil else {
+                let defaultImage = UIImage(named: "not_loaded_image.jpg")
+                cell.cellImageView.image = defaultImage
+                return cell
+            }
+            
+            self.imageLoadingHelper.loadImage(movie: Movie(movieEntity: movie), completion: { image in
+                guard let path = movie.imageLocalPath, let data = image.pngData() else {
+                    return
+                }
+                
+                DispatchQueue.main.async {
+                    cell.cellImageView.image = image
+                }
+                
+                LocalPathFileManager.saveData(path: path, data: data)
+            })
         }
         
         return cell
@@ -87,5 +102,14 @@ extension SavedMoviesCollectionViewDataSource {
     
     func getSavedFilteredMovies() -> [MovieEntity] {
         return self.savedFilteredMovies
+    }
+    
+    func getImageForSavedMovie(at index: Int) -> UIImage? {
+        let model = self.getSavedFilteredMovie(at: index)
+        guard let imageLocalPath = model?.imageLocalPath else {
+            return nil
+        }
+        
+        return LocalPathFileManager.getImage(at: imageLocalPath)
     }
 }

@@ -5,21 +5,19 @@
 //  Created by A-Team Intern on 9.09.21.
 //
 
-import Foundation
+import UIKit
 
 class Movie: Hashable {
     let movieResponse: MovieResponse
-    var imageData: Data?
-    lazy var genres: [String]? = movieResponse.genreIds?.compactMap { id -> String in
-        let allGenres = MoviesService.genres
-        return (allGenres?[id])!
+    lazy var genres: [String] = (movieResponse.genreIds ?? []).compactMap { id -> String? in
+        MoviesService.genres[id]
     }
     
     init(movieResponse: MovieResponse) {
         self.movieResponse = movieResponse
     }
     
-    init(movieEntity: MovieEntity, imageData: Data? = nil) {
+    init(movieEntity: MovieEntity) {
         self.movieResponse = MovieResponse(
             id: Int(movieEntity.id!),
             originalTitle: movieEntity.originalTitle,
@@ -32,7 +30,6 @@ class Movie: Hashable {
             runtime: movieEntity.runtime,
             genreIds: Array(movieEntity.genreIds)
         )
-        self.imageData = imageData
     }
     
     func hash(into hasher: inout Hasher) {

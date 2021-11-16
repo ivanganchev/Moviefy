@@ -254,11 +254,15 @@ class MovieInfoView: UIView {
         self.movieGenres.text = genres
     }
     
-    func setMovieImage(imageData: Data?) {
-        if let imageData = imageData {
+    func setMovieImage(image: UIImage?) {
+        if let image = image {
             DispatchQueue.main.async {
-                self.movieImageView.image = UIImage(data: imageData)
-                self.movieImageView.heightAnchor.constraint(equalTo: self.movieImageView.widthAnchor, multiplier: self.movieImageView.image!.size.height / self.movieImageView.image!.size.width, constant: 0).isActive = true
+                self.movieImageView.image = image
+                self.movieImageView.heightAnchor.constraint(
+                    equalTo: self.movieImageView.widthAnchor,
+                    multiplier: image.size.height / image.size.width,
+                    constant: 0
+                ).isActive = true
                 self.loadingIndicator.stopAnimating()
             }
         } else {

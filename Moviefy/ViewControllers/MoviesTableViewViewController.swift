@@ -37,19 +37,20 @@ class MoviesTableViewViewController: UIViewController, InitialTransitionAnimatab
 }
 
 extension MoviesTableViewViewController: MoviesTableViewButtonTapDelegate {
-    func switchView(path: EndPoint.MovieCategoryEndPoint, categoryType: String) {
-        let viewController = CategoryCollectionViewViewController(movieCategoryPath: path, categoryType: categoryType)
+    func switchView(path: EndPoint.MovieCategoryEndPoint, movieCategoryType: String) {
+        let viewController = CategoryCollectionViewViewController(movieCategoryPath: path, categoryType: movieCategoryType)
         self.navigationController?.pushViewController(viewController, animated: true)
     }
     
-    func setClickedCollectionViewCell(cell: MoviesCollectionViewCell?, movie: Movie) {
+    func didTapCollectionViewCell(moviesTableViewCell: MoviesTableViewCell, cell: ThumbnailCell?, movie: Movie) {
         self.selectedCellImageView = cell?.cellImageView
         self.selectedCellImageViewSnapshot = self.selectedCellImageView?.snapshotView(afterScreenUpdates: true)
         
-        ViewControllerPresenter.presentMovieInfoViewController(movie: movie, completion: { viewController in
-            viewController.modalPresentationStyle = .fullScreen
-            viewController.transitioningDelegate = self.transitioningContentDelegateInstance
-            present(viewController, animated: true)
-        })
+        let image = moviesTableViewCell.moviesCollectionViewDataSource.getMovieImage(movie: movie)
+        
+        let movieInfoViewController = ViewControllerPresenter.configMovieInfoViewController(movie: movie, movieImage: image)
+        movieInfoViewController.modalPresentationStyle = .fullScreen
+        movieInfoViewController.transitioningDelegate = self.transitioningContentDelegateInstance
+        present(movieInfoViewController, animated: true)
     }
 }

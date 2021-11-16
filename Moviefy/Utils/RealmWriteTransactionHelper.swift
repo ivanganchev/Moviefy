@@ -42,7 +42,7 @@ class RealmWriteTransactionHelper {
         }
     }
     
-    static func getRealmObject(primaryKey: String, entityType: Object.Type) -> Object? {
+    static func getRealmObject<T: Object>(primaryKey: String, entityType: T.Type) -> T? {
         let realm = try? Realm()
         
         return realm?.object(ofType: entityType, forPrimaryKey: primaryKey)
