@@ -8,8 +8,8 @@
 import UIKit
 
 class CategoryCollectionViewDataSource: NSObject {
-    private var movies = [Movie]()
-    private var filteredMovies = [Movie]()
+    var movies = [Movie]()
+    var filteredMovies = [Movie]()
     var movieCategoryPath: String
     private var currentPage = 1
     var imageLoadingHelper = ImageLoadingHelper()
@@ -117,14 +117,14 @@ extension CategoryCollectionViewDataSource: UICollectionViewDataSource {
 
 extension CategoryCollectionViewDataSource {
     func getMovie(at index: Int) -> Movie? {
-        if index < self.movies.count {
+        if index < self.movies.count && index >= 0 {
             return self.movies[index]
         }
         return nil
     }
     
     func getFilteredMovie(at index: Int) -> Movie? {
-        if index < self.filteredMovies.count {
+        if index < self.filteredMovies.count && index >= 0 {
             return self.filteredMovies[index]
         }
         return nil

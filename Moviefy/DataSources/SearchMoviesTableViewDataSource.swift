@@ -6,9 +6,10 @@
 //
 
 import UIKit
+@testable import Moviefy
 
 class SearchMoviesTableViewDataSource: NSObject {
-    private var movies: [Movie] = []
+    var movies: [Movie] = []
     private let genres = MoviesService.genres
     var imageLoadingHelper = ImageLoadingHelper()
     
@@ -94,7 +95,7 @@ extension SearchMoviesTableViewDataSource {
     }
     
     func getMovie(at index: Int) -> Movie? {
-        if index < self.movies.count {
+        if index < self.movies.count && index >= 0 {
             return self.movies[index]
         }
         return nil

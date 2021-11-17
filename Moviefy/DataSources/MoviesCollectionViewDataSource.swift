@@ -8,7 +8,7 @@
 import UIKit
 
 class MoviesCollectionViewDataSource: NSObject {
-    private var movies = [Movie]()
+    var movies = [Movie]()
     var imageLoadingHelper = ImageLoadingHelper()
     
     func fetchMovies(movieCategoryPath: String, completion: @escaping () -> Void) {
@@ -67,7 +67,7 @@ extension MoviesCollectionViewDataSource: UICollectionViewDataSource {
 
 extension MoviesCollectionViewDataSource {
     func getMovie(at index: Int) -> Movie? {
-        if index < self.movies.count {
+        if index < self.movies.count && index >= 0 {
             return self.movies[index]
         }
         return nil

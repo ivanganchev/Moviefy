@@ -27,7 +27,7 @@ extension GenrePickerViewControllerDataSource {
     }
 
     func getGenre(at index: Int) -> String? {
-        if index < GenrePickerViewControllerDataSource.genres.count {
+        if index < GenrePickerViewControllerDataSource.genres.count && index >= 0 {
             return GenrePickerViewControllerDataSource.genres[index]
         }
         return nil

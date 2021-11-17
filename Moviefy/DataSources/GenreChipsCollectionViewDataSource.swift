@@ -37,7 +37,7 @@ class GenreChipsCollectionViewDataSource: NSObject, UICollectionViewDataSource {
 
 extension GenreChipsCollectionViewDataSource {
     func getGenre(at index: Int) -> String? {
-        if index < self.genres.count {
+        if index < self.genres.count && index >= 0 {
             return self.genres[index]
         }
         return nil

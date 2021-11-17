@@ -9,7 +9,7 @@ import UIKit
 import RealmSwift
 
 class RecentSearchSuggestionsDataSource: NSObject {
-    private var suggestions = [SuggestionEntity]()
+    var suggestions = [SuggestionEntity]()
     private var token: NotificationToken?
     
     var deleteSearchTextButtonTap: (() -> Void)?
@@ -79,7 +79,7 @@ extension RecentSearchSuggestionsDataSource: UITableViewDataSource {
 
 extension RecentSearchSuggestionsDataSource {
     func getSuggestion(at index: Int) -> SuggestionEntity? {
-        if index < self.suggestions.count {
+        if index < self.suggestions.count && index >= 0 {
             return self.suggestions[index]
         }
         return nil

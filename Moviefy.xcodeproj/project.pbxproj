@@ -35,6 +35,13 @@
 		8E85AB2027452D6A002790E3 /* FilterMoviesTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E85AB0E27451824002790E3 /* FilterMoviesTest.swift */; };
 		8E85AB2127452D6A002790E3 /* IndexPathBuilderTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E85AB0C27451814002790E3 /* IndexPathBuilderTest.swift */; };
 		8E85AB5627452FD5002790E3 /* MoviefyUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E85AB5527452FD5002790E3 /* MoviefyUITests.swift */; };
+		8E85AB5E27453F7C002790E3 /* GetGenreTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E85AB5D27453F7C002790E3 /* GetGenreTest.swift */; };
+		8E85AB602745415D002790E3 /* CategoryCollectionViewDataSourceUnitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E85AB5F2745415D002790E3 /* CategoryCollectionViewDataSourceUnitTests.swift */; };
+		8E85AB62274547B8002790E3 /* MoviesCollectionViewDataSourceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E85AB61274547B8002790E3 /* MoviesCollectionViewDataSourceTests.swift */; };
+		8E85AB64274549DE002790E3 /* SearchMoviesTableViewDataSourceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E85AB63274549DE002790E3 /* SearchMoviesTableViewDataSourceTests.swift */; };
+		8E85AB6627454A77002790E3 /* SavedMoviesCollectionViewDataSourceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E85AB6527454A77002790E3 /* SavedMoviesCollectionViewDataSourceTests.swift */; };
+		8E85AB6827454B59002790E3 /* GenrePickerViewControllerDataSourceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E85AB6727454B59002790E3 /* GenrePickerViewControllerDataSourceTests.swift */; };
+		8E85AB6A27454CE1002790E3 /* RecentSearchSuggestionsDataSourceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E85AB6927454CE1002790E3 /* RecentSearchSuggestionsDataSourceTests.swift */; };
 		8E8C85B627229C9500B063F6 /* SuggestionEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8C85B527229C9500B063F6 /* SuggestionEntity.swift */; };
 		8E8C85BA2722ACC300B063F6 /* RecentSearchSuggestionsTableViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8C85B92722ACC300B063F6 /* RecentSearchSuggestionsTableViewDelegate.swift */; };
 		8E9357C6271593A0000EB3E5 /* SearchMovieView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E9357C5271593A0000EB3E5 /* SearchMovieView.swift */; };
@@ -129,6 +136,13 @@
 		8E85AB5327452FD5002790E3 /* MoviefyUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MoviefyUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8E85AB5527452FD5002790E3 /* MoviefyUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoviefyUITests.swift; sourceTree = "<group>"; };
 		8E85AB5727452FD5002790E3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8E85AB5D27453F7C002790E3 /* GetGenreTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetGenreTest.swift; sourceTree = "<group>"; };
+		8E85AB5F2745415D002790E3 /* CategoryCollectionViewDataSourceUnitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryCollectionViewDataSourceUnitTests.swift; sourceTree = "<group>"; };
+		8E85AB61274547B8002790E3 /* MoviesCollectionViewDataSourceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoviesCollectionViewDataSourceTests.swift; sourceTree = "<group>"; };
+		8E85AB63274549DE002790E3 /* SearchMoviesTableViewDataSourceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchMoviesTableViewDataSourceTests.swift; sourceTree = "<group>"; };
+		8E85AB6527454A77002790E3 /* SavedMoviesCollectionViewDataSourceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedMoviesCollectionViewDataSourceTests.swift; sourceTree = "<group>"; };
+		8E85AB6727454B59002790E3 /* GenrePickerViewControllerDataSourceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenrePickerViewControllerDataSourceTests.swift; sourceTree = "<group>"; };
+		8E85AB6927454CE1002790E3 /* RecentSearchSuggestionsDataSourceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentSearchSuggestionsDataSourceTests.swift; sourceTree = "<group>"; };
 		8E8C85B527229C9500B063F6 /* SuggestionEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionEntity.swift; sourceTree = "<group>"; };
 		8E8C85B92722ACC300B063F6 /* RecentSearchSuggestionsTableViewDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentSearchSuggestionsTableViewDelegate.swift; sourceTree = "<group>"; };
 		8E9357C5271593A0000EB3E5 /* SearchMovieView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchMovieView.swift; sourceTree = "<group>"; };
@@ -289,6 +303,13 @@
 		8E85AB1527452CFF002790E3 /* UnitTests */ = {
 			isa = PBXGroup;
 			children = (
+				8E85AB6927454CE1002790E3 /* RecentSearchSuggestionsDataSourceTests.swift */,
+				8E85AB6727454B59002790E3 /* GenrePickerViewControllerDataSourceTests.swift */,
+				8E85AB6527454A77002790E3 /* SavedMoviesCollectionViewDataSourceTests.swift */,
+				8E85AB63274549DE002790E3 /* SearchMoviesTableViewDataSourceTests.swift */,
+				8E85AB61274547B8002790E3 /* MoviesCollectionViewDataSourceTests.swift */,
+				8E85AB5F2745415D002790E3 /* CategoryCollectionViewDataSourceUnitTests.swift */,
+				8E85AB5D27453F7C002790E3 /* GetGenreTest.swift */,
 				8E85AB0C27451814002790E3 /* IndexPathBuilderTest.swift */,
 				8E85AB0E27451824002790E3 /* FilterMoviesTest.swift */,
 				8E85AB1E27452D2F002790E3 /* GenrePickingTest.swift */,
@@ -675,9 +696,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8E85AB62274547B8002790E3 /* MoviesCollectionViewDataSourceTests.swift in Sources */,
 				8E85AB2127452D6A002790E3 /* IndexPathBuilderTest.swift in Sources */,
+				8E85AB6827454B59002790E3 /* GenrePickerViewControllerDataSourceTests.swift in Sources */,
 				8E85AB2027452D6A002790E3 /* FilterMoviesTest.swift in Sources */,
+				8E85AB5E27453F7C002790E3 /* GetGenreTest.swift in Sources */,
+				8E85AB6627454A77002790E3 /* SavedMoviesCollectionViewDataSourceTests.swift in Sources */,
 				8E85AB1F27452D2F002790E3 /* GenrePickingTest.swift in Sources */,
+				8E85AB6A27454CE1002790E3 /* RecentSearchSuggestionsDataSourceTests.swift in Sources */,
+				8E85AB602745415D002790E3 /* CategoryCollectionViewDataSourceUnitTests.swift in Sources */,
+				8E85AB64274549DE002790E3 /* SearchMoviesTableViewDataSourceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

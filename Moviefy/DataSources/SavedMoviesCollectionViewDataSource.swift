@@ -10,7 +10,7 @@ import RealmSwift
 
 class SavedMoviesCollectionViewDataSource: NSObject {
     private var savedMovies = [MovieEntity]()
-    private var savedFilteredMovies = [MovieEntity]()
+    var savedFilteredMovies = [MovieEntity]()
     
     private var token: NotificationToken?
     
@@ -94,7 +94,7 @@ extension SavedMoviesCollectionViewDataSource: UICollectionViewDataSource {
 
 extension SavedMoviesCollectionViewDataSource {
     func getSavedFilteredMovie(at index: Int) -> MovieEntity? {
-        if index < self.savedFilteredMovies.count {
+        if index < self.savedFilteredMovies.count && index >= 0 {
             return self.savedFilteredMovies[index]
         }
         return nil
