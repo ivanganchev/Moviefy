@@ -1,8 +1,8 @@
 //
-//  sdfs.swift
-//  FilterMoviesTest
+//  IndexPathBuilderTest.swift
+//  GenrePickingTests
 //
-//  Created by A-Team Intern on 10.11.21.
+//  Created by A-Team Intern on 17.11.21.
 //
 
 import XCTest
@@ -27,7 +27,19 @@ class IndexPathBuilderTest: XCTestCase {
         
         XCTAssertEqual(5, row)
     }
-
+    
+    func testWithInvalidNumbers() throws {
+        XCTAssertEqual([IndexPath](), IndexPathBuilder.getIndexPathForHiddenContent(oldCount: 6, newCount: 3))
+    }
+    
+    func testWithNegativeNumbersFirstCase() throws {
+        XCTAssertEqual([IndexPath](), IndexPathBuilder.getIndexPathForHiddenContent(oldCount: -1, newCount: 6))
+    }
+    
+    func testWithNegativeNumbersSecondCase() throws {
+        XCTAssertEqual([IndexPath](), IndexPathBuilder.getIndexPathForHiddenContent(oldCount: 4, newCount: -6))
+    }
+    
     func testPerformanceExample() throws {
         // This is an example of a performance test case.
         self.measure {

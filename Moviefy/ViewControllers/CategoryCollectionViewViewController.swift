@@ -56,11 +56,11 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
         
         self.setGenreChipsViewUILayout()
         
-        self.fetchFilteredMovies { _ in
+        self.categoryCollectionViewDataSource.fetchMovies(genres: self.genreChipsCollectionViewDataSource.getAllSelectedGenres(), completion: { _ in
             DispatchQueue.main.async {
                 self.categoryCollectionView.categoryCollectionView.reloadData()
             }
-        }
+        })
     }
     
     override func loadView() {
@@ -90,9 +90,6 @@ class CategoryCollectionViewViewController: UIViewController, UIViewControllerTr
             case .success(let filteredMoviesCount):
                 let res = filteredMoviesCount - moviesCount
                 if res > 0 {
-                    self.categoryCollectionViewDataSource.loadImages(completion: {
-                        //self.categoryCollectionView.categoryCollectionView.reloadData()
-                    })
                     completion(filteredMoviesCount)
                 } else {
                     self.fetchFilteredMovies(completion: completion)
@@ -236,6 +233,9 @@ extension CategoryCollectionViewViewController: GenrePickerViewControllerDelegat
                     self.categoryCollectionViewDataSource.activityIndicatorView.stopAnimating()
                     let paths = IndexPathBuilder.getIndexPathForHiddenContent(oldCount: 0, newCount: self.categoryCollectionViewDataSource.getFilteredMovies().count)
                     self.categoryCollectionView.categoryCollectionView.insertItems(at: paths)
+                    self.categoryCollectionViewDataSource.loadImages(completion: {
+                        self.categoryCollectionView.categoryCollectionView.reloadItems(at: paths)
+                    })
                 }
             }
         }

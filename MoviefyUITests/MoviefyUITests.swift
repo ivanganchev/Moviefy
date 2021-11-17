@@ -2,7 +2,7 @@
 //  MoviefyUITests.swift
 //  MoviefyUITests
 //
-//  Created by A-Team Intern on 21.10.21.
+//  Created by A-Team Intern on 17.11.21.
 //
 
 import XCTest
@@ -11,7 +11,6 @@ class MoviefyUITests: XCTestCase {
 
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
-
         // In UI tests it is usually best to stop immediately when a failure occurs.
         continueAfterFailure = false
 
@@ -40,16 +39,6 @@ class MoviefyUITests: XCTestCase {
         XCTAssertEqual("Action", collectionViewsQuery.cells.element(boundBy: 0).children(matching: .any).matching(identifier: "genreLabel").firstMatch.label)
     }
     
-//    func test() {
-//        let app = XCUIApplication()
-//        app.launch()
-//        
-//        app.tables.children(matching: .button).matching(identifier: "See all").element(boundBy: 0).staticTexts["See all"].tap()
-//        app.collectionViews.children(matching: .cell).element(boundBy: 0).children(matching: .other).element.tap()
-//        
-//        XCTAssertEqual("Dilwale Dulhania Le Jayenge", app.staticTexts.matching(identifier: "movieTitle").firstMatch.label)
-//    }
-
     func testLaunchPerformance() throws {
         if #available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 7.0, *) {
             // This measures how long it takes to launch your application.

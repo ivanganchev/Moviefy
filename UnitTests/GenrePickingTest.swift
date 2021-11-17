@@ -1,14 +1,14 @@
 //
-//  GenrePickingTests.swift
-//  GenrePickingTests
+//  GenrePickingTest.swift
+//  UnitTests
 //
-//  Created by A-Team Intern on 19.10.21.
+//  Created by A-Team Intern on 17.11.21.
 //
 
 import XCTest
 @testable import Moviefy
 
-class TestGenrePicking: XCTestCase {
+class GenrePickingTest: XCTestCase {
     var selectedGenres = [String]()
     var allGenres = [String]()
     
@@ -82,3 +82,4 @@ class TestGenrePicking: XCTestCase {
     }
 
 }
+

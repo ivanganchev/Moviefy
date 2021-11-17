@@ -10,7 +10,7 @@ import UIKit
 class ImageLoadingHelper {
     let cache: NSCache<NSString, UIImage> = {
         let cache = NSCache<NSString, UIImage>()
-        cache.totalCostLimit = 200
+        cache.totalCostLimit = 400
         return cache
     }()
     

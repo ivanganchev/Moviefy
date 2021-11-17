@@ -1,8 +1,8 @@
 //
 //  FilterMoviesTest.swift
-//  FilterMoviesTest
+//  GenrePickingTests
 //
-//  Created by A-Team Intern on 20.10.21.
+//  Created by A-Team Intern on 17.11.21.
 //
 
 import XCTest
@@ -54,3 +54,4 @@ class FilterMoviesTest: XCTestCase {
     }
 
 }
+
